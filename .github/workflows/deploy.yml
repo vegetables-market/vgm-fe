@@ -1,0 +1,65 @@
+name: Deploy to Cloudflare Pages vgm-fe
+
+on:
+  push:
+    # すべてのブランチが対象
+  pull_request:
+    # PR作成用
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+      pull-requests: write
+
+    name: Build and Deploy
+    steps:
+      # 1. コードを取得
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. Node.js セットアップ
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # 3. 依存関係インストール
+      - name: Install Dependencies
+        run: npm ci
+
+      # 4. ビルド (環境変数をGitHub Secretsから注入)
+      - name: Build
+        run: npm run build
+        env:
+          # フロントエンドで使う環境変数はここに列挙します
+          # 例: VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          NODE_ENV: production
+
+      # 5. Cloudflare Pagesへデプロイ
+      - name: Publish to Cloudflare Pages
+        id: cf-deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy out --project-name=vgm-fe
+
+      # 6. PRにURLをコメント通知
+      - name: Comment Deployment URL on PR
+        uses: actions/github-script@v7
+        if: github.event_name == 'pull_request'
+        with:
+          script: |
+            const url = '${{ steps.cf-deploy.outputs.deployment-url }}';
+            const body = `### 🚀 Deploy Success!\n\nPreview URL: **[${url}](${url})**\n\nLogs are available in the "Actions" tab.`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            })
