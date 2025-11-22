@@ -47,6 +47,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy out --project-name=vgm-fe
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       # 6. PRにURLをコメント通知
       - name: Comment Deployment URL on PR
