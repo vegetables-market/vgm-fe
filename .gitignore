@@ -9,6 +9,7 @@ node_modules/
 # Next.js
 /.next/
 /out/
+next-env.d.ts
 
 # Production
 /build
@@ -31,6 +32,7 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
+.claude/
 *.swp
 *.swo
 *~
