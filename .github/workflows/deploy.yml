@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages vgm-fe
+name: Deploy to Cloudflare Pages vgm-app
 
 on:
   push:
@@ -35,9 +35,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # フロントエンドで使う環境変数はここに列挙します
-          # 例: VITE_API_URL: ${{ secrets.VITE_API_URL }}
           NODE_ENV: production
+          # ブランチごとにバックエンド URL を切り替え
+          NEXT_PUBLIC_API_URL: ${{ github.ref == 'refs/heads/main' && secrets.API_URL_PRODUCTION || secrets.API_URL_DEVELOPMENT }}
 
       # 5. Cloudflare Pagesへデプロイ
       - name: Publish to Cloudflare Pages
@@ -46,7 +46,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=vgm-fe
+          command: pages deploy out --project-name=vgm-app
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       # 6. PRにURLをコメント通知
