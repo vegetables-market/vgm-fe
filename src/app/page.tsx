@@ -1,8 +1,61 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+
+interface TestItem {
+  id: number;
+  name: string;
+}
+
 export default function Home() {
+  const [items, setItems] = useState<TestItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8080/api/test');
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+        const data = await response.json();
+        setItems(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, []);
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm">
+      <div className="z-10 w-full max-w-5xl">
         <h1 className="text-4xl font-bold">Welcome to VGM Frontend</h1>
+
+        {loading && <p className="mt-4 text-gray-500">Loading...</p>}
+        {error && <p className="mt-4 text-red-500">Error: {error}</p>}
+
+        {!loading && !error && (
+          <div className="mt-8">
+            <h2 className="mb-4 text-2xl font-semibold">Items from Backend</h2>
+            {items.length > 0 ? (
+              <ul className="space-y-2">
+                {items.map((item) => (
+                  <li key={item.id} className="border-l-4 border-blue-500 pl-4">
+                    <span className="font-semibold">ID {item.id}:</span> {item.name}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">No items found</p>
+            )}
+          </div>
+        )}
       </div>
     </main>
   );
