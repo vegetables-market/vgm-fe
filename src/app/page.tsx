@@ -1,11 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-
-interface TestItem {
-  id: number;
-  name: string;
-}
+import { fetchTestItems, type TestItem, ApiError } from '@/lib/api';
 
 export default function Home() {
   const [items, setItems] = useState<TestItem[]>([]);
@@ -13,23 +9,23 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchItems = async () => {
+    const loadItems = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8080/api/test');
-        if (!response.ok) {
-          throw new Error(`Failed to fetch: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await fetchTestItems();
         setItems(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        if (err instanceof ApiError) {
+          setError(`API Error: ${err.status}`);
+        } else {
+          setError(err instanceof Error ? err.message : 'Unknown error');
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchItems();
+    loadItems();
   }, []);
 
   return (
