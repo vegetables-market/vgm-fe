@@ -5,6 +5,7 @@ const getBackendUrl = () => {
 };
 
 const nextConfig: NextConfig = {
+    output: 'export',
     reactStrictMode: true,
     async rewrites() {
         return {
