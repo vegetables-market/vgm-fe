@@ -31,7 +31,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 w-full max-w-5xl">
-        <h1 className="text-4xl font-bold">Welcome to VGM Frontend</h1>
+        <h1 className="text-4xl font-bold">Welcome to VGM Frontend 今日のIA</h1>
 
         {loading && <p className="mt-4 text-gray-500">Loading...</p>}
         {error && <p className="mt-4 text-red-500">Error: {error}</p>}
