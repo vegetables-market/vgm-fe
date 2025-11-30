@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+// もしローカルフォントを使うならここで next/font/local の設定が必要だけど、一旦保留
+import SmoothScroll from "@/components/SmoothScroll"; // さっき作ったやつ
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,7 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        {/* クライアント側でLenisを起動 */}
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

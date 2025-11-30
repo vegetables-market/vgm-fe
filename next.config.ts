@@ -1,18 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // output: 'export', // ★ここをコメントアウト（または削除）する！
-  reactStrictMode: true,
-
-  // プロキシ設定を追加
-  async rewrites() {
-    return [
+  /* ここから追加 */
+  images: {
+    remotePatterns: [
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:8080/api/:path*', // バックエンドのURL
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
       },
-    ];
+    ],
   },
+  /* ここまで追加 */
 };
 
 export default nextConfig;
