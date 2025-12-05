@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-// もしローカルフォントを使うならここで next/font/local の設定が必要だけど、一旦保留
-import SmoothScroll from "@/components/SmoothScroll"; // さっき作ったやつ
+import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
+// ★追加: CartProviderをインポート
+import { CartProvider } from "@/context/CartContext";
 
 export const metadata: Metadata = {
-  title: "VGM Frontend",
-  description: "Video Game Music Frontend",
+  title: "Harvest Market",
+  description: "Fresh vegetables and foods market",
 };
 
 export default function RootLayout({
@@ -16,9 +17,15 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        {/* クライアント側でLenisを起動 */}
-        <SmoothScroll />
-        {children}
+        {/* ★重要: 
+          CartProviderで中身を全部囲むことで、アプリ内のどこからでも
+          「カートの状態」にアクセスできるようになるよ。
+        */}
+        <CartProvider>
+          {/* SmoothScroll (Lenis) もここで読み込む */}
+          <SmoothScroll />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );
