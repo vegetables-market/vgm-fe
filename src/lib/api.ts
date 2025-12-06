@@ -12,6 +12,13 @@ export const getApiUrl = (): string => {
 };
 
 /**
+ * メディアサーバー (vgm-media) の URL を取得
+ */
+export const getMediaUrl = (): string => {
+  return process.env.NEXT_PUBLIC_MEDIA_URL || 'http://localhost:8787';
+};
+
+/**
  * API エンドポイント定数
  */
 export const API_ENDPOINTS = {
@@ -67,4 +74,57 @@ export async function fetchApi<T>(endpoint: string): Promise<T> {
  */
 export async function fetchTestItems(): Promise<TestItem[]> {
   return fetchApi<TestItem[]>(API_ENDPOINTS.TEST);
+}
+
+/**
+ * UUID でファイル名を生成
+ */
+function generateFileName(originalFile: File): string {
+  const ext = originalFile.name.split('.').pop() || 'jpg';
+  const uuid = crypto.randomUUID();
+  return `${uuid}.${ext}`;
+}
+
+/**
+ * 画像を vgm-media (R2) にアップロード
+ * @param file - アップロードする画像ファイル
+ * @returns アップロード成功時のファイル名
+ */
+export async function uploadImage(file: File): Promise<string> {
+  // ファイルサイズチェック (300KB制限)
+  const maxSize = 300 * 1024; // 300KB
+  if (file.size > maxSize) {
+    throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024}KB)`);
+  }
+
+  // 画像形式チェック
+  if (!file.type.startsWith('image/')) {
+    throw new Error('画像ファイルのみアップロード可能です');
+  }
+
+  const fileName = generateFileName(file);
+  const arrayBuffer = await file.arrayBuffer();
+  const mediaUrl = getMediaUrl();
+
+  try {
+    const response = await fetch(`${mediaUrl}/${fileName}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: arrayBuffer,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new ApiError(response.status, `アップロード失敗: ${errorText}`);
+    }
+
+    return fileName;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+    throw new Error(`画像のアップロードに失敗しました: ${error}`);
+  }
 }
