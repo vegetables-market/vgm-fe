@@ -7,15 +7,22 @@ import imageCompression from 'browser-image-compression';
 const MAX_SIZE_MB = 0.3; // 300KB
 
 /**
- * 圧縮オプション
+ * 画像フォーマット型
  */
-const compressionOptions = {
-  maxSizeMB: MAX_SIZE_MB,
-  maxWidthOrHeight: 1920,
-  useWebWorker: true,
-  fileType: 'image/jpeg',
-  initialQuality: 0.8,
-} as const;
+export type ImageFormat = 'jpeg' | 'png' | 'webp';
+
+/**
+ * 圧縮オプションを生成
+ */
+function getCompressionOptions(format: ImageFormat = 'jpeg') {
+  return {
+    maxSizeMB: MAX_SIZE_MB,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    fileType: `image/${format}`,
+    initialQuality: 0.8,
+  };
+}
 
 /**
  * 圧縮結果の型定義
@@ -30,14 +37,19 @@ export interface CompressionResult {
 /**
  * 画像を圧縮する
  * @param file - 圧縮する画像ファイル
+ * @param format - 出力フォーマット（デフォルト: jpeg）
  * @returns 圧縮結果
  */
-export async function compressImage(file: File): Promise<CompressionResult> {
+export async function compressImage(
+  file: File,
+  format: ImageFormat = 'jpeg',
+): Promise<CompressionResult> {
   const originalSize = file.size;
 
   try {
     // 圧縮実行
-    const compressedFile = await imageCompression(file, compressionOptions);
+    const options = getCompressionOptions(format);
+    const compressedFile = await imageCompression(file, options);
     const compressedSize = compressedFile.size;
 
     // 圧縮率を計算（小数点第1位まで）

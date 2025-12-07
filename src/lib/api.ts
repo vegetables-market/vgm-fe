@@ -2,6 +2,9 @@
  * API 設定と関数の一元管理
  */
 
+/**
+ * 画像フォーマット型
+ */
 export type ImageFormat = 'jpg' | 'png' | 'webp';
 
 /**
@@ -86,6 +89,13 @@ function generateFileName(): string {
 }
 
 /**
+ * ImageFormatをMIMEタイプ用に変換
+ */
+function formatToMimeFormat(format: ImageFormat): 'jpeg' | 'png' | 'webp' {
+  return format === 'jpg' ? 'jpeg' : format;
+}
+
+/**
  * 画像を vgm-media (R2) にアップロード
  * @param file - アップロードする画像ファイル
  * @param format - 画像フォーマット (デフォルト: 'jpg')
@@ -109,7 +119,8 @@ export async function uploadImage(
   const fileName = generateFileName();
   const arrayBuffer = await file.arrayBuffer();
   const mediaUrl = getMediaUrl();
-  const contentType = `image/${format}`;
+  const mimeFormat = formatToMimeFormat(format);
+  const contentType = `image/${mimeFormat}`;
 
   try {
     const response = await fetch(`${mediaUrl}/${fileName}`, {

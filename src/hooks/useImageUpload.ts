@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import { uploadImage } from '@/lib/api';
+import { uploadImage, type ImageFormat } from '@/lib/api';
 import { compressImage } from '@/lib/utils/imageCompression';
 
 export function useImageUpload() {
@@ -33,8 +33,10 @@ export function useImageUpload() {
     setUploadedFileName(null);
 
     try {
-      // 画像を圧縮
-      const result = await compressImage(selectedFile);
+      // 画像を圧縮（デフォルトはjpeg）
+      const format: ImageFormat = 'jpg'; // 必要に応じて変更可能
+      const mimeFormat = format === 'jpg' ? 'jpeg' : format;
+      const result = await compressImage(selectedFile, mimeFormat);
 
       setFile(result.compressedFile);
       setPreview(URL.createObjectURL(result.compressedFile));
