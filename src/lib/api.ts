@@ -2,6 +2,8 @@
  * API 設定と関数の一元管理
  */
 
+export type ImageFormat = 'jpg' | 'png' | 'webp';
+
 /**
  * バックエンド API の URL を取得
  * GitHub Actions が環境変数を設定するため、
@@ -79,18 +81,20 @@ export async function fetchTestItems(): Promise<TestItem[]> {
 /**
  * UUID でファイル名を生成
  */
-function generateFileName(originalFile: File): string {
-  const ext = originalFile.name.split('.').pop() || 'jpg';
-  const uuid = crypto.randomUUID();
-  return `${uuid}.${ext}`;
+function generateFileName(): string {
+  return crypto.randomUUID();
 }
 
 /**
  * 画像を vgm-media (R2) にアップロード
  * @param file - アップロードする画像ファイル
+ * @param format - 画像フォーマット (デフォルト: 'jpg')
  * @returns アップロード成功時のファイル名
  */
-export async function uploadImage(file: File): Promise<string> {
+export async function uploadImage(
+  file: File,
+  format: ImageFormat = 'jpg',
+): Promise<string> {
   // ファイルサイズチェック (300KB制限)
   const maxSize = 300 * 1024; // 300KB
   if (file.size > maxSize) {
@@ -102,15 +106,16 @@ export async function uploadImage(file: File): Promise<string> {
     throw new Error('画像ファイルのみアップロード可能です');
   }
 
-  const fileName = generateFileName(file);
+  const fileName = generateFileName();
   const arrayBuffer = await file.arrayBuffer();
   const mediaUrl = getMediaUrl();
+  const contentType = `image/${format}`;
 
   try {
     const response = await fetch(`${mediaUrl}/${fileName}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': file.type,
+        'Content-Type': contentType,
       },
       body: arrayBuffer,
     });

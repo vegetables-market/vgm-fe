@@ -30,22 +30,9 @@ export default function UploadResult({ fileName, onReset }: Props) {
         <p className="mb-2 text-sm font-semibold">R2から取得した画像:</p>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={`${mediaUrl}/${fileName}`}
+          src={`${mediaUrl}/${fileName}?format=jpg`}
           alt="Uploaded Result"
-          className="w-32 h-32 object-cover border rounded bg-white"
-        />
-      </div>
-
-      {/* リサイズ確認 */}
-      <div>
-        <p className="mb-2 text-sm font-semibold">
-          リサイズ確認 (width=100):
-        </p>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`${mediaUrl}/${fileName}?width=100`}
-          alt="Resized Result"
-          className="border rounded bg-white"
+          className="max-w-full border rounded bg-white"
         />
       </div>
 
