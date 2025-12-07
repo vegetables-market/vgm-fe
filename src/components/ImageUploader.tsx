@@ -139,10 +139,10 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
           {/* アップロードボタン */}
           <button
             onClick={handleUpload}
-            disabled={!file || uploading || compressing}
+            disabled={!file || uploading || compressing || !!error}
             className={`px-6 py-2 rounded-full font-bold text-white transition-colors
               ${
-                !file || uploading || compressing
+                !file || uploading || compressing || !!error
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-green-600 hover:bg-green-700'
               }`}

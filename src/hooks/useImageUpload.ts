@@ -2,11 +2,12 @@
  * 画像アップロード用カスタムフック
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { uploadImage, type ImageFormat } from '@/lib/api';
 import { compressImage } from '@/lib/utils/imageCompression';
 
 export function useImageUpload() {
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -23,34 +24,53 @@ export function useImageUpload() {
   const [format, setFormat] = useState<ImageFormat>('jpg');
 
   /**
-   * ファイル選択処理（圧縮を含む）
+   * 画像処理（圧縮）を実行
    */
-  const handleFileSelect = async (selectedFile: File | null) => {
-    if (!selectedFile) {
-      reset();
-      return;
-    }
-
+  const processFile = useCallback(async (targetFile: File, targetFormat: ImageFormat) => {
     setCompressing(true);
     setError(null);
     setUploadedFileName(null);
 
     try {
       // 画像を圧縮（選択されたフォーマットで）
-      const mimeFormat = format === 'jpg' ? 'jpeg' : format;
-      const result = await compressImage(selectedFile, mimeFormat);
+      const mimeFormat = targetFormat === 'jpg' ? 'jpeg' : targetFormat;
+      const result = await compressImage(targetFile, mimeFormat);
+
+      // 300KB制限チェック
+      if (result.compressedSize > 300 * 1024) {
+        setError('300KB以下に圧縮できませんでした。別のフォーマットを試すか、より小さな画像を使用してください。');
+      }
 
       setFile(result.compressedFile);
       setPreview(URL.createObjectURL(result.compressedFile));
       setOriginalSize(result.originalSize);
       setCompressedSize(result.compressedSize);
       setCompressionRatio(result.compressionRatio);
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : '画像の圧縮に失敗しました');
     } finally {
       setCompressing(false);
     }
+  }, []);
+
+  /**
+   * ファイルまたはフォーマットが変更されたら再圧縮
+   */
+  useEffect(() => {
+    if (originalFile) {
+      processFile(originalFile, format);
+    }
+  }, [originalFile, format, processFile]);
+
+  /**
+   * ファイル選択処理
+   */
+  const handleFileSelect = (selectedFile: File | null) => {
+    if (!selectedFile) {
+      reset();
+      return;
+    }
+    setOriginalFile(selectedFile);
   };
 
   /**
@@ -59,6 +79,11 @@ export function useImageUpload() {
   const upload = async (): Promise<boolean> => {
     if (!file) {
       setError('ファイルが選択されていません');
+      return false;
+    }
+
+    if (file.size > 300 * 1024) {
+      setError('ファイルサイズが300KBを超えています');
       return false;
     }
 
@@ -81,6 +106,7 @@ export function useImageUpload() {
    * 状態をリセット
    */
   const reset = () => {
+    setOriginalFile(null);
     setFile(null);
     setPreview(null);
     setUploadedFileName(null);

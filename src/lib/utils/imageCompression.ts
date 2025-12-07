@@ -48,8 +48,25 @@ export async function compressImage(
 
   try {
     // 圧縮実行
-    const options = getCompressionOptions(format);
-    const compressedFile = await imageCompression(file, options);
+    let options = getCompressionOptions(format);
+    let compressedFile = await imageCompression(file, options);
+    
+    // 300KBを超える場合、サイズに収まるまで解像度を落として再試行 (最大5回)
+    let iteration = 0;
+    const MAX_ITERATIONS = 5;
+    
+    while (compressedFile.size > MAX_SIZE_MB * 1024 * 1024 && iteration < MAX_ITERATIONS) {
+      // 解像度を徐々に下げる (0.8倍ずつ)
+      options.maxWidthOrHeight = Math.floor(options.maxWidthOrHeight * 0.8);
+      // 画質設定も少し下げる（browser-image-compressionの自動調整を補助）
+      options.initialQuality = Math.max(0.5, options.initialQuality * 0.9);
+      
+      console.log(`Retry compression: ${iteration + 1}, MaxWidth: ${options.maxWidthOrHeight}, Quality: ${options.initialQuality}`);
+      
+      compressedFile = await imageCompression(file, options);
+      iteration++;
+    }
+
     const compressedSize = compressedFile.size;
 
     // 圧縮率を計算（小数点第1位まで）
