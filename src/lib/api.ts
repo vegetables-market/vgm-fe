@@ -136,7 +136,9 @@ export async function uploadImage(
       throw new ApiError(response.status, `アップロード失敗: ${errorText}`);
     }
 
-    return fileName;
+    // レスポンスからIDを取得（バックエンドが返すIDを使用）
+    const result = await response.json();
+    return result.id || fileName;
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
