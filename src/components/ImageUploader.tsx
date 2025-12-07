@@ -24,6 +24,8 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
     originalSize,
     compressedSize,
     compressionRatio,
+    format,
+    setFormat,
     handleFileSelect,
     upload,
     reset,
@@ -71,6 +73,46 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
               </div>
             </div>
           )}
+
+          {/* フォーマット選択 */}
+          <div className="mb-4">
+            <label className="block text-sm font-semibold mb-2">保存形式:</label>
+            <div className="flex justify-center gap-4">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  value="jpg"
+                  checked={format === 'jpg'}
+                  onChange={(e) => setFormat(e.target.value as 'jpg')}
+                  disabled={uploading || compressing}
+                  className="mr-2"
+                />
+                <span>JPEG</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  value="png"
+                  checked={format === 'png'}
+                  onChange={(e) => setFormat(e.target.value as 'png')}
+                  disabled={uploading || compressing}
+                  className="mr-2"
+                />
+                <span>PNG</span>
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  value="webp"
+                  checked={format === 'webp'}
+                  onChange={(e) => setFormat(e.target.value as 'webp')}
+                  disabled={uploading || compressing}
+                  className="mr-2"
+                />
+                <span>WebP</span>
+              </label>
+            </div>
+          </div>
 
           {/* ファイル選択 */}
           <input

@@ -18,6 +18,9 @@ export function useImageUpload() {
   const [originalSize, setOriginalSize] = useState<number | null>(null);
   const [compressedSize, setCompressedSize] = useState<number | null>(null);
   const [compressionRatio, setCompressionRatio] = useState<number | null>(null);
+  
+  // フォーマット選択
+  const [format, setFormat] = useState<ImageFormat>('jpg');
 
   /**
    * ファイル選択処理（圧縮を含む）
@@ -33,8 +36,7 @@ export function useImageUpload() {
     setUploadedFileName(null);
 
     try {
-      // 画像を圧縮（デフォルトはjpeg）
-      const format: ImageFormat = 'jpg'; // 必要に応じて変更可能
+      // 画像を圧縮（選択されたフォーマットで）
       const mimeFormat = format === 'jpg' ? 'jpeg' : format;
       const result = await compressImage(selectedFile, mimeFormat);
 
@@ -64,7 +66,7 @@ export function useImageUpload() {
     setError(null);
 
     try {
-      const fileName = await uploadImage(file);
+      const fileName = await uploadImage(file, format);
       setUploadedFileName(fileName);
       return true;
     } catch (err) {
@@ -100,6 +102,8 @@ export function useImageUpload() {
     originalSize,
     compressedSize,
     compressionRatio,
+    format,
+    setFormat,
     handleFileSelect,
     upload,
     reset,
