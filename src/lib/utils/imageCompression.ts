@@ -46,6 +46,17 @@ export async function compressImage(
 ): Promise<CompressionResult> {
   const originalSize = file.size;
 
+  // 目標サイズ以下で、かつフォーマットが一致する場合はそのまま返す
+  const targetMimeType = `image/${format}`;
+  if (originalSize <= MAX_SIZE_MB * 1024 * 1024 && file.type === targetMimeType) {
+    return {
+      compressedFile: file,
+      originalSize,
+      compressedSize: originalSize,
+      compressionRatio: 0,
+    };
+  }
+
   try {
     // 圧縮実行
     let options = getCompressionOptions(format);
