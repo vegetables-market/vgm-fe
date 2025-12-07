@@ -7,6 +7,7 @@
 import ImagePreview from './ImagePreview';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import UploadResult from './UploadResult';
+import { formatFileSize } from '@/lib/utils/imageCompression';
 
 type Props = {
   onUploadCompleteAction?: (filename: string) => void;
@@ -19,6 +20,10 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
     uploading,
     uploadedFileName,
     error,
+    compressing,
+    originalSize,
+    compressedSize,
+    compressionRatio,
     handleFileSelect,
     upload,
     reset,
@@ -48,12 +53,31 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
           {/* プレビュー */}
           <ImagePreview preview={preview} />
 
+          {/* 圧縮中の表示 */}
+          {compressing && (
+            <div className="mb-4 rounded-lg bg-blue-100 p-4 text-blue-700">
+              🔄 画像を圧縮中...
+            </div>
+          )}
+
+          {/* 圧縮結果の表示 */}
+          {!compressing && originalSize && compressedSize && compressionRatio !== null && (
+            <div className="mb-4 rounded-lg bg-green-100 p-4 text-green-700">
+              <div className="font-semibold mb-2">✅ 圧縮完了</div>
+              <div className="text-sm space-y-1">
+                <div>元のサイズ: {formatFileSize(originalSize)}</div>
+                <div>圧縮後: {formatFileSize(compressedSize)}</div>
+                <div>圧縮率: {compressionRatio}%</div>
+              </div>
+            </div>
+          )}
+
           {/* ファイル選択 */}
           <input
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            disabled={uploading}
+            disabled={uploading || compressing}
             className="block w-full text-sm text-gray-500
               file:mr-4 file:py-2 file:px-4
               file:rounded-full file:border-0
@@ -73,10 +97,10 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
           {/* アップロードボタン */}
           <button
             onClick={handleUpload}
-            disabled={!file || uploading}
+            disabled={!file || uploading || compressing}
             className={`px-6 py-2 rounded-full font-bold text-white transition-colors
               ${
-                !file || uploading
+                !file || uploading || compressing
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-green-600 hover:bg-green-700'
               }`}
