@@ -4,7 +4,6 @@
 
 import { useState } from 'react';
 import { uploadImage } from '@/lib/api';
-import { validateImageFile } from '@/lib/validators/image';
 import { compressImage } from '@/lib/utils/imageCompression';
 
 export function useImageUpload() {
@@ -29,13 +28,6 @@ export function useImageUpload() {
       return;
     }
 
-    // 画像タイプのバリデーション（サイズは圧縮後にチェック）
-    const typeValidation = validateImageFile(selectedFile);
-    if (!typeValidation.valid) {
-      setError(typeValidation.error || '不正なファイルです');
-      return;
-    }
-
     setCompressing(true);
     setError(null);
     setUploadedFileName(null);
@@ -43,13 +35,6 @@ export function useImageUpload() {
     try {
       // 画像を圧縮
       const result = await compressImage(selectedFile);
-
-      // 圧縮後のファイルで再度バリデーション
-      const validation = validateImageFile(result.compressedFile);
-      if (!validation.valid) {
-        setError(validation.error || '圧縮後のファイルが不正です');
-        return;
-      }
 
       setFile(result.compressedFile);
       setPreview(URL.createObjectURL(result.compressedFile));
