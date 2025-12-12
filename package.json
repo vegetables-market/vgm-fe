@@ -11,6 +11,8 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^5.4.1",
+    "@stripe/stripe-js": "^8.5.3",
     "@studio-freight/lenis": "^1.0.42",
     "framer-motion": "^12.23.24",
     "gsap": "^3.13.0",
