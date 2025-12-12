@@ -134,6 +134,21 @@ export default function ProfilePage() {
                 </Link>
               </div>
 
+              <div className="border-b pb-4">
+                <h2 className="text-sm font-semibold text-gray-600 mb-2">
+                  決済機能
+                </h2>
+                <Link
+                  href="/payment-test"
+                  className="inline-block bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                >
+                  決済機能テストページ
+                </Link>
+                <p className="text-xs text-gray-500 mt-2">
+                  商品の出品・購入・決済のテストができます
+                </p>
+              </div>
+
               <div className="pt-4">
                 <button
                   onClick={handleLogout}
