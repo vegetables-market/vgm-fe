@@ -1,26 +1,46 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@theme {
+  /* ここでフォント定義 */
+  --font-primary: "PP Neue Montreal", sans-serif;
+
+  /* 色もここで定義する（Tailwindのクラスとして使えるようになる） */
+  /* もし #f9f8f4 を背景色のデフォルトにしたいならこう */
+  --color-background: #f9f8f4;
+  --color-foreground: #171717; /* 仮の黒 */
 }
 
-html {
-  color-scheme: light dark;
-}
-
+/* bodyなどのリセット */
 body {
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-primary);
+  /* 定義した色変数を割り当てる */
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  overflow-x: hidden;
 }
 
-@media (prefers-color-scheme: light) {
-  body {
-    color: #213547;
-    background-color: #ffffff;
-  }
-}
+/* GSAPアニメーションに必要な基本設定 */
+:root { --font-primary: "PP Neue Montreal", sans-serif; }
+
+/* アニメーションエリアの必須スタイル */
+.fixed-section { height: 1100vh; position: relative; }
+.fixed-container { position: sticky; top: 0; left: 0; width: 100%; height: 100vh; overflow: hidden; }
+.background-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background-color: #000; }
+.background-image { position: absolute; top: -10%; left: 0; width: 100%; height: 120%; object-fit: cover; object-position: center center; opacity: 0; filter: brightness(0.7); will-change: transform; }
+.background-image.active { opacity: 1; z-index: 1; }
+
+.grid-container { position: relative; z-index: 10; height: 100%; display: grid; grid-template-columns: repeat(12, 1fr); padding: 0 2rem; }
+
+/* コンテンツ配置 */
+.header { grid-column: 1 / 13; padding-top: 5vh; text-align: center; color: white; mix-blend-mode: overlay; }
+.main-content-row { grid-column: 1 / 13; display: flex; justify-content: space-between; align-items: center; position: absolute; top: 50%; width: 100%; left: 0; transform: translateY(-50%); padding: 0 2rem; }
+
+/* メニューアニメーション */
+.artist { opacity: 0.6; transition: all 0.3s; cursor: pointer; }
+.artist:hover { opacity: 1; transform: translateX(10px); color: #86efac; }
+
+.featured-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center; opacity: 0; visibility: hidden; }
+.featured-content.active { opacity: 1; visibility: visible; }
+
+/* ガラス風モーダル背景 */
+.glass-effect { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
