@@ -38,6 +38,7 @@ jobs:
           NODE_ENV: production
           # ブランチごとにバックエンド URL を切り替え
           NEXT_PUBLIC_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.API_URL_PROD || vars.API_URL_DEV }}
+          NEXT_PUBLIC_MEDIA_URL: ${{ github.ref == 'refs/heads/main' && vars.MEDIA_URL_PROD || vars.MEDIA_URL_DEV }}
 
       # 5. Cloudflare Pagesへデプロイ
       - name: Publish to Cloudflare Pages
