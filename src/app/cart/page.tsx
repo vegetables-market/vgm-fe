@@ -1,14 +1,11 @@
 "use client";
 
 import Link from 'next/link';
-import Image from 'next/image';
-// ★修正: updateQuantity をインポート
 import { useCart } from '@/context/CartContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export default function CartPage() {
-  // ★修正: updateQuantity を受け取る
   const { cartItems, removeFromCart, updateQuantity, totalPrice } = useCart();
 
   return (
@@ -41,6 +38,7 @@ export default function CartPage() {
               {cartItems.map((item) => (
                 <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm border border-stone-100 flex flex-col sm:flex-row gap-4 items-center">
                   <div className="relative w-24 h-24 shrink-0 bg-stone-100 rounded-lg overflow-hidden">
+                    {/* ここは img タグを使っているので next/image のインポートは不要 */}
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 w-full">
@@ -53,7 +51,7 @@ export default function CartPage() {
                     <p className="text-xs text-stone-500 mb-3">{item.producer}</p>
                     
                     <div className="flex justify-between items-end">
-                      {/* ★修正: カート内での個数変更セレクター */}
+                      {/* カート内での個数変更セレクター */}
                       <div className="flex items-center gap-3">
                         <div className="flex items-center border border-stone-200 rounded-full px-2 py-1 bg-stone-50">
                           <button 
