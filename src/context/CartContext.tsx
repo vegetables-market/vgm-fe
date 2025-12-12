@@ -16,7 +16,7 @@ type CartContextType = {
   cartItems: CartItem[];
   addToCart: (item: Omit<CartItem, 'quantity'>) => void;
   removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void; // ★追加
+  updateQuantity: (id: number, quantity: number) => void;
   clearCart: () => void;
   totalPrice: number;
   totalItems: number;
@@ -53,10 +53,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       // 新しい商品は追加
       return [...prev, { ...product, quantity: 1 }];
     });
-    // ★削除: ここにあった alert() を消しました！
   };
 
-  // ★追加: 個数を直接変更する機能
   const updateQuantity = (id: number, quantity: number) => {
     setCartItems((prev) => 
       prev.map((item) => {

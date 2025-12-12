@@ -11,7 +11,7 @@ export default function CheckoutPage() {
   const { cartItems, totalPrice, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // ★追加: フォームの入力値を管理するState
+  // フォームの入力値を管理するState
   const [address, setAddress] = useState({
     lastName: '',
     firstName: '',
@@ -22,7 +22,7 @@ export default function CheckoutPage() {
     building: ''
   });
 
-  // ★追加: 住所自動入力のエラーメッセージ
+  // 住所自動入力のエラーメッセージ
   const [zipError, setZipError] = useState('');
 
   // カートが空なら表示
@@ -37,7 +37,7 @@ export default function CheckoutPage() {
     );
   }
 
-  // ★追加: 郵便番号が変更された時の処理
+  // 郵便番号が変更された時の処理
   const handleZipChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value.replace(/-/g, ''); // ハイフンを除去
     setAddress({ ...address, postalCode: val });
