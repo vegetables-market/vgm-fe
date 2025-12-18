@@ -1,12 +1,26 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next"; // ★Viewportを追加
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
-// ★追加: CartProviderをインポート
 import { CartProvider } from "@/context/CartContext";
+
+//Viewport設定
+export const viewport: Viewport = {
+  themeColor: "#166534",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1, // アプリっぽくするために拡大縮小を無効化
+  userScalable: false, 
+};
 
 export const metadata: Metadata = {
   title: "Harvest Market",
   description: "Fresh vegetables and foods market",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Harvest",
+  },
 };
 
 export default function RootLayout({
@@ -17,12 +31,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        {/* ★重要: 
-          CartProviderで中身を全部囲むことで、アプリ内のどこからでも
-          「カートの状態」にアクセスできるようになるよ。
-        */}
         <CartProvider>
-          {/* SmoothScroll (Lenis) もここで読み込む */}
           <SmoothScroll />
           {children}
         </CartProvider>
