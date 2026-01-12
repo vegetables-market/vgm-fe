@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
-    "build": "next build && serwist build",
+    "build": "serwist build && next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
