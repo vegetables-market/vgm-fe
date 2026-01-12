@@ -1,28 +1,10 @@
 import type { NextConfig } from "next";
-import withPWAInit from "@ducanh2912/next-pwa";
+import withSerwistInit from "@serwist/next";
 
-const withPWA = withPWAInit({
-  dest: "public",
-  disable: false, 
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  workboxOptions: {
-    // インストール時に全ファイルを強制的に保存する
-    skipWaiting: true,
-    clientsClaim: true,
-    // 外部サイトの画像もオフラインで見れるように保存
-    runtimeCaching: [
-      {
-        urlPattern: /^https:\/\/images\.unsplash\.com\/.*/,
-        handler: 'CacheFirst',
-        options: {
-          cacheName: 'unsplash-images',
-          expiration: { maxEntries: 50, maxAgeSeconds: 30 * 24 * 60 * 60 }
-        }
-      }
-    ]
-  },
+const withSerwist = withSerwistInit({
+  swSrc: "src/sw.ts",
+  swDest: "out/sw.js",
+  disable: process.env.NODE_ENV === "development",
 });
 
 const nextConfig: NextConfig = {
@@ -36,4 +18,4 @@ const nextConfig: NextConfig = {
   turbopack: {}, 
 };
 
-export default withPWA(nextConfig);
+export default withSerwist(nextConfig);

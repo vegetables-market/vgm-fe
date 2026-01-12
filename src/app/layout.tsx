@@ -15,7 +15,6 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Harvest Market",
   description: "Fresh vegetables and foods market",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
