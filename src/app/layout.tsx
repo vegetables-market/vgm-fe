@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"; // ★Viewportを追加
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
+import { SerwistProvider } from "./serwist";
 
 //Viewport設定
 export const viewport: Viewport = {
@@ -30,10 +31,12 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body>
-        <CartProvider>
-          <SmoothScroll />
-          {children}
-        </CartProvider>
+        <SerwistProvider swUrl="/sw.js">
+          <CartProvider>
+            <SmoothScroll />
+            {children}
+          </CartProvider>
+        </SerwistProvider>
       </body>
     </html>
   );

@@ -1,11 +1,4 @@
 import type { NextConfig } from "next";
-import withSerwistInit from "@serwist/next";
-
-const withSerwist = withSerwistInit({
-  swSrc: "src/sw.ts",
-  swDest: "out/sw.js",
-  disable: process.env.NODE_ENV === "development",
-});
 
 const nextConfig: NextConfig = {
   output: 'export',
@@ -18,4 +11,4 @@ const nextConfig: NextConfig = {
   turbopack: {}, 
 };
 
-export default withSerwist(nextConfig);
+export default nextConfig;
