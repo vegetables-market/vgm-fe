@@ -92,7 +92,7 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-gray-800">プロフィール</h1>
             <Link
-              href="/"
+              href="/vgm-fe/public"
               className="text-blue-500 hover:underline text-sm"
             >
               ホームへ戻る

@@ -108,7 +108,7 @@ export default function LoginPage() {
               ログイン
             </button>
 
-            <Link href="/" className="mt-8 text-xs text-gray-400 hover:text-green-600 underline">← トップページに戻る</Link>
+            <Link href="/vgm-fe/public" className="mt-8 text-xs text-gray-400 hover:text-green-600 underline">← トップページに戻る</Link>
           </form>
         </div>
 

@@ -12,7 +12,7 @@ import {
   Product,
   CreateProductRequest,
 } from '@/lib/api';
-import StripePaymentModal from './components/StripePaymentModal';
+import StripePaymentModal from '../../../../components/StripePaymentModal';
 
 export default function PaymentTestPage() {
   const router = useRouter();

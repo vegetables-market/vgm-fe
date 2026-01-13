@@ -26,7 +26,7 @@ export default function CartPage() {
             </div>
             <h2 className="text-xl font-bold mb-2">カートは空です</h2>
             <p className="text-stone-500 mb-8">新鮮な野菜や食材を探しに行きましょう！</p>
-            <Link href="/" className="inline-block bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 transition">
+            <Link href="/vgm-fe/public" className="inline-block bg-green-600 text-white font-bold py-3 px-8 rounded-full hover:bg-green-700 transition">
               買い物を続ける
             </Link>
           </div>

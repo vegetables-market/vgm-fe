@@ -27,7 +27,7 @@ function DetailContent() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-stone-600">
         <p className="text-xl mb-4">商品が見つかりませんでした。</p>
-        <Link href="/" className="text-green-600 hover:underline">トップページに戻る</Link>
+        <Link href="/vgm-fe/public" className="text-green-600 hover:underline">トップページに戻る</Link>
       </div>
     );
   }
@@ -137,7 +137,7 @@ export default function DetailPage() {
 
       <main className="flex-1 py-12 px-4 md:px-8">
         <nav className="max-w-5xl mx-auto mb-4 flex items-center text-stone-500 text-sm">
-          <Link href="/" className="hover:text-green-600 transition-colors flex items-center gap-1 font-bold">
+          <Link href="/vgm-fe/public" className="hover:text-green-600 transition-colors flex items-center gap-1 font-bold">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
               <path fillRule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
             </svg>
