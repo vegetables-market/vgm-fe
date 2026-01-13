@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from '@/components/parts/Footer';
 
 export default function CheckoutPage() {
   const router = useRouter();

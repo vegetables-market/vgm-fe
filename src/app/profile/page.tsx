@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 // ★修正: Headerをインポート
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from '@/components/parts/Footer';
 
 // ==========================================
 // 1. 編集用モーダルコンポーネント

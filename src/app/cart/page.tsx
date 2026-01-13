@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from '@/components/parts/Footer';
 
 export default function CartPage() {
   const { cartItems, removeFromCart, updateQuantity, totalPrice } = useCart();

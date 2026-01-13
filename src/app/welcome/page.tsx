@@ -9,7 +9,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CustomEase } from 'gsap/CustomEase';
 import Lenis from '@studio-freight/lenis';
 import { motion, AnimatePresence } from 'framer-motion';
-import Footer from '@/components/Footer';
+import Footer from '@/components/parts/Footer';
 import { useCart } from '@/context/CartContext';
 
 // GSAPプラグイン登録

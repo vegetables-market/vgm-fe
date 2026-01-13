@@ -10,7 +10,7 @@ export default function Footer() {
           
           {/* ブランド情報 */}
           <div className="col-span-1 md:col-span-1">
-            <Link href="/" className="font-serif text-3xl font-bold text-white tracking-tight block mb-4">
+            <Link href="/vgm-fe/public" className="font-serif text-3xl font-bold text-white tracking-tight block mb-4">
               Harvest
             </Link>
             <p className="text-sm leading-relaxed mb-6">

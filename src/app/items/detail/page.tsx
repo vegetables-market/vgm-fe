@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense, useState } from 'react';
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import Footer from '@/components/parts/Footer';
 import { useCart } from '@/context/CartContext';
 import { ITEMS_DATA } from '@/lib/data';
 
