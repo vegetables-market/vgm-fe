@@ -4,10 +4,10 @@ export default function Footer() {
   return (
     <footer className="bg-stone-900 text-stone-400 py-16 font-sans">
       <div className="max-w-7xl mx-auto px-6 md:px-12">
-        
+
         {/* 上部: グリッドレイアウト */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16 border-b border-stone-800 pb-12">
-          
+
           {/* ブランド情報 */}
           <div className="col-span-1 md:col-span-1">
             <Link href="/" className="font-serif text-3xl font-bold text-white tracking-tight block mb-4">
@@ -64,7 +64,7 @@ export default function Footer() {
 
         {/* 下部: コピーライト */}
         <div className="flex flex-col md:flex-row justify-between items-center text-xs text-stone-600">
-          <p>&copy; 2025 Harvest Market. All rights reserved.</p>
+          <p>&copy; 2025 Grand Market. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
             <span>Made with 🥬 in Japan</span>
           </div>
