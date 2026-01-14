@@ -28,7 +28,7 @@ export default function MainLayout({
   const showTabletNav = isPWA && deviceType === "tablet";
 
   return (
-    <section className="flex relative flex-col">
+    <section className={`flex relative ${isPWA ? "" : "flex-col"} `}>
       {showHeader && <Header />}
       {/*{showHeader && <HeaderSpacer />}*/}
       {showMobileNav && <MobileNavigation />}

@@ -1,26 +1,134 @@
-import React from "react";
-import Link from "next/link";
-import { FaHouse } from "react-icons/fa6";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+
+import { HiHome, HiOutlineHome } from "react-icons/hi";
+import { FaMagnifyingGlass, FaRegHeart, FaHeart } from "react-icons/fa6";
+import { IoCart, IoGridOutline, IoCartOutline, IoGrid } from "react-icons/io5";
 
 const TabletLeftNavigation = () => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [animatingItem, setAnimatingItem] = useState<string | null>(null);
+
+  const navItems = [
+    {
+      href: "/",
+      iconOff: HiOutlineHome,
+      iconOn: HiHome,
+      label: "ホーム",
+    },
+    {
+      href: "/search",
+      iconOff: FaMagnifyingGlass,
+      iconOn: FaMagnifyingGlass,
+      label: "探す",
+      isSearchButton: true,
+    },
+    {
+      href: "/basket",
+      iconOff: IoCartOutline,
+      iconOn: IoCart,
+      label: "カゴ",
+    },
+    {
+      href: "/favorites",
+      iconOff: FaRegHeart,
+      iconOn: FaHeart,
+      label: "お気に入り",
+    },
+    {
+      href: "/menu",
+      iconOff: IoGridOutline,
+      iconOn: IoGrid,
+      label: "メニュー",
+    },
+  ];
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
+  const handleNavClick = (item: (typeof navItems)[0]) => {
+    const active = isActive(item.href);
+
+    // アニメーションをトリガー
+    setAnimatingItem(item.href);
+    setTimeout(() => {
+      setAnimatingItem(null);
+    }, 400);
+
+    // 検索ボタンの特殊処理
+    if (item.isSearchButton) {
+      if (active) {
+        // 2回目：検索ページにいる場合、inputにフォーカス
+        const searchInputRef = (window as any).searchInputRef;
+        if (searchInputRef?.current) {
+          const input = searchInputRef.current;
+          input.focus();
+          input.click();
+        }
+      } else {
+        // 1回目：検索ページにいないので、遷移する
+        router.push(item.href);
+      }
+    } else {
+      router.push(item.href);
+    }
+  };
+
   return (
-    <nav className="bg-white h-dvh overline-y-hidden w-1/4 border-r border-slate-100 p-6 sticky top-0">
-      <div className="flex flex-col flex-1 h-full">
-        <button className="bg-amber-300">
-          <Link href="/" className="flex">
-            <FaHouse />
-            <span>タブレットnavigation</span>
-          </Link>
-        </button>
-        <button className="bg-amber-300">
-          <Link href="/" className="flex">
-            <FaHouse />
-            <span>その他</span>
-          </Link>
-        </button>
-      </div>
-      <div className="w-full h-fit">
-        <button className="bg-blue-300">見つける</button>
+    <nav className="shrink-0 block bg-white h-dvh overflow-y-auto w-1/4  border-r border-slate-100 p-6 sticky top-0">
+      <style>{`
+        @keyframes bounce-icon {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+        }
+        .animate-bounce-icon {
+          animation: bounce-icon 0.4s ease-in-out;
+        }
+      `}</style>
+
+      <div className="flex flex-col h-full">
+        {/* ロゴエリア */}
+        <div className="mb-10 px-2 mt-2">
+          <h1 className="text-2xl font-bold text-green-800 tracking-tight">
+            GrandMarket
+          </h1>
+        </div>
+
+        {/* ナビゲーションリスト */}
+        <div className="flex flex-col gap-2">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            const Icon = active ? item.iconOn : item.iconOff;
+            const isAnimating = animatingItem === item.href;
+
+            return (
+              <button
+                key={item.href}
+                onClick={() => handleNavClick(item)}
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all w-full text-left group
+                  ${
+                    active
+                      ? "bg-green-50 text-emerald-600 font-bold shadow-sm"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                  }`}
+              >
+                <div
+                  className={`relative ${isAnimating ? "animate-bounce-icon" : ""}`}
+                >
+                  <Icon
+                    className={`text-2xl transition-transform group-hover:scale-105 ${active ? "" : "opacity-80"}`}
+                  />
+                </div>
+                <span className="text-base">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </nav>
   );
