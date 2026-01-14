@@ -9,7 +9,7 @@ import { useCart } from "@/context/CartContext";
 import { FaMagnifyingGlass, FaRegHeart } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
 
-const Header = () => {
+export default function WebHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,7 +29,7 @@ const Header = () => {
   };
 
   return (
-    <header className="fixed z-50 w-full h-16 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 flex items-center justify-between px-6">
       <div className="flex items-center ">
         <Link
           href="/"
@@ -147,6 +147,4 @@ const Header = () => {
       </div>
     </header>
   );
-};
-
-export default Header;
+}

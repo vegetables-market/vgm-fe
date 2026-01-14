@@ -8,7 +8,7 @@ import { HiHome, HiOutlineHome } from "react-icons/hi";
 import { FaMagnifyingGlass, FaRegHeart, FaHeart } from "react-icons/fa6";
 import { IoCart, IoGridOutline, IoCartOutline, IoGrid } from "react-icons/io5";
 
-const MobileNavigation = () => {
+export default function MobileNavigation() {
   const isPWA = useIsPWA();
   const router = useRouter();
   const pathname = usePathname();
@@ -124,6 +124,4 @@ const MobileNavigation = () => {
       </div>
     </nav>
   );
-};
-
-export default MobileNavigation;
+}

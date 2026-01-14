@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import Header from "@/components/parts/Header";
+import Header from "@/components/parts/WebHeader";
+// import HeaderSpacer from "@/components/parts/WebHeaderSpacer";
 // import MobileHeader from "@/components/parts/MobileHeader";
 import MobileNavigation from "@/components/parts/MobileNavigation";
 // import TabletHeader from "@/components/parts/TabletHeader";
@@ -27,8 +28,9 @@ export default function MainLayout({
   const showTabletNav = isPWA && deviceType === "tablet";
 
   return (
-    <section className="flex relative">
+    <section className="flex relative flex-col">
       {showHeader && <Header />}
+      {/*{showHeader && <HeaderSpacer />}*/}
       {showMobileNav && <MobileNavigation />}
       {showTabletNav && <TabletLeftNavigation />}
       <main className="w-full">{children}</main>
