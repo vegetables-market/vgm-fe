@@ -11,7 +11,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1, // アプリっぽくするために拡大縮小を無効化
-  userScalable: false, 
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -31,13 +31,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
+      <body className="bg-slate-50">
         <SerwistProvider swUrl="/sw.js">
           <CartProvider>
             <SmoothScroll />
-            <DeviceInfoWrapper>
-              {children}
-            </DeviceInfoWrapper>
+            <DeviceInfoWrapper>{children}</DeviceInfoWrapper>
           </CartProvider>
         </SerwistProvider>
       </body>
