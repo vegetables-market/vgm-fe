@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next"; // ★Viewportを追加
 import SmoothScroll from "@/components/SmoothScroll";
+import DeviceInfoWrapper from "@/components/DeviceInfoWrapper";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { SerwistProvider } from "./serwist";
@@ -34,7 +35,9 @@ export default function RootLayout({
         <SerwistProvider swUrl="/sw.js">
           <CartProvider>
             <SmoothScroll />
-            {children}
+            <DeviceInfoWrapper>
+              {children}
+            </DeviceInfoWrapper>
           </CartProvider>
         </SerwistProvider>
       </body>
