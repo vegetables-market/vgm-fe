@@ -1,6 +1,6 @@
 {
-  "name": "Harvest Market",
-  "short_name": "Harvest",
+  "name": "Grand Market",
+  "short_name": "Grand",
   "description": "旬を、手渡す。生産者とつながるマルシェアプリ",
   "start_url": "/",
   "display": "standalone",
