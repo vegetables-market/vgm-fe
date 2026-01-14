@@ -2,29 +2,36 @@
 
 import React from "react";
 import Header from "@/components/parts/Header";
+// import MobileHeader from "@/components/parts/MobileHeader";
 import MobileNavigation from "@/components/parts/MobileNavigation";
+// import TabletHeader from "@/components/parts/TabletHeader";
 import TabletLeftNavigation from "@/components/parts/TabletLeftNavigation";
-import { useDevice } from '@/hooks/useDevice';
+import { useDevice } from "@/hooks/useDevice";
 import { useIsPWA } from "@/hooks/useIsPWA";
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
-    const isPWA = useIsPWA();
-    const { deviceType } = useDevice();
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const isPWA = useIsPWA();
+  const { deviceType } = useDevice();
 
-    // PWAかつタブレットの場合のみMobileNavigationを表示
-    // const showMobileNav = (isPWA && deviceType === 'tablet');
-    // タブレットの場合のみTabletLeftNavigationを表示
-    const showTabletNav = (isPWA && deviceType === 'tablet');
+  // Headerを表示する条件: デスクトップ、またはブラウザモード（非PWA）
+  const showHeader = deviceType === "desktop" || !isPWA;
 
-    return (
-        <section className="relative w-full">
-            <Header />
+  // PWAかつモバイルの場合のみMobileNavigationを表示
+  const showMobileNav = deviceType === "mobile";
 
-            <MobileNavigation />
-            {/* PWAかつタブレットの場合のみ表示 */}
-            {showTabletNav && <TabletLeftNavigation />}
+  // PWAかつタブレットの場合のみTabletLeftNavigationを表示
+  const showTabletNav = isPWA && deviceType === "tablet";
 
-            <main>{children}</main>
-        </section>
-    );
+  return (
+    <section className="flex relative">
+      {showHeader && <Header />}
+      {showMobileNav && <MobileNavigation />}
+      {showTabletNav && <TabletLeftNavigation />}
+      <main className="w-full">{children}</main>
+    </section>
+  );
 }
