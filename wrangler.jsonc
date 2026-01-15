@@ -7,10 +7,6 @@
     "nodejs_compat"
   ],
   "pages_build_output_dir": ".open-next/assets",
-  "assets": {
-    "directory": ".open-next/assets",
-    "binding": "ASSETS"
-  },
   "kv_namespaces": [
     {
       "binding": "NEXT_CACHE_WORKERS_KV",
