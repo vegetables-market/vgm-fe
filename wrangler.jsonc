@@ -1,16 +1,16 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "vgm-app",
-  "main": ".open-next/worker.js",
-  "compatibility_date": "2026-01-16",
-  "compatibility_flags": [
-    "nodejs_compat"
-  ],
-  "pages_build_output_dir": ".open-next/assets",
-  "kv_namespaces": [
-    {
-      "binding": "NEXT_CACHE_WORKERS_KV",
-      "id": "e931752174384a62af8815197779b76c"
-    }
-  ]
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "vgm-app",
+	"main": ".open-next/worker.js",
+	"compatibility_date": "2026-01-16",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"pages_build_output_dir": ".open-next/assets",
+	"kv_namespaces": [
+		{
+			"binding": "NEXT_CACHE_WORKERS_KV",
+			"id": "f523a576d7654949a72eb16797ad80a3"
+		}
+	]
 }
