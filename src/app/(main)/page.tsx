@@ -2,12 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { useIsPWA } from "@/hooks/useIsPWA";
-import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 
 export default function MainPage() {
-  const isPWA = useIsPWA();
-  const { updatePWA } = usePWAUpdate();
 
   return (
     <div className="p-8">
