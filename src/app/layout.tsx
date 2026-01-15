@@ -11,16 +11,16 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1, // アプリっぽくするために拡大縮小を無効化
-  userScalable: false, 
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
-  title: "Harvest Market",
+  title: "Grand Market",
   description: "Fresh vegetables and foods market",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Harvest",
+    title: "Grand Market",
   },
 };
 
