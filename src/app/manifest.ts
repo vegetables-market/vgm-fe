@@ -4,9 +4,9 @@ export const dynamic = "force-static";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Harvest Market',
-    short_name: 'Harvest',
-    description: '旬を、手渡す。生産者とつながるマルシェアプリ',
+    name: 'Grand Market',
+    short_name: 'Grand Market',
+    description: '地域の美味しいものを発見。とれたて新鮮な野菜をあなたに',
     lang: 'ja',
     id: '/',
     start_url: '/',
@@ -20,7 +20,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: '/icons/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
-        purpose: 'any', // any と maskable を分けるケースも多いですが、現状でも動作はします
+        purpose: 'any',
       },
       {
         src: '/icons/icon-192x192.png',

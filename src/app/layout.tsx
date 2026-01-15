@@ -15,12 +15,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Harvest Market",
-  description: "Fresh vegetables and foods market",
+  title: "Grand Market",
+  description: "地域の美味しいものを発見。とれたて新鮮な野菜をあなたに",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Harvest",
+    title: "Grand Market",
   },
 };
 
