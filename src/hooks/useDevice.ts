@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 
 export type DeviceType = 'mobile' | 'tablet' | 'desktop';
 
-export const useDevice = () => {
-  const [deviceType, setDeviceType] = useState<DeviceType>('desktop');
+export const useDevice = (initialType?: DeviceType) => {
+  const [deviceType, setDeviceType] = useState<DeviceType>(initialType || 'desktop');
 
   useEffect(() => {
     const ua = navigator.userAgent.toLowerCase();
@@ -23,13 +23,18 @@ export const useDevice = () => {
       (/ipad|macintosh/.test(ua) && 'ontouchend' in document) || // 旧iPad判定の予備
       (ua.includes('android') && !ua.includes('mobile'));
 
+    let newType: DeviceType = 'desktop';
     if (isIpadOS || isTabletUA) {
-      setDeviceType('tablet');
+      newType = 'tablet';
     } else if (/iphone|ipod|android.*mobile/.test(ua)) {
-      setDeviceType('mobile');
-    } else {
-      setDeviceType('desktop');
+      newType = 'mobile';
     }
+
+    setDeviceType(newType);
+
+    // Cookieに保存 (有効期限: 1年)
+    document.cookie = `device_type=${newType}; path=/; max-age=31536000`;
+
   }, []);
 
   return {

@@ -4,6 +4,8 @@ import DeviceInfoWrapper from "@/components/DeviceInfoWrapper";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { SerwistProvider } from "./serwist";
+import { DeviceType } from "@/hooks/useDevice";
+import { cookies } from "next/headers";
 
 //Viewport設定
 export const viewport: Viewport = {
@@ -24,18 +26,42 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const cookieStore = await cookies();
+
+  // デバイスタイプの取得
+  const deviceTypeCookie = cookieStore.get("device_type");
+  let initialDeviceType: DeviceType | undefined = undefined;
+  if (deviceTypeCookie) {
+    const val = deviceTypeCookie.value;
+    if (val === "mobile" || val === "tablet" || val === "desktop") {
+      initialDeviceType = val;
+    }
+  }
+
+  // PWA状態の取得
+  const isPWACookie = cookieStore.get("is_pwa");
+  let initialIsPWA = false;
+  if (isPWACookie) {
+    initialIsPWA = isPWACookie.value === "true";
+  }
+
   return (
     <html lang="ja">
       <body className="bg-slate-50">
         <SerwistProvider swUrl="/sw.js">
           <CartProvider>
             <SmoothScroll />
-            <DeviceInfoWrapper>{children}</DeviceInfoWrapper>
+            <DeviceInfoWrapper
+              initialIsPWA={initialIsPWA}
+              initialDeviceType={initialDeviceType}
+            >
+              {children}
+            </DeviceInfoWrapper>
           </CartProvider>
         </SerwistProvider>
       </body>

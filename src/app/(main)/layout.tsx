@@ -1,39 +1,36 @@
-"use client";
+import React from 'react';
+import { cookies } from 'next/headers';
+import MainLayoutClient from './MainLayoutClient';
+import { DeviceType } from '@/hooks/useDevice';
 
-import React from "react";
-import Header from "@/components/parts/WebHeader";
-// import HeaderSpacer from "@/components/parts/WebHeaderSpacer";
-// import MobileHeader from "@/components/parts/MobileHeader";
-import MobileNavigation from "@/components/parts/MobileNavigation";
-// import TabletHeader from "@/components/parts/TabletHeader";
-import TabletLeftNavigation from "@/components/parts/TabletLeftNavigation";
-import { useDevice } from "@/hooks/useDevice";
-import { useIsPWA } from "@/hooks/useIsPWA";
-
-export default function MainLayout({
+export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const isPWA = useIsPWA();
-  const { deviceType } = useDevice();
+  const cookieStore = await cookies();
+  const deviceTypeCookie = cookieStore.get('device_type');
+  const isPWACookie = cookieStore.get('is_pwa');
 
-  // Headerを表示する条件: デスクトップ、またはブラウザモード（非PWA）
-  const showHeader = deviceType === "desktop" || !isPWA;
+  let initialDeviceType: DeviceType | undefined = undefined;
+  if (deviceTypeCookie) {
+    const val = deviceTypeCookie.value;
+    if (val === 'mobile' || val === 'tablet' || val === 'desktop') {
+      initialDeviceType = val;
+    }
+  }
 
-  // PWAかつモバイルの場合のみMobileNavigationを表示
-  const showMobileNav = deviceType === "mobile";
-
-  // PWAかつタブレットの場合のみTabletLeftNavigationを表示
-  const showTabletNav = isPWA && deviceType === "tablet";
+  let initialIsPWA = false;
+  if (isPWACookie) {
+    initialIsPWA = isPWACookie.value === 'true';
+  }
 
   return (
-    <section className={`flex relative ${isPWA ? "" : "flex-col"} `}>
-      {showHeader && <Header />}
-      {/*{showHeader && <HeaderSpacer />}*/}
-      {showMobileNav && <MobileNavigation />}
-      {showTabletNav && <TabletLeftNavigation />}
-      <main className="w-full">{children}</main>
-    </section>
+    <MainLayoutClient
+      initialDeviceType={initialDeviceType}
+      initialIsPWA={initialIsPWA}
+    >
+      {children}
+    </MainLayoutClient>
   );
 }

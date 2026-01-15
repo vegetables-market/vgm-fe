@@ -6,15 +6,21 @@ import { useDevice } from "@/hooks/useDevice";
 import { usePWAUpdate } from "@/hooks/usePWAUpdate";
 import { IoReload } from "react-icons/io5";
 
+import { DeviceType } from "@/hooks/useDevice";
+
 interface DeviceInfoWrapperProps {
   children?: React.ReactNode;
+  initialIsPWA?: boolean;
+  initialDeviceType?: DeviceType;
 }
 
 export default function DeviceInfoWrapper({
   children,
+  initialIsPWA,
+  initialDeviceType,
 }: DeviceInfoWrapperProps) {
-  const isPWA = useIsPWA();
-  const { deviceType } = useDevice();
+  const isPWA = useIsPWA(initialIsPWA);
+  const { deviceType } = useDevice(initialDeviceType);
   const { updatePWA, isSWRegistered } = usePWAUpdate();
   const [isSecure, setIsSecure] = React.useState(true);
 
@@ -29,9 +35,9 @@ export default function DeviceInfoWrapper({
       <div className="fixed bottom-20 right-0 m-4 p-3 bg-black/80 text-white text-xs rounded-lg shadow-lg z-[9999] pointer-events-none backdrop-blur-sm">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-gray-400">PWA Mode:</span>
+            <span className="font-bold text-gray-400">Display Mode:</span>
             <span
-              className={isPWA ? "text-green-400 font-bold" : "text-gray-200"}
+              className={isPWA ? "text-green-400 font-bold" : "text-yellow-400"}
             >
               {isPWA ? "Active" : "Inactive"}
             </span>
