@@ -17,6 +17,18 @@ export default function manifest(): MetadataRoute.Manifest {
     prefer_related_applications: false,
     icons: [
       {
+        src: '/icons/icon-180x180.png',
+        sizes: '180x180',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/icons/icon-180x180.png',
+        sizes: '180x180',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+      {
         src: '/icons/icon-192x192.png',
         sizes: '192x192',
         type: 'image/png',
@@ -42,6 +54,18 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     categories: ['shopping', 'food'],
-    // ストアアプリ風UI、screenshotsプロパティ....
+    screenshots: [
+      {
+        src: '/screenshots/mobile-1.webp',
+        sizes: '1080x1920',
+        type: 'image/webp',
+      },
+      {
+        src: '/screenshots/desktop-1.webp',
+        sizes: '1920x1080',
+        type: 'image/webp',
+        form_factor: 'wide',
+      },
+    ],
   }
 }
