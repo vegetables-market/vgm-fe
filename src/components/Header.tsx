@@ -10,7 +10,7 @@ export default function Header() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+
   const { totalItems } = useCart();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-        
+
         {/* 1. ロゴ & ナビゲーション */}
         <div className="flex items-center gap-8">
           <Link href="/" className="font-serif text-2xl font-bold text-green-800 tracking-tight flex items-center gap-2">
@@ -44,7 +44,7 @@ export default function Header() {
 
         {/* 2. 右側のエリア */}
         <div className="flex items-center gap-4">
-          
+
           {/* アイコン「ショッピングカート */}
           <Link href="/cart" className="relative p-2 text-stone-400 hover:text-green-700 transition">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,8 +63,16 @@ export default function Header() {
             <svg className="w-4 h-4 text-stone-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <input type="text" placeholder="検索..." className="bg-transparent border-none outline-none text-sm w-full placeholder-stone-400 text-stone-700"/>
+            <input type="text" placeholder="検索..." className="bg-transparent border-none outline-none text-sm w-full placeholder-stone-400 text-stone-700" />
           </div>
+
+          {/* 出品ボタン */}
+          <Link
+            href="/listing"
+            className="text-sm font-bold bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition shadow-sm"
+          >
+            出品
+          </Link>
 
           {/* ユーザーメニュー */}
           {isLoggedIn ? (
