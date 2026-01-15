@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
     "build": "serwist build && next build",
+    "build:worker": "npm run build && opennextjs-cloudflare build --skipNextBuild",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
+    "@opennextjs/cloudflare": "^1.14.8",
     "@serwist/cli": "^9.0.9",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^22.10.6",
@@ -44,6 +46,7 @@
     "prettier": "^3.4.2",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "wrangler": "^4.59.2"
   }
 }
