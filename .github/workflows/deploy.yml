@@ -1,7 +1,10 @@
-name: Deploy to Cloudflare Pages (OpenNext)
+name: Deploy to Cloudflare Pages (Static)
 
 on:
   push:
+    branches:
+      - main
+      - develop
   pull_request:
 
 jobs:
@@ -26,22 +29,11 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npx @opennextjs/cloudflare@latest build
+        run: npm run build
         env:
           NODE_ENV: production
           NEXT_PUBLIC_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.API_URL_PROD || vars.API_URL_DEV }}
           NEXT_PUBLIC_MEDIA_URL: ${{ github.ref == 'refs/heads/main' && vars.MEDIA_URL_PROD || vars.MEDIA_URL_DEV }}
-
-      - name: Verify build output
-        run: |
-          echo "📂 Build output structure:"
-          ls -la .open-next/assets/ 2>/dev/null || echo "⚠️ .open-next/assets not found"
-          echo ""
-          echo "📂 Checking _worker.js:"
-          ls -la .open-next/assets/_worker.js 2>/dev/null || echo "⚠️ _worker.js not found"
-          echo ""
-          echo "📂 Static files:"
-          find .open-next/assets/_next -type f 2>/dev/null | wc -l || echo "0"
 
       - name: Deploy to Cloudflare Pages
         id: cf-deploy
@@ -49,7 +41,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy .open-next/assets --project-name=vgm-app
+          command: pages deploy out --project-name=vgm-app
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Comment Deployment URL on PR

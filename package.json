@@ -5,8 +5,6 @@
   "scripts": {
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
     "build": "serwist build && next build",
-    "build:worker": "npm run build && npx @opennextjs/cloudflare@latest",
-    "preview": "npx @opennextjs/cloudflare@latest dev",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
@@ -29,7 +27,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
-    "@opennextjs/cloudflare": "^1.14.8",
     "@serwist/cli": "^9.0.9",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/node": "^22.10.6",

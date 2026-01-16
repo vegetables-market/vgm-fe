@@ -3,26 +3,38 @@ import { cookies } from 'next/headers';
 import MainLayoutClient from './MainLayoutClient';
 import { DeviceType } from '@/hooks/useDevice';
 
+// 静的エクスポート時はこのルートは動的レンダリングされない
+// Docker環境でSSRを有効にした際に、Cookieベースの高速化が機能する
+export const dynamic = 'force-dynamic';
+
 export default async function MainLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const deviceTypeCookie = cookieStore.get('device_type');
-  const isPWACookie = cookieStore.get('is_pwa');
-
+  // 静的エクスポート時: このコードは実行されず、initialは常にundefined/falseになる
+  // Docker/SSR環境時: 2回目以降の訪問でCookieから読み取り、初回レンダリングでチラつきを防ぐ
   let initialDeviceType: DeviceType | undefined = undefined;
-  if (deviceTypeCookie) {
-    const val = deviceTypeCookie.value;
-    if (val === 'mobile' || val === 'tablet' || val === 'desktop') {
-      initialDeviceType = val;
-    }
-  }
-
   let initialIsPWA = false;
-  if (isPWACookie) {
-    initialIsPWA = isPWACookie.value === 'true';
+
+  try {
+    const cookieStore = await cookies();
+    const deviceTypeCookie = cookieStore.get('device_type');
+    const isPWACookie = cookieStore.get('is_pwa');
+
+    if (deviceTypeCookie) {
+      const val = deviceTypeCookie.value;
+      if (val === 'mobile' || val === 'tablet' || val === 'desktop') {
+        initialDeviceType = val;
+      }
+    }
+
+    if (isPWACookie) {
+      initialIsPWA = isPWACookie.value === 'true';
+    }
+  } catch (error) {
+    // 静的エクスポート環境では cookies() が使えないため、エラーをキャッチ
+    // クライアント側でlocalStorageから読み取る
   }
 
   return (
