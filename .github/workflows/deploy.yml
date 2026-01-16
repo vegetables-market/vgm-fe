@@ -2,7 +2,7 @@ name: Deploy to Cloudflare Pages vgm-app
 
 on:
   push:
-  # すべてのブランチが対象
+# すべてのブランチが対象
   pull_request:
 # PR作成用
 
@@ -55,36 +55,35 @@ jobs:
           # 念のため静的ファイルも確実にコピー（もしOpenNextがコピーし損ねていた場合用）
           mkdir -p .open-next/assets/_next/static
           cp -r .next/static/* .open-next/assets/_next/static/
+          echo "📂 Listing .open-next/assets/_next structure (partial):"
+          ls -R .open-next/assets/_next | head -n 20
 
-      # wrangler.toml / wrangler.jsonc の競合設定と日付エラーを修正
-      - name: Fix wrangler configuration issues
+      # 完全にクリーンな wrangler.json を生成して既存のファイルを置換
+      # これにより、フォーマットエラーや競合設定、不要なフィールドを排除する
+      - name: Recreate wrangler.json
         run: |
-          FILE=""
-          if [ -f wrangler.jsonc ]; then
-            FILE="wrangler.jsonc"
-          elif [ -f wrangler.toml ]; then
-            FILE="wrangler.toml"
-          fi
-
-          if [ -n "$FILE" ]; then
-            echo "🔧 Fixing $FILE..."
+          echo "🔧 Creating clean wrangler.json..."
+          cat > wrangler.json <<EOF
+          {
+            "name": "vgm-app",
+            "compatibility_date": "2024-09-23",
+            "compatibility_flags": ["nodejs_compat"],
+            "pages_build_output_dir": ".open-next/assets",
+            "kv_namespaces": [
+              {
+                "binding": "NEXT_CACHE_WORKERS_KV",
+                "id": "f523a576d7654949a72eb16797ad80a3"
+              }
+            ]
+          }
+          EOF
           
-            # Pagesデプロイと競合する 'main' 設定を無効化
-            # for jsonc
-            sed -i 's/"main":/"_main_disabled":/g' "$FILE"
-            # for toml
-            sed -i 's/^main =/# main =/g' "$FILE"
+          # 古い設定ファイルを削除して競合を防止
+          rm -f wrangler.jsonc wrangler.toml
           
-            # 未来の日付エラー回避のため、過去の安全な日付に強制変更 (2024-10-22)
-            # for jsonc
-            sed -i 's/"compatibility_date":.*/"compatibility_date": "2024-10-22",/g' "$FILE"
-            # for toml
-            sed -i 's/compatibility_date =.*/compatibility_date = "2024-10-22"/g' "$FILE"
-          
-            echo "-------- Modified $FILE content --------"
-            cat "$FILE"
-            echo "----------------------------------------"
-          fi
+          echo "-------- New wrangler.json content --------"
+          cat wrangler.json
+          echo "-------------------------------------------"
 
       # 5. Cloudflare Pagesへデプロイ
       - name: Publish to Cloudflare Pages
