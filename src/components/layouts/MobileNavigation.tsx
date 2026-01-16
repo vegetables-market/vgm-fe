@@ -1,6 +1,5 @@
 "use client";
 
-import { useIsPWA } from "@/hooks/useIsPWA";
 import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 
@@ -9,7 +8,6 @@ import { FaMagnifyingGlass, FaRegHeart, FaHeart } from "react-icons/fa6";
 import { IoCart, IoGridOutline, IoCartOutline, IoGrid } from "react-icons/io5";
 
 export default function MobileNavigation() {
-  const isPWA = useIsPWA();
   const router = useRouter();
   const pathname = usePathname();
   const [animatingItem, setAnimatingItem] = useState<string | null>(null);
@@ -87,7 +85,7 @@ export default function MobileNavigation() {
 
   return (
     <nav
-      className={` fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300 ${isPWA ? "pb-5" : "pb-0"}`}
+      className={` fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300 pb-5"`}
     >
       <style>{`
         @keyframes bounce-icon {

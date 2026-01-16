@@ -8,7 +8,6 @@ import { useCart } from "@/context/CartContext";
 
 import { FaMagnifyingGlass, FaRegHeart } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
-import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function WebHeader() {
   const router = useRouter();
@@ -60,7 +59,6 @@ export default function WebHeader() {
 
       <div className="flex items-center gap-4 sm:gap-6 text-gray-600 dark:text-gray-300">
         <div className="flex gap-2 items-center">
-          <ThemeToggle />
           {/* お気に入り */}
           <Link
             href="/favorites"
