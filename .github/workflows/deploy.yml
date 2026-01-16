@@ -46,20 +46,37 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.API_URL_PROD || vars.API_URL_DEV }}
           NEXT_PUBLIC_MEDIA_URL: ${{ github.ref == 'refs/heads/main' && vars.MEDIA_URL_PROD || vars.MEDIA_URL_DEV }}
 
-      # OpenNext ビルド結果の確認
-      - name: Verify OpenNext build output
+      # OpenNext ビルド結果の確認と修正
+      - name: Fix OpenNext static assets
         run: |
-          echo "📂 Checking .open-next/assets structure:"
+          echo "🔧 Ensuring static files consistency..."
+          
+          # .next/static を .open-next/assets/_next/static に強制上書き
+          # これにより、HTMLが参照するファイルと実際のファイルが一致する
+          if [ -d ".next/static" ]; then
+            echo "📦 Copying .next/static to .open-next/assets/_next/static"
+            rm -rf .open-next/assets/_next/static
+            mkdir -p .open-next/assets/_next
+            cp -r .next/static .open-next/assets/_next/static
+          else
+            echo "⚠️ .next/static not found!"
+          fi
+          
+          # public フォルダの内容をルートにコピー
+          if [ -d "public" ]; then
+            echo "📦 Copying public folder contents"
+            cp -r public/* .open-next/assets/ 2>/dev/null || true
+          fi
+          
+          echo ""
+          echo "📂 Verifying .open-next/assets structure:"
           ls -la .open-next/assets/ || echo "⚠️ .open-next/assets not found!"
           echo ""
-          echo "📂 Checking .open-next/assets/_next/static structure:"
-          ls -la .open-next/assets/_next/static/ 2>/dev/null || echo "⚠️ _next/static not found!"
-          echo ""
-          echo "📂 Listing all chunk files:"
+          echo "📂 Listing chunk files (first 30):"
           find .open-next/assets/_next/static -name "*.js" 2>/dev/null | head -n 30 || echo "⚠️ No JS files found!"
           echo ""
-          echo "📂 Checking if _worker.js exists:"
-          ls -la .open-next/assets/_worker.js 2>/dev/null || ls -la .open-next/worker.js || echo "⚠️ No worker file found!"
+          echo "📂 Checking _worker.js:"
+          ls -la .open-next/assets/_worker.js 2>/dev/null || echo "⚠️ _worker.js not found!"
 
       # 重要: .gitignore によってアップロード対象ファイルが除外されるのを防ぐため、一時的に .gitignore を無効化
       - name: Disable .gitignore for deployment
