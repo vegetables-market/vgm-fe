@@ -53,10 +53,25 @@ jobs:
           touch .open-next/assets/.nojekyll
           
           # 念のため静的ファイルも確実にコピー（もしOpenNextがコピーし損ねていた場合用）
+      # publicフォルダもコピー
+      - name: Ensure static assets presence
+        run: |
           mkdir -p .open-next/assets/_next/static
           cp -r .next/static/* .open-next/assets/_next/static/
+          
+          # publicフォルダの内容もルートにコピー（faviconなど）
+          cp -r public/* .open-next/assets/ || true
+          
           echo "📂 Listing .open-next/assets/_next structure (partial):"
           ls -R .open-next/assets/_next | head -n 20
+
+      # 重要: .gitignore によってアップロード対象ファイルが除外されるのを防ぐため、一時的に .gitignore を無効化
+      - name: Disable .gitignore for deployment
+        run: |
+          if [ -f .gitignore ]; then
+            mv .gitignore .gitignore.bak
+            echo "🚫 Moved .gitignore to .gitignore.bak to prevent Wrangler from ignoring assets"
+          fi
 
       # 完全にクリーンな wrangler.json を生成して既存のファイルを置換
       # これにより、フォーマットエラーや競合設定、不要なフィールドを排除する
