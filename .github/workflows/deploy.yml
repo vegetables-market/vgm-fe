@@ -31,6 +31,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      # 3.5. 完全にクリーンなビルドを保証（以前のビルド成果物を削除）
+      - name: Clean build artifacts
+        run: |
+          rm -rf .next .open-next out
+          echo "🧹 Cleaned all build artifacts"
+
       # 4. ビルド (環境変数をGitHub Secretsから注入)
       - name: Build
         run: npm run build:worker
@@ -40,30 +46,20 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.API_URL_PROD || vars.API_URL_DEV }}
           NEXT_PUBLIC_MEDIA_URL: ${{ github.ref == 'refs/heads/main' && vars.MEDIA_URL_PROD || vars.MEDIA_URL_DEV }}
 
-      # OpenNextのWorkerファイルと依存ディレクトリをPages形式に整形して配置
-      - name: Prepare for Cloudflare Pages
+      # OpenNext ビルド結果の確認
+      - name: Verify OpenNext build output
         run: |
-          cp .open-next/worker.js .open-next/assets/_worker.js
-          cp -r .open-next/cloudflare .open-next/assets/
-          cp -r .open-next/middleware .open-next/assets/
-          cp -r .open-next/server-functions .open-next/assets/
-          if [ -d ".open-next/.build" ]; then cp -r .open-next/.build .open-next/assets/; fi
-          
-          # 静的ファイルが無視されないように.nojekyllを作成
-          touch .open-next/assets/.nojekyll
-          
-          # 念のため静的ファイルも確実にコピー（もしOpenNextがコピーし損ねていた場合用）
-      # publicフォルダもコピー
-      - name: Ensure static assets presence
-        run: |
-          mkdir -p .open-next/assets/_next/static
-          cp -r .next/static/* .open-next/assets/_next/static/
-          
-          # publicフォルダの内容もルートにコピー（faviconなど）
-          cp -r public/* .open-next/assets/ || true
-          
-          echo "📂 Listing .open-next/assets/_next structure (partial):"
-          ls -R .open-next/assets/_next | head -n 20
+          echo "📂 Checking .open-next/assets structure:"
+          ls -la .open-next/assets/ || echo "⚠️ .open-next/assets not found!"
+          echo ""
+          echo "📂 Checking .open-next/assets/_next/static structure:"
+          ls -la .open-next/assets/_next/static/ 2>/dev/null || echo "⚠️ _next/static not found!"
+          echo ""
+          echo "📂 Listing all chunk files:"
+          find .open-next/assets/_next/static -name "*.js" 2>/dev/null | head -n 30 || echo "⚠️ No JS files found!"
+          echo ""
+          echo "📂 Checking if _worker.js exists:"
+          ls -la .open-next/assets/_worker.js 2>/dev/null || ls -la .open-next/worker.js || echo "⚠️ No worker file found!"
 
       # 重要: .gitignore によってアップロード対象ファイルが除外されるのを防ぐため、一時的に .gitignore を無効化
       - name: Disable .gitignore for deployment
