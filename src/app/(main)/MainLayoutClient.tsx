@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Header from "@/components/layouts/WebHeader";
-import MobileNavigation from "@/components/layouts/MobileNavigation";
-import TabletLeftNavigation from "@/components/layouts/TabletLeftNavigation";
+import dynamic from "next/dynamic";
 import { useDevice, DeviceType } from "@/hooks/useDevice";
 import { useIsPWA } from "@/hooks/useIsPWA";
+
+const Header = dynamic(() => import("@/components/layouts/WebHeader"));
+const MobileNavigation = dynamic(() => import("@/components/layouts/MobileNavigation"));
+const TabletLeftNavigation = dynamic(() => import("@/components/layouts/TabletLeftNavigation"));
 
 export default function MainLayoutClient({
   children,
@@ -39,7 +41,7 @@ export default function MainLayoutClient({
   const showHeader = deviceType === "desktop" || !isPWA;
 
   // PWAかつモバイルの場合のみMobileNavigationを表示
-  const showMobileNav = deviceType === "mobile";
+  const showMobileNav = isPWA && deviceType === "mobile";
 
   // PWAかつタブレットの場合のみTabletLeftNavigationを表示
   const showTabletNav = isPWA && deviceType === "tablet";
