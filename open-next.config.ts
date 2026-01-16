@@ -1,7 +1,6 @@
-// default open-next.config.ts file created by @opennextjs/cloudflare
 import { defineCloudflareConfig } from "@opennextjs/cloudflare/config";
-import kvIncrementalCache from "@opennextjs/cloudflare/overrides/incremental-cache/kv-incremental-cache";
 
 export default defineCloudflareConfig({
-	incrementalCache: kvIncrementalCache,
+  // デフォルト設定を使用
+  // 静的ファイルの扱いはOpenNextに完全に任せる
 });
