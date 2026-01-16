@@ -2,9 +2,6 @@ name: Deploy to Cloudflare Pages (Static)
 
 on:
   push:
-    branches:
-      - main
-      - develop
   pull_request:
 
 jobs:
