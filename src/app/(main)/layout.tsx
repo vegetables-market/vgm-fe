@@ -3,9 +3,6 @@ import { cookies } from 'next/headers';
 import MainLayoutClient from './MainLayoutClient';
 import { DeviceType } from '@/hooks/useDevice';
 
-// 静的エクスポート時はこのルートは動的レンダリングされない
-// Docker環境でSSRを有効にした際に、Cookieベースの高速化が機能する
-export const dynamic = 'force-dynamic';
 
 export default async function MainLayout({
   children,
