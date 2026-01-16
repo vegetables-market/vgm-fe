@@ -1,13 +1,22 @@
 @import "tailwindcss";
 
+:root {
+  --background: #f9f8f4;
+  --foreground: #171717;
+}
+
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
 @theme {
   /* ここでフォント定義 */
   --font-primary: "PP Neue Montreal", sans-serif;
 
   /* 色もここで定義する（Tailwindのクラスとして使えるようになる） */
-  /* もし #f9f8f4 を背景色のデフォルトにしたいならこう */
-  --color-background: #f9f8f4;
-  --color-foreground: #171717; /* 仮の黒 */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 /* bodyなどのリセット */
@@ -17,6 +26,7 @@ body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* GSAPアニメーションに必要な基本設定 */

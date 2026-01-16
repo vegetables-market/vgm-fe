@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartContext";
 
 import { FaMagnifyingGlass, FaRegHeart } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function WebHeader() {
   const router = useRouter();
@@ -29,7 +30,7 @@ export default function WebHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full h-16 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="sticky top-0 z-50 w-full h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-sm border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 transition-colors duration-300">
       <div className="flex items-center ">
         <Link
           href="/"
@@ -38,7 +39,7 @@ export default function WebHeader() {
           <div className="w-10 h-10 overflow-hidden rounded-xl flex items-center justify-center text-white font-bold">
             <img src="/icons/vgm-icon.svg" alt="GrandMarket Logo" />
           </div>
-          <h1 className="text-xl font-bold text-gray-700 tracking-tight hidden sm:block">
+          <h1 className="text-xl font-bold text-gray-700 dark:text-gray-100 tracking-tight hidden sm:block">
             GrandMarket
           </h1>
         </Link>
@@ -52,13 +53,14 @@ export default function WebHeader() {
           <input
             type="text"
             placeholder="商品を検索..."
-            className="w-full pl-10 pr-4 py-2 rounded-full outline-1 outline-gray-300  bg-transparent hover:bg-green-50 hover:outline-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-green-50   transition-all"
+            className="w-full pl-10 pr-4 py-2 rounded-full outline-1 outline-gray-300 dark:outline-gray-700 bg-transparent dark:text-white hover:bg-green-50 dark:hover:bg-gray-800 hover:outline-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-green-50 dark:focus:bg-gray-800 transition-all"
           />
         </div>
       </div>
 
-      <div className="flex items-center gap-4 sm:gap-6 text-gray-600">
-        <div className="flex gap-2">
+      <div className="flex items-center gap-4 sm:gap-6 text-gray-600 dark:text-gray-300">
+        <div className="flex gap-2 items-center">
+          <ThemeToggle />
           {/* お気に入り */}
           <Link
             href="/favorites"

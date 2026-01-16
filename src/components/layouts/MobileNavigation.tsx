@@ -87,7 +87,7 @@ export default function MobileNavigation() {
 
   return (
     <nav
-      className={` fixed w-full bottom-0 block lg:hidden bg-white/80 border-t border-slate-100 ${isPWA ? "pb-5" : "pb-0"}`}
+      className={` fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300 ${isPWA ? "pb-5" : "pb-0"}`}
     >
       <style>{`
         @keyframes bounce-icon {
