@@ -50,6 +50,23 @@ jobs:
         run: |
           echo "🔧 Ensuring static files consistency..."
           
+          # 最重要: worker.js を _worker.js として assets にコピー
+          if [ -f ".open-next/worker.js" ]; then
+            echo "📦 Copying .open-next/worker.js to .open-next/assets/_worker.js"
+            cp .open-next/worker.js .open-next/assets/_worker.js
+          else
+            echo "⚠️ .open-next/worker.js not found!"
+          fi
+          
+          # OpenNextの依存ファイルもコピー
+          echo "📦 Copying OpenNext dependencies to assets..."
+          cp -r .open-next/cloudflare .open-next/assets/ 2>/dev/null || echo "⚠️ cloudflare dir not found"
+          cp -r .open-next/middleware .open-next/assets/ 2>/dev/null || echo "⚠️ middleware dir not found"
+          cp -r .open-next/server-functions .open-next/assets/ 2>/dev/null || echo "⚠️ server-functions dir not found"
+          if [ -d ".open-next/.build" ]; then 
+            cp -r .open-next/.build .open-next/assets/
+          fi
+          
           # .next/static を .open-next/assets/_next/static に強制上書き
           # これにより、HTMLが参照するファイルと実際のファイルが一致する
           if [ -d ".next/static" ]; then
