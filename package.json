@@ -2,7 +2,6 @@
   "name": "vgm-fe",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
     "build": "serwist build && next build",
