@@ -3,8 +3,6 @@ name: Deploy to Cloudflare Pages (OpenNext)
 on:
   push:
     branches:
-      - main
-      - develop
   pull_request:
 
 jobs:
