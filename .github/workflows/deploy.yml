@@ -2,7 +2,9 @@ name: Deploy to Cloudflare Pages (Static)
 
 on:
   push:
+# すべてのブランチが対象
   pull_request:
+# PR作成用
 
 jobs:
   deploy:
