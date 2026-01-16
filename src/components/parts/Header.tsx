@@ -33,10 +33,10 @@ const Header = () => {
                     <span className="material-icons-outlined">shopping_cart</span>
                     <span className="text-sm font-medium">カート</span>
                 </button>
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300">
+                <Link href="/profile" className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300 hover:ring-2 hover:ring-emerald-500 transition-all">
                     {/* アイコン画像のプレースホルダー */}
-                    <img src="https://placehold.co/100" alt="User" className="w-full h-full object-cover" />
-                </div>
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=hanako" alt="User" className="w-full h-full object-cover" />
+                </Link>
             </div>
         </header>
 
