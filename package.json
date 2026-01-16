@@ -6,6 +6,7 @@
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
     "build": "serwist build && next build",
     "build:worker": "npm run build && opennextjs-cloudflare build --skipNextBuild",
+    "preview": "opennextjs-cloudflare preview",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",

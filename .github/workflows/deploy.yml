@@ -48,6 +48,13 @@ jobs:
           cp -r .open-next/middleware .open-next/assets/
           cp -r .open-next/server-functions .open-next/assets/
           if [ -d ".open-next/.build" ]; then cp -r .open-next/.build .open-next/assets/; fi
+          
+          # 静的ファイルが無視されないように.nojekyllを作成
+          touch .open-next/assets/.nojekyll
+          
+          # 念のため静的ファイルも確実にコピー（もしOpenNextがコピーし損ねていた場合用）
+          mkdir -p .open-next/assets/_next/static
+          cp -r .next/static/* .open-next/assets/_next/static/
 
       # 5. Cloudflare Pagesへデプロイ
       - name: Publish to Cloudflare Pages
