@@ -2,7 +2,7 @@ name: Deploy to Cloudflare Pages vgm-app
 
 on:
   push:
-# すべてのブランチが対象
+  # すべてのブランチが対象
   pull_request:
 # PR作成用
 
@@ -55,6 +55,36 @@ jobs:
           # 念のため静的ファイルも確実にコピー（もしOpenNextがコピーし損ねていた場合用）
           mkdir -p .open-next/assets/_next/static
           cp -r .next/static/* .open-next/assets/_next/static/
+
+      # wrangler.toml / wrangler.jsonc の競合設定と日付エラーを修正
+      - name: Fix wrangler configuration issues
+        run: |
+          FILE=""
+          if [ -f wrangler.jsonc ]; then
+            FILE="wrangler.jsonc"
+          elif [ -f wrangler.toml ]; then
+            FILE="wrangler.toml"
+          fi
+
+          if [ -n "$FILE" ]; then
+            echo "🔧 Fixing $FILE..."
+          
+            # Pagesデプロイと競合する 'main' 設定を無効化
+            # for jsonc
+            sed -i 's/"main":/"_main_disabled":/g' "$FILE"
+            # for toml
+            sed -i 's/^main =/# main =/g' "$FILE"
+          
+            # 未来の日付エラー回避のため、過去の安全な日付に強制変更 (2024-10-22)
+            # for jsonc
+            sed -i 's/"compatibility_date":.*/"compatibility_date": "2024-10-22",/g' "$FILE"
+            # for toml
+            sed -i 's/compatibility_date =.*/compatibility_date = "2024-10-22"/g' "$FILE"
+          
+            echo "-------- Modified $FILE content --------"
+            cat "$FILE"
+            echo "----------------------------------------"
+          fi
 
       # 5. Cloudflare Pagesへデプロイ
       - name: Publish to Cloudflare Pages
