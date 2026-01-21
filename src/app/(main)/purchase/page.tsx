@@ -3,12 +3,12 @@
 import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+
 import { PURCHASE_ITEM } from "@/lib/data";
 
 function PurchaseContent() {
-    const searchParams = useSearchParams();
-    const id = searchParams.get("id");
+    // const searchParams = useSearchParams();
+    // const id = searchParams.get("id");
 
     const [isPurchased, setIsPurchased] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
