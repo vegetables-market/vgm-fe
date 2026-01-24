@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { login, loginWithTotp, LoginRequest, ApiError } from '@/lib/api';
+// import { login, LoginRequest, ApiError } from '@/lib/api';
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [formData, setFormData] = useState<LoginRequest>({
-    username: '',
-    password: '',
-  });
+  // const router = useRouter();
+  // const [formData, setFormData] = useState<LoginRequest>({
+  //   username: '',
+  //   password: '',
+  // });
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -24,41 +24,41 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await login(formData);
+      // const response = await login(formData);
 
       // TOTP必要な場合（success: falseでもrequireTotpがtrueならTOTP画面へ）
-      if (response.requireTotp) {
-        setShowTotpInput(true);
-        setMessage('');  // メッセージをクリア
-        setIsLoading(false);
-        return;
-      }
+      // if (response.requireTotp) {
+      //   setShowTotpInput(true);
+      //   setMessage('');  // メッセージをクリア
+      //   setIsLoading(false);
+      //   return;
+      // }
 
-      // 通常ログイン成功
-      if (response.success) {
-        if (response.userId && response.username) {
-          localStorage.setItem(
-            'user',
-            JSON.stringify({
-              id: response.userId,
-              username: response.username,
-              email: response.email,
-            }),
-          );
-        }
-        setMessage('ログインに成功しました！');
-        setTimeout(() => {
-          router.push('/');
-        }, 1000);
-      } else {
-        setMessage(response.message);
-      }
+      // // 通常ログイン成功
+      // if (response.success) {
+      //   if (response.userId && response.username) {
+      //     localStorage.setItem(
+      //       'user',
+      //       JSON.stringify({
+      //         id: response.userId,
+      //         username: response.username,
+      //         email: response.email,
+      //       }),
+      //     );
+      //   }
+      //   setMessage('ログインに成功しました！');
+      //   setTimeout(() => {
+      //     router.push('/');
+      //   }, 1000);
+      // } else {
+      //   setMessage(response.message);
+      // }
     } catch (error) {
-      if (error instanceof ApiError) {
-        setMessage(error.message);
-      } else {
-        setMessage('エラーが発生しました。もう一度お試しください。');
-      }
+      // if (error instanceof ApiError) {
+      //   setMessage(error.message);
+      // } else {
+      //   setMessage('エラーが発生しました。もう一度お試しください。');
+      // }
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
@@ -71,49 +71,49 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const response = await loginWithTotp({
-        username: formData.username,
-        password: formData.password,
-        totpCode: totpCode,
-      });
+      // const response = await loginWithTotp({
+      //   username: formData.username,
+      //   password: formData.password,
+      //   totpCode: totpCode,
+      // });
 
-      if (response.success) {
-        if (response.userId && response.username) {
-          localStorage.setItem(
-            'user',
-            JSON.stringify({
-              id: response.userId,
-              username: response.username,
-              email: response.email,
-            }),
-          );
-        }
-        setMessage('ログインに成功しました！');
-        setTimeout(() => {
-          router.push('/');
-        }, 1000);
-      } else {
-        setMessage(response.message);
-      }
+      // if (response.success) {
+      //   if (response.userId && response.username) {
+      //     localStorage.setItem(
+      //       'user',
+      //       JSON.stringify({
+      //         id: response.userId,
+      //         username: response.username,
+      //         email: response.email,
+      //       }),
+      //     );
+      //   }
+      //   setMessage('ログインに成功しました！');
+      //   setTimeout(() => {
+      //     router.push('/');
+      //   }, 1000);
+      // } else {
+      //   setMessage(response.message);
+      // }
     } catch (error) {
-      if (error instanceof ApiError) {
-        setMessage(error.message);
-      } else {
-        setMessage('エラーが発生しました。もう一度お試しください。');
-      }
+      // if (error instanceof ApiError) {
+      //   setMessage(error.message);
+      // } else {
+      //   setMessage('エラーが発生しました。もう一度お試しください。');
+      // }
       console.error('TOTP login error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   // const { name, value } = e.target;
+  //   // setFormData((prev) => ({
+  //   //   ...prev,
+  //   //   [name]: value,
+  //   // }));
+  // };
 
   const handleBackToLogin = () => {
     setShowTotpInput(false);
@@ -141,8 +141,8 @@ export default function LoginPage() {
                 type="text"
                 id="username"
                 name="username"
-                value={formData.username}
-                onChange={handleChange}
+                // value={formData.username}
+                // onChange={handleChange}
                 required
                 autoComplete="username"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -161,8 +161,8 @@ export default function LoginPage() {
                 type="password"
                 id="password"
                 name="password"
-                value={formData.password}
-                onChange={handleChange}
+                // value={formData.password}
+                // onChange={handleChange}
                 required
                 autoComplete="current-password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
