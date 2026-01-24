@@ -162,7 +162,7 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 // value={formData.password}
-                // onChange={handleChange}
+                onChange={handleChange}
                 required
                 autoComplete="current-password"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
