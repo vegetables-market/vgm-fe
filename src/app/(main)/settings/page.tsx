@@ -1,9 +1,11 @@
 import React from "react";
+import Link from "next/link";
 
 export default function SettingsPage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">設定</h1>
+        <Link href="/settings/security/">セキュリティ</Link>
         セキュリティ
 - ID変更
 - メールアドレス
