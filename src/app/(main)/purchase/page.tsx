@@ -23,6 +23,7 @@ import { PaymentMethodSelectModal } from "@/components/purchase/PaymentMethodSel
 import { AddressSelectModal } from "@/components/purchase/AddressSelectModal";
 import { DeliveryPlaceSelectModal } from "@/components/purchase/DeliveryPlaceSelectModal";
 import { AddAddressModal } from "@/components/purchase/AddAddressModal";
+import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
 
 function PurchaseContent() {
   // 購入状態
@@ -329,14 +330,16 @@ function PurchaseContent() {
 
 export default function PurchasePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-background flex items-center justify-center text-gray-900 dark:text-white">
-          読み込み中...
-        </div>
-      }
-    >
-      <PurchaseContent />
-    </Suspense>
+    <ProtectedRoute>
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-background flex items-center justify-center text-gray-900 dark:text-white">
+            読み込み中...
+          </div>
+        }
+      >
+        <PurchaseContent />
+      </Suspense>
+    </ProtectedRoute>
   );
 }
