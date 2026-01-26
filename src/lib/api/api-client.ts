@@ -48,34 +48,52 @@ export async function fetchApi<T>(
     const apiUrl = getApiUrl();
     const url = `${apiUrl}${endpoint}`;
 
-    console.log('[fetchApi] URL:', url);
-    console.log('[fetchApi] Method:', options?.method || 'GET');
-    console.log('[fetchApi] Options:', options);
+    // デバッグログ出力
+    const addLog = (msg: string) => {
+        if (typeof window !== 'undefined' && (window as any).addAuthLog) {
+            (window as any).addAuthLog(msg);
+        }
+    };
+
+    addLog(`[API Request] ${options?.method || 'GET'} ${endpoint}`);
+
+    // デフォルトオプションの設定
+    const defaultOptions: RequestInit = {
+        credentials: 'include', // デフォルトでCookieを含める
+        ...options,
+        headers: {
+            ...options?.headers,
+        },
+    };
 
     try {
-        const response = await fetch(url, options);
+        const response = await fetch(url, defaultOptions);
 
         if (!response.ok) {
-            // レスポンスボディを読み取り、エラーメッセージを取得
             let errorMessage = `API Error: ${response.status}`;
             try {
                 const errorData = await response.json();
-                // バックエンドからのエラーメッセージがあれば使用
                 if (errorData && errorData.message) {
                     errorMessage = errorData.message;
                 }
             } catch (jsonError) {
-                // JSONのパースに失敗した場合はデフォルトメッセージを使用
+                // JSONパース失敗
             }
+            
+            addLog(`[API Error] ${response.status}: ${errorMessage}`);
             throw new ApiError(response.status, errorMessage);
         }
 
-        return response.json();
+        const data = await response.json();
+        addLog(`[API Success] ${endpoint}`);
+        return data;
     } catch (error) {
         if (error instanceof ApiError) {
             throw error;
         }
-        throw new Error(`Failed to fetch: ${error}`);
+        const networkError = `Network Error: ${error}`;
+        addLog(`[API Network Error] ${networkError}`);
+        throw new Error(networkError);
     }
 }
 
@@ -95,21 +113,16 @@ function formatToMimeFormat(format: ImageFormat): 'jpeg' | 'png' | 'webp' {
 
 /**
  * 画像を vgm-media (R2) にアップロード
- * @param file - アップロードする画像ファイル
- * @param format - 画像フォーマット (デフォルト: 'jpg')
- * @returns アップロード成功時のファイル名
  */
 export async function uploadImage(
     file: File,
     format: ImageFormat = 'jpg',
 ): Promise<string> {
-    // ファイルサイズチェック (300KB制限)
-    const maxSize = 300 * 1024; // 300KB
+    const maxSize = 300 * 1024;
     if (file.size > maxSize) {
         throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024}KB)`);
     }
 
-    // 画像形式チェック
     if (!file.type.startsWith('image/')) {
         throw new Error('画像ファイルのみアップロード可能です');
     }
@@ -134,7 +147,6 @@ export async function uploadImage(
             throw new ApiError(response.status, `アップロード失敗: ${errorText}`);
         }
 
-        // レスポンスからIDを取得（バックエンドが返すIDを使用）
         const result = await response.json();
         return result.id || fileName;
     } catch (error) {
