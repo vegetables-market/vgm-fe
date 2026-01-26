@@ -7,6 +7,7 @@ import { FaCircleExclamation } from 'react-icons/fa6';
 import SocialLoginButtons from '@/components/features/auth/SocialLoginButtons';
 import { login } from '@/services/authService';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
+import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
   const [step, setStep] = useState<'email' | 'password'>('email');
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { login: authLogin } = useAuth();
 
   const addLog = (msg: string) => {
     if (typeof window !== 'undefined' && (window as any).addAuthLog) {
@@ -90,8 +92,7 @@ export default function LoginPage() {
           }
         } else if (data.user) {
           addLog('Login successful!');
-          localStorage.setItem('vgm_user', JSON.stringify(data.user));
-          if ((window as any).refreshAuth) (window as any).refreshAuth();
+          authLogin(data.user);
           router.push('/');
         }
       } catch (err: any) {
@@ -111,10 +112,10 @@ export default function LoginPage() {
           <h2 className="mb-6 w-fit cursor-default text-center text-3xl font-bold text-white">
             ログイン
           </h2>
-          
-          <SocialLoginButtons 
-            mode="login" 
-            onProviderClick={(id) => addLog(`Social login clicked: ${id}`)} 
+
+          <SocialLoginButtons
+            mode="login"
+            onProviderClick={(id) => addLog(`Social login clicked: ${id}`)}
           />
 
           <div className="relative my-4 w-full">

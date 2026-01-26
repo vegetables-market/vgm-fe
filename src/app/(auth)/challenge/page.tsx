@@ -6,6 +6,7 @@ import { FaCircleExclamation, FaRotateRight } from 'react-icons/fa6';
 import { verifyChallenge, resendCode } from '@/services/authService';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import OtpInput from '@/components/features/auth/OtpInput';
+import { useAuth } from '@/context/AuthContext';
 
 function ChallengeContent() {
   const [code, setCode] = useState('');
@@ -17,6 +18,7 @@ function ChallengeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const flowId = searchParams.get('flow_id');
+  const { login: authLogin } = useAuth();
 
   const addLog = (msg: string) => {
     if (typeof window !== 'undefined' && (window as any).addAuthLog) {
@@ -52,12 +54,11 @@ function ChallengeContent() {
       addLog(`Challenge successful: ${JSON.stringify(data)}`);
 
       if (data.user) {
-        localStorage.setItem('vgm_user', JSON.stringify(data.user));
+        authLogin(data.user);
         // 認証完了後はmasked_emailを削除
         localStorage.removeItem('vgm_masked_email');
-        if ((window as any).refreshAuth) (window as any).refreshAuth();
       }
-      
+
       router.push('/');
     } catch (err: any) {
       const message = getErrorMessage(err);
@@ -70,16 +71,16 @@ function ChallengeContent() {
 
   const handleResend = async () => {
     if (!flowId || isResending) return;
-    
+
     setIsResending(true);
     setError('');
     setSuccessMsg('');
-    
+
     try {
       const data = await resendCode({ flow_id: flowId });
       addLog(`Resend successful. New flow_id: ${data.flow_id}`);
       setSuccessMsg('認証コードを再送信しました。');
-      
+
       // URLのflow_idを更新（リロードなしで）
       const newUrl = `/challenge?flow_id=${data.flow_id}`;
       router.replace(newUrl);
@@ -105,7 +106,7 @@ function ChallengeContent() {
               {error}
             </p>
           )}
-          
+
           {successMsg && (
             <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-green-600/90 text-center text-[11px] text-white p-2">
               {successMsg}
@@ -127,15 +128,15 @@ function ChallengeContent() {
 
             <form onSubmit={handleSubmit}>
               <div className="mb-6">
-                <OtpInput 
-                  value={code} 
-                  onChange={setCode} 
+                <OtpInput
+                  value={code}
+                  onChange={setCode}
                   disabled={!flowId || isLoading}
                 />
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black disabled:opacity-50 hover:bg-gray-200 transition-colors"
                 disabled={!flowId || isLoading || code.length !== 6}
               >
@@ -145,7 +146,7 @@ function ChallengeContent() {
           </div>
 
           <div className="flex flex-col w-full items-center justify-center gap-4 mt-2">
-            <button 
+            <button
               onClick={handleResend}
               disabled={isResending}
               className="flex items-center text-xs text-amber-300 hover:text-amber-200 transition-colors disabled:opacity-50"
@@ -153,8 +154,8 @@ function ChallengeContent() {
               <FaRotateRight className={`mr-1 ${isResending ? 'animate-spin' : ''}`} />
               認証コードを再送信
             </button>
-            
-            <button 
+
+            <button
               onClick={() => router.push('/login')}
               className="text-xs text-zinc-500 underline cursor-pointer bg-transparent border-none hover:text-zinc-300 transition-colors"
             >
