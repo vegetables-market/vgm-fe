@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { enableTotp, verifyAndEnableTotp, disableTotp, ApiError } from '@/lib/api/api-auth';
+// import { enableTotp, verifyAndEnableTotp, disableTotp, ApiError } from '@/lib/api/api-auth';
 import Image from 'next/image';
 
 interface UserData {
