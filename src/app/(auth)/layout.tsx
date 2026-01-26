@@ -1,5 +1,4 @@
 // app/(auth)/layout.tsx
-import DebugConsole from "@/components/features/auth/DebugConsole";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,7 +6,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="pb-12">
         {children}
       </div>
-      <DebugConsole />
     </section>
   );
 }
