@@ -82,6 +82,7 @@ export interface LoginResponse {
     flow_id?: string;
     masked_email?: string;
     requireTotp?: boolean;
+    mfa_token?: string;
 }
 
 export interface EnableTotpResponse {

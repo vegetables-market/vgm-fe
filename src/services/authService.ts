@@ -114,3 +114,20 @@ export async function getUserById(userId: number): Promise<LoginResponse> {
         credentials: 'include',
     });
 }
+
+/**
+ * MFA検証（ログイン時）
+ */
+export async function verifyMfa(
+    mfaToken: string,
+    code: string
+): Promise<LoginResponse> {
+    return fetchApi<LoginResponse>('/v1/auth/verify-mfa', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mfa_token: mfaToken, code }),
+        credentials: 'include',
+    });
+}

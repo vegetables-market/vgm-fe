@@ -10,7 +10,7 @@ export default function SecurityPage() {
         <Link href="/settings/security/email">email</Link><br />
         <Link href="/settings/security/password">パスワード</Link><br />
         <Link href="/settings/security/user-name">ユーザー名</Link><br />
-        <Link href="/settings/security/mfa">二段階認証</Link><br />
+        <Link href="/settings/security/signinoptions">二段階認証</Link><br />
       </div>
     </ProtectedRoute>
   );

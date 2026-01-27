@@ -39,6 +39,43 @@ export class ApiError extends Error {
 }
 
 /**
+ * 401 Unauthorized エラー時の処理
+ */
+function handleUnauthorized(): void {
+    if (typeof window !== 'undefined') {
+        // AuthContext に通知
+        window.dispatchEvent(new Event('auth:unauthorized'));
+
+        // localStorage をクリア
+        localStorage.removeItem('vgm_user');
+
+        // ログインページにリダイレクト（現在のURLを保存）
+        const currentPath = window.location.pathname;
+        const redirectUrl = currentPath !== '/login'
+            ? `/login?redirect=${encodeURIComponent(currentPath)}`
+            : '/login';
+
+        window.location.href = redirectUrl;
+    }
+}
+
+/**
+ * Cookie から CSRF トークンを取得
+ */
+function getCsrfToken(): string | null {
+    if (typeof document === 'undefined') return null;
+
+    const cookies = document.cookie.split(';');
+    const csrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='));
+
+    if (csrfCookie) {
+        return decodeURIComponent(csrfCookie.split('=')[1]);
+    }
+
+    return null;
+}
+
+/**
  * 汎用 API フェッチ関数
  */
 export async function fetchApi<T>(
@@ -57,12 +94,17 @@ export async function fetchApi<T>(
 
     addLog(`[API Request] ${options?.method || 'GET'} ${endpoint}`);
 
+    // CSRF トークンを取得
+    const csrfToken = getCsrfToken();
+
     // デフォルトオプションの設定
     const defaultOptions: RequestInit = {
         credentials: 'include', // デフォルトでCookieを含める
         ...options,
         headers: {
             ...options?.headers,
+            // CSRF トークンをヘッダーに追加（POSTなどの場合）
+            ...(csrfToken && options?.method !== 'GET' && { 'X-XSRF-TOKEN': csrfToken }),
         },
     };
 
@@ -70,6 +112,13 @@ export async function fetchApi<T>(
         const response = await fetch(url, defaultOptions);
 
         if (!response.ok) {
+            // 401 Unauthorized の場合は自動ログアウト
+            if (response.status === 401) {
+                addLog('[API Error] 401 Unauthorized - Auto logout');
+                handleUnauthorized();
+                throw new ApiError(401, 'Unauthorized');
+            }
+
             let errorMessage = `API Error: ${response.status}`;
             try {
                 const errorData = await response.json();
@@ -79,7 +128,7 @@ export async function fetchApi<T>(
             } catch (jsonError) {
                 // JSONパース失敗
             }
-            
+
             addLog(`[API Error] ${response.status}: ${errorMessage}`);
             throw new ApiError(response.status, errorMessage);
         }

@@ -24,6 +24,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshAuthInternal();
     }, []);
 
+    // 401 Unauthorized イベントをリッスン
+    useEffect(() => {
+        const handleUnauthorizedEvent = () => {
+            setUser(null);
+            localStorage.removeItem('vgm_user');
+        };
+
+        window.addEventListener('auth:unauthorized', handleUnauthorizedEvent);
+
+        return () => {
+            window.removeEventListener('auth:unauthorized', handleUnauthorizedEvent);
+        };
+    }, []);
+
     // 認証状態を再読み込み
     const refreshAuthInternal = () => {
         try {
