@@ -85,7 +85,7 @@ export default function MobileNavigation() {
 
   return (
     <nav
-      className={` fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300 pb-5"`}
+      className={`pb-5 fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300"`}
     >
       <style>{`
         @keyframes bounce-icon {
@@ -96,7 +96,7 @@ export default function MobileNavigation() {
           animation: bounce-icon 0.4s ease-in-out;
         }
       `}</style>
-      <div className="flex items-center justify-between h-16 max-w-md mx-auto ">
+      <div className="flex items-center justify-between h-18 max-w-md mx-auto ">
         {navItems.map((item) => {
           const active = isActive(item.href);
           const Icon = active ? item.iconOn : item.iconOff;
