@@ -54,6 +54,24 @@ export interface LoginRequest {
     device_id?: string;
 }
 
+export interface EnableTotpRequest {
+    // No fields required for start
+}
+
+export interface VerifyTotpRequest {
+    code: string;
+}
+
+export interface DisableTotpRequest {
+    code: string;
+    password?: string;
+}
+
+export interface TotpLoginRequest {
+    mfa_token: string;
+    code: string;
+}
+
 // Responses
 export interface RegisterResponse {
     status: string;

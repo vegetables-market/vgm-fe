@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { FaCircleExclamation, FaRotateRight } from 'react-icons/fa6';
 import OtpInput from '@/components/features/auth/OtpInput';
 
