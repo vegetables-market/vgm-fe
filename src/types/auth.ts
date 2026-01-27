@@ -3,7 +3,7 @@
  */
 
 export interface UserInfo {
-    user_id: number;
+    username: string; // user_id -> username
     display_name: string;
     email: string | null;
     avatar_url: string | null;
@@ -83,6 +83,7 @@ export interface LoginResponse {
     masked_email?: string;
     requireTotp?: boolean;
     mfa_token?: string;
+    mfa_type?: string;
 }
 
 export interface EnableTotpResponse {

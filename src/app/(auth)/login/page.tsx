@@ -10,15 +10,14 @@ import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 
 export default function LoginPage() {
-  const [step, setStep] = useState<'email' | 'password' | 'mfa'>('email');
+  const [step, setStep] = useState<'email' | 'password'>('email');
   const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [mfaCode, setMfaCode] = useState('');
-  const [mfaToken, setMfaToken] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login: authLogin } = useAuth();
+
 
   const addLog = (msg: string) => {
     if (typeof window !== 'undefined' && (window as any).addAuthLog) {
@@ -37,38 +36,10 @@ export default function LoginPage() {
         return;
       }
 
-      setIsLoading(true);
-      addLog(`Checking device status for: ${emailOrUsername}`);
-      try {
-        // パスワードなしで一度ログインAPIを叩く
-        const data = await login({ username: emailOrUsername });
-        addLog(`Check response: ${data.status}`);
-
-        if (data.status === 'MFA_REQUIRED' && data.mfa_token) {
-          // パスワードスキップで即MFA（これは通常ありえないが、仕様上ありうるなら）
-          // しかし現状のバックエンド実装ではパスワード必須なのでここには来ないはず
-          // 念のため
-          setMfaToken(data.mfa_token);
-          setStep('mfa');
-        } else if (data.require_verification && data.flow_id) {
-          // 既知の端末なら直接チャレンジ画面へ
-          addLog('Known device. Redirecting to challenge.');
-          if (data.masked_email) {
-            localStorage.setItem('vgm_masked_email', data.masked_email);
-          }
-          router.push(`/challenge?flow_id=${data.flow_id}`);
-        } else {
-          // 未知の端末ならパスワード入力を求める
-          addLog('Unknown device. Password required.');
-          setStep('password');
-        }
-      } catch (err: any) {
-        // ユーザーが見つからない場合などもパスワード入力へ進ませる（存在秘匿のため）
-        addLog(`Check failed: ${err.message}. Falling back to password.`);
-        setStep('password');
-      } finally {
-        setIsLoading(false);
-      }
+      // 以前はここでAPIを叩いてユーザー存在確認を行っていたが、
+      // セキュリティ向上（User Enumeration対策）のため、常にパスワード入力へ進むように変更
+      addLog(`Proceeding to password step for: ${emailOrUsername}`);
+      setStep('password');
       return;
     }
 
@@ -85,9 +56,13 @@ export default function LoginPage() {
         const data = await login({ username: emailOrUsername, password });
 
         if (data.status === 'MFA_REQUIRED' && data.mfa_token) {
-          addLog('MFA Required.');
-          setMfaToken(data.mfa_token);
-          setStep('mfa');
+          addLog('MFA Required. Redirecting to challenge page.');
+          // MFAトークンをクエリパラメータにセットして遷移
+          // 注意: トークンが非常に長い場合、URL長制限に引っかかる可能性があるが、
+          // 通常のJWT/HMAC程度なら問題ない。セキュリティ的にはURLに残るのは望ましくないが、
+          // 一時トークンであり短寿命のため許容範囲とする。より安全にするならState管理が必要。
+          const mfaType = data.mfa_type?.toLowerCase() || 'totp';
+          router.push(`/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`);
         } else if (data.require_verification) {
           if (data.flow_id) {
             // 認証が必要で、flow_idがある場合（パスワード正解、または未知の端末）
@@ -95,7 +70,7 @@ export default function LoginPage() {
             if (data.masked_email) {
               localStorage.setItem('vgm_masked_email', data.masked_email);
             }
-            router.push(`/challenge?flow_id=${data.flow_id}`);
+            router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
           } else {
             // 認証が必要だが、flow_idがない場合（パスワード間違いなど）
             addLog('Login failed: Invalid credentials.');
@@ -114,40 +89,6 @@ export default function LoginPage() {
         setIsLoading(false);
       }
       return;
-    }
-
-    // ステップ3: MFAコード入力後
-    if (step === 'mfa') {
-      if (!mfaCode) {
-        setError('認証コードを入力してください。');
-        return;
-      }
-
-      setIsLoading(true);
-      addLog('Verifying MFA code...');
-      try {
-        // authServiceにverifyMfaを追加する必要がある
-        // ここでは動的にインポートするか、事前に追加されている前提
-        const { verifyMfa } = await import('@/services/authService');
-        const data = await verifyMfa(mfaToken, mfaCode);
-
-        // MFA後のレスポンス処理
-        if (data.user) {
-          addLog('MFA login successful!');
-          authLogin(data.user);
-          router.push('/');
-        } else if (data.require_verification && data.flow_id) {
-          // MFA後にメール認証が必要な場合（もしあれば）
-          router.push(`/challenge?flow_id=${data.flow_id}`);
-        } else {
-          setError('ログインに失敗しました。');
-        }
-      } catch (err: any) {
-        const message = getErrorMessage(err);
-        setError(message); // "Invalid verification code" など
-      } finally {
-        setIsLoading(false);
-      }
     }
   };
 
@@ -178,7 +119,7 @@ export default function LoginPage() {
 
           <div className="mb-3 w-75">
             <form onSubmit={handleSubmit}>
-              {step !== 'mfa' && (
+              {step !== 'password' && (
                 <>
                   <div className="mb-2 w-full"><span className="cursor-default text-[12px] font-bold text-white">メールアドレスまたはユーザーID</span></div>
                   <input
@@ -207,36 +148,13 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {step === 'mfa' && (
-                <div className="mb-3">
-                  <div className="mb-2 w-full"><span className="cursor-default text-[12px] font-bold text-white">2段階認証コード</span></div>
-                  <input
-                    type="text"
-                    value={mfaCode}
-                    onChange={(e) => setMfaCode(e.target.value)}
-                    placeholder="6桁のコードを入力"
-                    className="mb-3 h-9 w-full rounded-lg border-2 !border-white/70 bg-black pl-3 text-sm transition-colors duration-300 outline-none focus:!border-white"
-                    autoFocus
-                    disabled={isLoading}
-                    maxLength={6}
-                  />
-                </div>
-              )}
+
 
               <button type="submit" className="h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black disabled:opacity-50" disabled={isLoading}>
-                {isLoading ? '処理中...' : step === 'email' ? '次へ' : step === 'mfa' ? '認証する' : 'ログイン'}
+                {isLoading ? '処理中...' : step === 'email' ? '次へ' : 'ログイン'}
               </button>
             </form>
-            {step === 'mfa' && (
-              <button
-                type="button"
-                onClick={() => setStep('password')}
-                className="mt-4 w-full text-center text-xs text-gray-400 hover:text-white"
-                disabled={isLoading}
-              >
-                戻る
-              </button>
-            )}
+
           </div>
 
           <div className="flex w-full items-center justify-center">
