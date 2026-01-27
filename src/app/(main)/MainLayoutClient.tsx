@@ -50,7 +50,6 @@ export default function MainLayoutClient({
     <section className={`flex relative ${deviceType === "tablet" ? "" : "flex-col"} `}>
       {showHeader && <Header />}
       {showMobileNav && <MobileNavigation />}
-      <MobileNavigation />
       {showTabletNav && <TabletLeftNavigation />}
       <main className="w-full">{children}</main>
     </section>
