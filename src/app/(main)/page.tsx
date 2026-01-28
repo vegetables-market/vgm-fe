@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function MainPage() {
     return (
@@ -7,7 +10,7 @@ export default function MainPage() {
             <h1 className="text-2xl font-bold mb-4">VGM Top Page</h1>
             <p className="mb-4">Welcome to VGM application.</p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-4 mb-4">
                 <Link href="/dashboard" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                     Dashboard
                 </Link>
@@ -17,43 +20,11 @@ export default function MainPage() {
                 <Link href="/test" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                     Test Pages
                 </Link>
+                <Link href="/products" className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    購入する
+                </Link>
+                <ThemeToggle />
             </div>
-            <div>
-                ここ
-            </div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
         </div>
     );
 }

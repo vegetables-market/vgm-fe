@@ -3,19 +3,19 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getUserById, ApiError } from '@/lib/api';
+// import { getUserById, ApiError } from '@/lib/api/api-auth';
 
-interface UserData {
-  id: number;
-  username: string;
-  email: string;
-}
+// interface UserData {
+//   id: number;
+//   username: string;
+//   email: string;
+// }
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [userData, setUserData] = useState<UserData | null>(null);
+  // const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -27,26 +27,26 @@ export default function ProfilePage() {
           return;
         }
 
-        const user = JSON.parse(storedUser) as UserData;
+        // const user = JSON.parse(storedUser) as UserData;
 
         // バックエンドから最新のユーザー情報を取得
-        const response = await getUserById(user.id);
+        // const response = await getUserById(user.id);
 
-        if (response.success && response.userId && response.username) {
-          setUserData({
-            id: response.userId,
-            username: response.username,
-            email: response.email || '',
-          });
-        } else {
-          setError('ユーザー情報の取得に失敗しました');
-        }
+        // if (response.success && response.userId && response.username) {
+        //   setUserData({
+        //     id: response.userId,
+        //     username: response.username,
+        //     email: response.email || '',
+        //   });
+        // } else {
+        //   setError('ユーザー情報の取得に失敗しました');
+        // }
       } catch (err) {
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          setError('エラーが発生しました');
-        }
+        // if (err instanceof ApiError) {
+        //   setError(err.message);
+        // } else {
+        //   setError('エラーが発生しました');
+        // }
         console.error('Profile load error:', err);
       } finally {
         setLoading(false);
@@ -69,21 +69,21 @@ export default function ProfilePage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-          <div className="text-red-600 mb-4">{error}</div>
-          <Link
-            href="/login"
-            className="text-blue-500 hover:underline"
-          >
-            ログインページへ
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center bg-gray-100">
+  //       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+  //         <div className="text-red-600 mb-4">{error}</div>
+  //         <Link
+  //           href="/login"
+  //           className="text-blue-500 hover:underline"
+  //         >
+  //           ログインページへ
+  //         </Link>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8">
@@ -99,27 +99,27 @@ export default function ProfilePage() {
             </Link>
           </div>
 
-          {userData && (
+          {/*{userData && (*/}
             <div className="space-y-6">
               <div className="border-b pb-4">
                 <h2 className="text-sm font-semibold text-gray-600 mb-2">
                   ユーザーID
                 </h2>
-                <p className="text-lg text-gray-800">{userData.id}</p>
+                {/*<p className="text-lg text-gray-800">{userData.id}</p>*/}
               </div>
 
               <div className="border-b pb-4">
                 <h2 className="text-sm font-semibold text-gray-600 mb-2">
                   ユーザー名
                 </h2>
-                <p className="text-lg text-gray-800">{userData.username}</p>
+                {/*<p className="text-lg text-gray-800">{userData.username}</p>*/}
               </div>
 
               <div className="border-b pb-4">
                 <h2 className="text-sm font-semibold text-gray-600 mb-2">
                   メールアドレス
                 </h2>
-                <p className="text-lg text-gray-800">{userData.email}</p>
+                {/*<p className="text-lg text-gray-800">{userData.email}</p>*/}
               </div>
 
               <div className="border-b pb-4">
@@ -158,7 +158,7 @@ export default function ProfilePage() {
                 </button>
               </div>
             </div>
-          )}
+          {/*)}*/}
         </div>
       </div>
     </div>

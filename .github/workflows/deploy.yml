@@ -1,10 +1,10 @@
-name: Deploy to Cloudflare Pages vgm-app
+name: Deploy to Cloudflare Pages (Static)
 
 on:
   push:
-    # すべてのブランチが対象
+# すべてのブランチが対象
   pull_request:
-    # PR作成用
+# PR作成用
 
 jobs:
   deploy:
@@ -16,32 +16,25 @@ jobs:
 
     name: Build and Deploy
     steps:
-      # 1. コードを取得
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 2. Node.js セットアップ
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
-      # 3. 依存関係インストール
       - name: Install Dependencies
         run: npm ci
 
-      # 4. ビルド (環境変数をGitHub Secretsから注入)
       - name: Build
         run: npm run build
         env:
           NODE_ENV: production
-          # ブランチごとにバックエンド URL を切り替え
           NEXT_PUBLIC_API_BASE_URL: ${{ github.ref == 'refs/heads/main' && vars.API_URL_PROD || vars.API_URL_DEV }}
           NEXT_PUBLIC_MEDIA_URL: ${{ github.ref == 'refs/heads/main' && vars.MEDIA_URL_PROD || vars.MEDIA_URL_DEV }}
 
-      # 5. Cloudflare Pagesへデプロイ
-      - name: Publish to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages
         id: cf-deploy
         uses: cloudflare/wrangler-action@v3
         with:
@@ -50,15 +43,13 @@ jobs:
           command: pages deploy out --project-name=vgm-app
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      # 6. PRにURLをコメント通知
       - name: Comment Deployment URL on PR
         uses: actions/github-script@v7
         if: github.event_name == 'pull_request'
         with:
           script: |
             const url = '${{ steps.cf-deploy.outputs.deployment-url }}';
-            const body = `### 🚀 Deploy Success!\n\nPreview URL: **[${url}](${url})**\n\nLogs are available in the "Actions" tab.`;
-            
+            const body = `### 🚀 Deploy Success!\n\nPreview URL: **[${url}](${url})**`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
