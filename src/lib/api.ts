@@ -72,35 +72,61 @@ export interface ReleaseEscrowRequest {
     orderId: number;
 }
 
+export interface UploadTokenResponse {
+    token: string;
+    filename: string;
+    expiresAt: number;
+}
 
-
-/**
- * 商品一覧取得
- */
-export async function getProducts(): Promise<{ success: boolean; products: Product[] }> {
-    return fetchApi(API_ENDPOINTS.PRODUCTS, {
+// カテゴリ一覧取得
+export async function getCategories(): Promise<any[]> {
+    return fetchApi(`${API_ENDPOINTS.ITEMS}/categories`, {
         method: 'GET',
-        credentials: 'include',
     });
 }
 
 /**
- * 商品作成
+ * アップロードトークン取得 (一般ユーザー用)
  */
-export async function createProduct(request: CreateProductRequest): Promise<{
-    success: boolean;
-    message: string;
-    productId?: number
-}> {
-    return fetchApi(API_ENDPOINTS.PRODUCTS, {
+export const getUploadToken = async (): Promise<{ token: string; key_prefix: string; bucket: string; filename: string }> => {
+  const result = await fetchApi<{ token: string; key_prefix: string; bucket: string; filename: string }>(
+    `${API_ENDPOINTS.ITEMS}/upload-token`,
+    {
+      method: 'POST',
+    }
+  );
+  return result;
+};
+
+export const createItem = async (data: any) => {
+  return await fetchApi(`${API_ENDPOINTS.ITEMS}`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+};
+
+export const getMyItems = async () => {
+    return await fetchApi<any[]>(`${API_ENDPOINTS.ITEMS}/me`, {
+        method: 'GET',
+    });
+};
+/**
+ * アップロードトークン取得 (管理者用)
+ */
+export async function getAdminUploadToken(filename: string): Promise<UploadTokenResponse> {
+    // API_ENDPOINTS.ADMIN が未定義な可能性があるため、パスを直接指定、あるいはendpoint追加が必要
+    // ここでは直接パスを指定するが、本来は api-endpoint.ts に定義すべき
+    return fetchApi('/v1/admin/media/upload-token', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
+        body: JSON.stringify({ filename }),
         credentials: 'include',
     });
 }
+
+
 
 /**
  * 注文作成

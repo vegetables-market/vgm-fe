@@ -12,7 +12,7 @@ export const API_ENDPOINTS = {
     TOTP_DISABLE: '/api/auth/totp/disable',
     LOGIN_TOTP: '/api/auth/login/totp',
     // 商品関連
-    PRODUCTS: '/api/products',
+    ITEMS: '/v1/market/items',
     // 注文関連
     ORDERS: '/api/orders',
     // 決済関連
