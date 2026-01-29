@@ -1,75 +1,72 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { FaCircleExclamation } from 'react-icons/fa6';
-import EmailVerification from '@/components/features/auth/verification/EmailVerification';
-import TotpVerification from '@/components/features/auth/verification/TotpVerification';
-import EmailMfaVerification from '@/components/features/auth/verification/EmailMfaVerification';
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { FaCircleExclamation } from "react-icons/fa6";
+import EmailVerification from "@/components/features/auth/verification/EmailVerification";
+import TotpVerification from "@/components/features/auth/verification/TotpVerification";
+import EmailMfaVerification from "@/components/features/auth/verification/EmailMfaVerification";
 
 function ChallengeContent() {
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   // デフォルトはemailとする（既存互換性のため）
-  const type = searchParams.get('type') || (searchParams.get('flow_id') ? 'email' : null);
-  const flowId = searchParams.get('flow_id');
-  const mfaToken = searchParams.get('token') || searchParams.get('mfa_token');
+  const type =
+    searchParams.get("type") || (searchParams.get("flow_id") ? "email" : null);
+  const flowId = searchParams.get("flow_id");
+  const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
 
   useEffect(() => {
     if (!type) {
-      setError('不正なリクエストです。');
+      setError("不正なリクエストです。");
     }
   }, [type]);
 
   const renderContent = () => {
     // 1. Email Verification (Signup / Login Unknown Device) -> flow_id
-    if (type === 'email' && flowId) {
+    if (type === "email" && flowId) {
       return <EmailVerification flowId={flowId} />;
     }
     // 2. Email MFA (Login Known Device) -> mfa_token
-    if (type === 'email' && mfaToken) {
+    if (type === "email" && mfaToken) {
       return <EmailMfaVerification mfaToken={mfaToken} />;
     }
     // 3. TOTP MFA -> mfa_token
-    if (type === 'totp' && mfaToken) {
+    if (type === "totp" && mfaToken) {
       return <TotpVerification mfaToken={mfaToken} />;
     }
-    
+
     // パラメータ不足等の場合
     if (!error) {
-       return null;
+      return null;
     }
     return null;
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-black">
-      <div className="flex w-125 flex-col items-center rounded-2xl bg-[#121212] pt-8 pb-12">
-        <div className="flex w-75 flex-col items-center">
-          <h2 className="mb-6 w-fit cursor-default text-center text-3xl font-bold text-white">
-            セキュリティ確認
-          </h2>
+    <div className="flex w-75 flex-col items-center">
+      <h2 className="mb-6 w-fit cursor-default text-center text-3xl font-bold text-white">
+        セキュリティ確認
+      </h2>
 
-          {error && (
-             <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-red-600/90 text-center text-[11px] text-white p-2">
-               <FaCircleExclamation className="mr-1 flex-shrink-0" />
-               {error}
-             </p>
-           )}
+      {error && (
+        <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-red-600/90 p-2 text-center text-[11px] text-white">
+          <FaCircleExclamation className="mr-1 flex-shrink-0" />
+          {error}
+        </p>
+      )}
 
-          {renderContent()}
+      {renderContent()}
 
-          <div className="flex flex-col w-full items-center justify-center gap-4 mt-6">
-            <button
-              onClick={() => router.push('/login')}
-              className="text-xs text-zinc-500 underline cursor-pointer bg-transparent border-none hover:text-zinc-300 transition-colors"
-            >
-              ログイン画面に戻る
-            </button>
-          </div>
-        </div>
+      <div className="mt-6 flex w-full flex-col items-center justify-center gap-4">
+        <button
+          onClick={() => router.push("/login")}
+          className="cursor-pointer border-none bg-transparent text-xs text-zinc-500 underline transition-colors hover:text-zinc-300"
+        >
+          ログイン画面に戻る
+        </button>
       </div>
     </div>
   );
@@ -77,7 +74,13 @@ function ChallengeContent() {
 
 export default function ChallengePage() {
   return (
-    <Suspense fallback={<div className="bg-black h-screen w-screen flex items-center justify-center text-white">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-screen items-center justify-center bg-black text-white">
+          Loading...
+        </div>
+      }
+    >
       <ChallengeContent />
     </Suspense>
   );

@@ -98,17 +98,81 @@ export const getUploadToken = async (): Promise<{ token: string; key_prefix: str
   return result;
 };
 
-export const createItem = async (data: any) => {
-  return await fetchApi(`${API_ENDPOINTS.ITEMS}`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
-};
+// 商品ステータス定義
+export const ITEM_STATUS = {
+    WORK_IN_PROGRESS: 0, // 出品作業中
+    DRAFT: 1,            // 下書き
+    ON_SALE: 2,          // 出品中
+    TRADING: 3,          // 取引中
+    SOLD_OUT: 4,         // 売り切れ
+    SUSPENDED: 5,        // 停止
+} as const;
+
+export type ItemStatus = typeof ITEM_STATUS[keyof typeof ITEM_STATUS];
+
+export interface Item {
+    id: number;
+    name: string | null;
+    price: number | null;
+    status: ItemStatus;
+    imageUrl?: string | null;
+    createdAt: string;
+}
+
+export interface CreateDraftResponse {
+    item_id: number;
+}
+
+export interface LinkImagesRequest {
+    filenames: string[];
+}
 
 export const getMyItems = async () => {
-    return await fetchApi<any[]>(`${API_ENDPOINTS.ITEMS}/me`, {
+    return await fetchApi<Item[]>(`${API_ENDPOINTS.ITEMS}/me`, {
         method: 'GET',
     });
+};
+
+export const createDraft = async (): Promise<CreateDraftResponse> => {
+    return await fetchApi<CreateDraftResponse>(`${API_ENDPOINTS.ITEMS}/draft`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+};
+
+export const linkImages = async (itemId: number, filenames: string[]) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/images`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ filenames }),
+    });
+};
+
+export const updateItem = async (itemId: number, data: any) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+};
+
+// Legacy support (optional, can be removed if not used)
+export const createItem = async (data: any) => {
+    // If we want to support the old flow, we might need a separate endpoint or just map to draft->publish here ?
+    // For now, keeping it as a wrapper around POST /items (which is deprecated/legacy in controller)
+  return await fetchApi(`${API_ENDPOINTS.ITEMS}`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 };
 /**
  * アップロードトークン取得 (管理者用)

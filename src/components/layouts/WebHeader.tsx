@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,7 +27,7 @@ export default function WebHeader() {
         console.error("Failed to parse user info", e);
       }
     }
-    
+
     // ログイン状態の変更を検知するためのイベントリスナー（簡易的）
     const handleStorageChange = () => {
       const updatedUser = localStorage.getItem("vgm_user");
@@ -37,11 +37,11 @@ export default function WebHeader() {
         setUser(null);
       }
     };
-    
+
     window.addEventListener("storage", handleStorageChange);
     // カスタムイベント（DebugConsoleなどからの更新用）
     // ※本来はContextで管理すべきだが、今回は簡易実装
-    
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };
@@ -61,40 +61,49 @@ export default function WebHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full h-16 bg-white/80 dark:bg-black/80 backdrop-blur-md shadow-sm border-b border-gray-200 dark:border-gray-800 flex items-center justify-between px-6 transition-colors duration-300">
-      <div className="flex items-center ">
+    <header className="border-border sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 shadow-sm backdrop-blur-sm">
+      <div className="flex items-center">
         <Link
           href="/"
-          className="flex items-center gap-3 hover:opacity-80 transition-opacity pr-3"
+          className="flex items-center gap-3 pr-3 transition-transform duration-300 hover:scale-102"
         >
-          <div className="w-10 h-10 overflow-hidden rounded-xl flex items-center justify-center text-white font-bold">
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl font-bold">
             <img src="/icons/vgm-icon.svg" alt="GrandMarket Logo" />
           </div>
-          <h1 className="text-xl font-bold text-gray-700 dark:text-gray-100 tracking-tight hidden sm:block">
+          <h1 className="hidden text-xl font-bold tracking-tight sm:block">
             GrandMarket
           </h1>
         </Link>
       </div>
 
-      <div className="flex-1 max-w-md mx-6 hidden md:block">
-        <div className="relative group">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-            <FaMagnifyingGlass className="text-gray-400 text-xl group-hover:text-gray-500 group-focus-within:text-emerald-600 group-focus-within:group-hover:text-emerald-600 transition-colors " />
-          </div>
+      <div className="mx-6 block h-10 max-w-md flex-1 items-center">
+        <div className="relative flex h-10 items-center">
+          {/*<FaMagnifyingGlass className=" text-xl text-gray-400 transition-colors group-focus-within:text-emerald-600 group-hover:text-gray-500 group-focus-within:group-hover:text-emerald-600" />*/}
+
+          {/*<div className="  flex items-center pointer-events-none ">*/}
+          {/*  <FaMagnifyingGlass className="text-gray-400 text-xl group-hover:text-gray-500 group-focus-within:text-emerald-600 group-focus-within:group-hover:text-emerald-600 transition-colors " />*/}
+          {/*</div>*/}
+          {/*<input*/}
+          {/*  type="text"*/}
+          {/*  placeholder="商品を検索..."*/}
+          {/*  className=" w-full py-2 pr-4 pl-10 outline-1 outline-gray-300 transition-all  hover:outline-gray-400 focus:bg-green-50 focus:ring-2 focus:ring-emerald-600 focus:outline-none dark:text-white dark:outline-gray-700 dark:hover:bg-gray-800 dark:focus:bg-gray-800"*/}
+          {/*/>*/}
           <input
-            type="text"
+            type="search"
             placeholder="商品を検索..."
-            className="w-full pl-10 pr-4 py-2 rounded-full outline-1 outline-gray-300 dark:outline-gray-700 bg-transparent dark:text-white hover:bg-green-50 dark:hover:bg-gray-800 hover:outline-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-green-50 dark:focus:bg-gray-800 transition-all"
+            className="peer absolute z-30 h-full w-full rounded-full py-2 pr-4 pl-10 outline-none placeholder:text-neutral-400"
           />
+          <FaMagnifyingGlass className="peer-focus:text-primary pointer-events-none absolute left-3 z-20 transition-all duration-200 dark:text-neutral-400 peer-hover:dark:text-white" />
+          <div className="peer-hover:bg-muted-foreground bg-muted peer-focus:border-primary peer-focus:bg-muted-foreground z-10 h-full w-full rounded-full border transition-all duration-200 peer-hover:border-neutral-600 peer-focus:border-2 dark:border-neutral-800"></div>
         </div>
       </div>
 
-      <div className="flex items-center gap-4 sm:gap-6 text-gray-600 dark:text-gray-300">
-        <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-4 text-gray-600 sm:gap-6 dark:text-gray-300">
+        <div className="flex items-center gap-2">
           {/* お気に入り */}
           <Link
             href="/favorites"
-            className="flex flex-col items-center justify-center gap-0.5 hover:text-amber-600 transition-colors"
+            className="flex flex-col items-center justify-center gap-0.5 transition-colors hover:text-amber-600"
           >
             <FaRegHeart className="text-xl sm:text-2xl" />
             <span className="text-[8px] font-bold">お気に入り</span>
@@ -103,12 +112,12 @@ export default function WebHeader() {
           {/* カート */}
           <Link
             href="/basket"
-            className="flex flex-col items-center justify-center gap-0.5 hover:text-amber-600 transition-colors"
+            className="flex flex-col items-center justify-center gap-0.5 transition-colors hover:text-amber-600"
           >
             <div className="relative">
               <IoCartOutline className="text-xl sm:text-2xl" />
               {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-white">
+                <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full border border-white bg-red-500 text-[8px] font-bold text-white">
                   {totalItems}
                 </span>
               )}
@@ -122,10 +131,14 @@ export default function WebHeader() {
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden cursor-pointer border border-gray-300 dark:border-gray-700 hover:ring-2 hover:ring-amber-500 transition-all flex items-center justify-center"
+              className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-100 transition-all hover:ring-2 hover:ring-amber-500 dark:border-gray-700 dark:bg-gray-800"
             >
               {user.avatar_url ? (
-                <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+                <img
+                  src={user.avatar_url}
+                  alt={user.display_name}
+                  className="h-full w-full object-cover"
+                />
               ) : (
                 <FaUser className="text-gray-500 dark:text-gray-400" />
               )}
@@ -142,33 +155,37 @@ export default function WebHeader() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 py-2 z-20 overflow-hidden"
+                    className="absolute right-0 z-20 mt-2 w-56 overflow-hidden rounded-xl border border-gray-100 bg-white py-2 shadow-xl dark:border-zinc-800 dark:bg-zinc-900"
                   >
-                    <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800">
-                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.display_name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                    <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-800">
+                      <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
+                        {user.display_name}
+                      </p>
+                      <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
                     </div>
-                    
+
                     <Link
                       href="/profile"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium"
+                      className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-zinc-800"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       マイページ
                     </Link>
                     <Link
                       href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium"
+                      className="block px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-zinc-800"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       設定
                     </Link>
-                    
-                    <div className="h-px bg-gray-100 dark:bg-zinc-800 my-1 mx-2"></div>
-                    
+
+                    <div className="mx-2 my-1 h-px bg-gray-100 dark:bg-zinc-800"></div>
+
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold"
+                      className="w-full px-4 py-2 text-left text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
                     >
                       ログアウト
                     </button>
@@ -181,13 +198,13 @@ export default function WebHeader() {
           <div className="flex gap-2">
             <Link
               href="/login"
-              className="text-xs sm:text-sm font-bold bg-gray-800 dark:bg-white text-white dark:text-black px-4 py-2 rounded-full hover:opacity-90 transition"
+              className="rounded-full bg-gray-800 px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 sm:text-sm dark:bg-white dark:text-black"
             >
               ログイン
             </Link>
             <Link
               href="/signup"
-              className="hidden sm:block text-xs sm:text-sm font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
+              className="hidden rounded-full border border-gray-300 px-4 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50 sm:block sm:text-sm dark:border-gray-700 dark:text-gray-300 dark:hover:bg-zinc-800"
             >
               新規登録
             </Link>

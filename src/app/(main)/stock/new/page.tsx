@@ -1,12 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import ImageUploader from '@/components/ImageUploader';
-import { createItem, getCategories } from '@/lib/api';
+import { getCategories, updateItem } from '@/lib/api';
+import { useItemDraft } from '@/hooks/useItemDraft';
+import { useMultiImageUpload } from '@/hooks/useMultiImageUpload';
 
 export default function StockNewPage() {
   const router = useRouter();
+  const { itemId, initDraft, loading: draftLoading } = useItemDraft();
+  const { files, addFiles, removeFile, isAllCompleted, hasError, pendingCount } = useMultiImageUpload(itemId);
+  
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
   const [error, setError] = useState('');
@@ -17,7 +21,6 @@ export default function StockNewPage() {
   const [categoryId, setCategoryId] = useState<number | ''>('');
   const [price, setPrice] = useState('');
   const [quantity, setQuantity] = useState('1');
-  const [imageFilename, setImageFilename] = useState('');
 
   // Constants (Mock Masters for now)
   const shippingDaysOptions = [
@@ -40,25 +43,69 @@ export default function StockNewPage() {
   const [shippingPayerType, setShippingPayerType] = useState(0); // 0:送料込
   const [itemCondition, setItemCondition] = useState(0); // 0:新品
 
+  // Initialize Draft on Mount
   useEffect(() => {
+    initDraft().catch(err => console.error("Failed to init draft", err));
+    
     // Fetch categories
     getCategories()
       .then(data => setCategories(data))
       .catch(err => console.error('Failed to fetch categories', err));
-  }, []);
+  }, [initDraft]);
 
-  const handleUploadComplete = (filename: string) => {
-    setImageFilename(filename);
+  // Drag & Drop Handlers
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      addFiles(Array.from(e.dataTransfer.files));
+    }
+  }, [addFiles]);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      addFiles(Array.from(e.target.files));
+    }
+    // file inputクリア
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!imageFilename) {
+    if (!itemId) {
+        setError('Draft Item initialization failed. Please reload.');
+        return;
+    }
+
+    if (files.length === 0) {
       setError('画像アップロードは必須です。');
       return;
     }
+    
+    if (pendingCount > 0) {
+         setError('画像のアップロード中です。完了までお待ちください。');
+         return;
+    }
+    
+    if (hasError) {
+        setError('画像のアップロードに失敗しているものがあります。削除してやり直してください。');
+        return;
+    }
+
+    // 既に完了していなければチェック
+    if (!isAllCompleted) {
+        setError('画像のアップロードが完了していません。');
+        return;
+    }
+
     if (!name || !description || !price || !categoryId) {
       setError('必須項目を入力してください。');
       return;
@@ -77,10 +124,12 @@ export default function StockNewPage() {
         shipping_days_id: shippingDaysId,
         shipping_method_id: shippingMethodId,
         item_condition: itemCondition,
-        image_urls: [imageFilename] // 1枚のみ対応
+        // image_urls is handled by backend link-images api, so we don't strictly need to send it here.
+        // But if the backend expects it or we want to re-order, we might need to send it.
+        // For now, based on plan, updateItem (PUT) updates the item details and sets status to ON_SALE.
       };
 
-      await createItem(payload);
+      await updateItem(itemId, payload);
       router.push('/stock'); // 一覧へ遷移
     } catch (err) {
       console.error(err);
@@ -89,6 +138,10 @@ export default function StockNewPage() {
       setLoading(false);
     }
   };
+
+  if (draftLoading && !itemId) {
+      return <div className="p-8 text-center">Loading draft...</div>;
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg mt-8">
@@ -101,11 +154,73 @@ export default function StockNewPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 画像アップロード */}
+        {/* 画像アップロード UI */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">商品画像 (必須)</label>
-          <ImageUploader onUploadCompleteAction={handleUploadComplete} />
-          {imageFilename && <p className="text-sm text-green-600 mt-1">✓ アップロード済み: {imageFilename}</p>}
+          
+          <div 
+            className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer"
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onClick={() => fileInputRef.current?.click()}
+          >
+             <input 
+                type="file" 
+                multiple 
+                accept="image/*" 
+                className="hidden" 
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+             />
+             <p className="text-gray-500">
+                ドラッグ＆ドロップ または クリックして画像をアップロード
+             </p>
+          </div>
+
+          {/* プレビューグリッド */}
+          {files.length > 0 && (
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-4 mt-4">
+                  {files.map((file) => (
+                      <div key={file.id} className="relative group aspect-square bg-gray-100 rounded-md overflow-hidden border">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img 
+                            src={file.previewUrl} 
+                            alt="preview" 
+                            className="w-full h-full object-cover"
+                          />
+                          
+                          {/* Overlay for status */}
+                          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <button 
+                                type="button"
+                                onClick={() => removeFile(file.id)}
+                                className="bg-red-500 text-white rounded-full p-1 w-8 h-8 flex items-center justify-center hover:bg-red-600"
+                              >
+                                  ×
+                              </button>
+                          </div>
+                          
+                          {/* Status Indicator */}
+                          {file.status !== 'completed' && (
+                              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-200">
+                                  <div 
+                                    className={`h-full ${file.status === 'error' ? 'bg-red-500' : 'bg-green-500'}`} 
+                                    style={{ width: `${file.progress}%` }}
+                                  />
+                              </div>
+                          )}
+                          
+                          {file.status === 'error' && (
+                              <div className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1">Error</div>
+                          )}
+                      </div>
+                  ))}
+              </div>
+          )}
+          
+          <div className="mt-2 text-sm text-gray-500 text-right">
+             {files.length}枚の画像 (アップロード済み: {files.filter(f => f.status === 'completed').length})
+          </div>
         </div>
 
         {/* 商品詳細 */}
@@ -248,12 +363,12 @@ export default function StockNewPage() {
         <div className="pt-6">
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || pendingCount > 0}
             className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
-              loading ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
+              (loading || pendingCount > 0) ? 'bg-gray-400' : 'bg-red-600 hover:bg-red-700'
             } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500`}
           >
-            {loading ? '出品中...' : '出品する'}
+            {loading ? '処理中...' : pendingCount > 0 ? `画像アップロード中 (${pendingCount})` : '出品する'}
           </button>
         </div>
       </form>

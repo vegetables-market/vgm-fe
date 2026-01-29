@@ -18,7 +18,7 @@ const SOCIAL_PROVIDERS: SocialProvider[] = [
     logo: "/serviceLogo/logo-google.svg",
     bgColor: "bg-white",
     textColor: "text-black",
-    borderColor: "border-zinc-300",
+    borderColor: "border-zinc-400",
   },
 ];
 
@@ -27,11 +27,14 @@ interface SocialLoginButtonsProps {
   onProviderClick?: (providerId: string) => void;
 }
 
-export default function SocialLoginButtons({ mode, onProviderClick }: SocialLoginButtonsProps) {
+export default function SocialLoginButtons({
+  mode,
+  onProviderClick,
+}: SocialLoginButtonsProps) {
   const actionText = mode === "login" ? "でログイン" : "で登録";
 
   return (
-    <div className="flex w-full flex-col gap-2 mb-6">
+    <div className="mb-4 flex w-full flex-col gap-2">
       {SOCIAL_PROVIDERS.map((provider) => (
         <button
           key={provider.id}
@@ -52,7 +55,10 @@ export default function SocialLoginButtons({ mode, onProviderClick }: SocialLogi
               />
             </div>
           </div>
-          <span className="text-sm">{provider.name}{actionText}</span>
+          <span className="text-sm">
+            {provider.name}
+            {actionText}
+          </span>
         </button>
       ))}
     </div>

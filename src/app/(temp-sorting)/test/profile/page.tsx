@@ -175,11 +175,11 @@ export default function ProfilePage() {
   ];
 
   useEffect(() => {
-    if (!sessionStorage.getItem('harvest_is_logged_in')) {
-      router.push('/login');
-    } else {
+    // if (!sessionStorage.getItem('harvest_is_logged_in')) {
+    //   router.push('/login');
+    // } else {
       setIsLoading(false);
-    }
+    // }
   }, [router]);
 
   const handleSaveProfile = (updatedUser: any) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 type Theme = "light" | "dark";
 
@@ -11,7 +11,7 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   // Default to light to match server rendering and avoid hydration mismatch for now
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
@@ -42,9 +42,17 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  // Prevent hydration issues
+  // Prevent hydration issues by rendering Provider always, but maybe with default values?
+  // Actually, we can just render the provider. The 'theme' state defaults to 'light', which matches server.
+  // The useEffect handles the update.
+  // The early return `if (!mounted) return <>{children}</>` was causing the issue because it stripped the Provider.
+  
+  // We still want to avoid rendering mismatches if possible, but providing context is essential.
+  // So we just remove the early return.
+  
   if (!mounted) {
-    return <>{children}</>;
+     // 初期表示時は常にlightとしてProviderを提供 (フックがエラーにならないように)
+     // ただし、useEffectが走るまでクラス適用などはされない
   }
 
   return (
