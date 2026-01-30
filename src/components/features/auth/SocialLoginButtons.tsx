@@ -38,7 +38,14 @@ export default function SocialLoginButtons({
       {SOCIAL_PROVIDERS.map((provider) => (
         <button
           key={provider.id}
-          onClick={() => onProviderClick?.(provider.id)}
+          onClick={() => {
+            if (provider.id === "google") {
+              const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+              window.location.href = `${apiUrl}/api/oauth2/authorization/google`;
+            } else {
+              onProviderClick?.(provider.id);
+            }
+          }}
           className={`relative flex h-12 w-full cursor-pointer items-center justify-center rounded-full border ${provider.borderColor} ${provider.bgColor} font-bold ${provider.textColor} transition-opacity hover:opacity-90`}
         >
           <div className="absolute left-8">
