@@ -13,7 +13,12 @@ interface Step0Props {
   addLog: (msg: string) => void;
 }
 
-export default function Step0Email({ formData, setFormData, onNext, addLog }: Step0Props) {
+export default function Step0Email({
+  formData,
+  setFormData,
+  onNext,
+  addLog,
+}: Step0Props) {
   const [showError, setShowError] = useState(false);
 
   const isEmailValid = useMemo(() => {
@@ -35,18 +40,20 @@ export default function Step0Email({ formData, setFormData, onNext, addLog }: St
       <form onSubmit={handleSubmit}>
         <section>
           <div className="mb-2 w-full">
-            <span className="text-[13px] font-bold text-white">メールアドレス</span>
+            <span className="text-[13px] font-bold">メールアドレス</span>
           </div>
 
           <input
             type="email"
             value={formData.email}
-            onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, email: e.target.value }))
+            }
             placeholder="mail@example.com"
             className={`mb-1 h-9 w-full rounded-lg border-2 bg-black pl-3 text-[13px] text-white transition-colors duration-300 outline-none ${
               showError && !isEmailValid
-                ? "!border-red-400"
-                : "!border-white/70 focus:!border-white"
+                ? "border-red-400"
+                : "border-white/70 focus:border-white"
             }`}
             autoFocus
           />
@@ -60,7 +67,7 @@ export default function Step0Email({ formData, setFormData, onNext, addLog }: St
 
         <button
           type="submit"
-          className="mt-6 h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black hover:bg-gray-200 transition-colors"
+          className="mt-6 h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black transition-colors hover:bg-gray-200"
         >
           次へ
         </button>
@@ -75,12 +82,20 @@ export default function Step0Email({ formData, setFormData, onNext, addLog }: St
             <span className="bg-[#121212] px-2 text-gray-400">または</span>
           </div>
         </div>
-        
-        <SocialLoginButtons mode="signup" onProviderClick={(id) => addLog(`Social signup: ${id}`)} />
-        
+
+        <SocialLoginButtons
+          mode="signup"
+          onProviderClick={(id) => addLog(`Social signup: ${id}`)}
+        />
+
         <div className="mt-8 flex w-full items-center justify-center border-t border-gray-800 pt-6">
-          <span className="mr-1 text-xs text-[#b3b3b3]">アカウントをお持ちの方は</span>
-          <Link href="/login" className="text-xs text-white underline hover:text-gray-300">
+          <span className="mr-1 text-xs text-[#b3b3b3]">
+            アカウントをお持ちの方は
+          </span>
+          <Link
+            href="/login"
+            className="text-xs text-white underline hover:text-gray-300"
+          >
             ここからログイン
           </Link>
         </div>

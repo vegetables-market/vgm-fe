@@ -49,13 +49,9 @@ function handleUnauthorized(): void {
         // localStorage をクリア
         localStorage.removeItem('vgm_user');
 
-        // ログインページにリダイレクト（現在のURLを保存）
-        const currentPath = window.location.pathname;
-        const redirectUrl = currentPath !== '/login'
-            ? `/login?redirect=${encodeURIComponent(currentPath)}`
-            : '/login';
-
-        window.location.href = redirectUrl;
+        // 自動リダイレクトを停止（ユーザー要望により）
+        // 必要な場合は画面側でこのイベントを検知して制御する
+        // window.location.href = '/login';
     }
 }
 
@@ -83,7 +79,7 @@ export async function fetchApi<T>(
     options?: RequestInit,
 ): Promise<T> {
     const apiUrl = getApiUrl();
-    const url = `${apiUrl}${endpoint}`;
+    const url = `${apiUrl}/api${endpoint}`;
 
     // デバッグログ出力
     const addLog = (msg: string) => {
@@ -98,14 +94,21 @@ export async function fetchApi<T>(
     const csrfToken = getCsrfToken();
 
     // デフォルトオプションの設定
+    const defaultHeaders: Record<string, string> = {
+        ...(options?.headers as Record<string, string>),
+        // CSRF トークンをヘッダーに追加（POSTなどの場合）
+        ...(csrfToken && options?.method !== 'GET' ? { 'X-XSRF-TOKEN': csrfToken } : {}),
+    };
+
+    // bodyが文字列ならJSONとみなしてContent-Typeを設定（もし未設定なら）
+    if (options?.body && typeof options.body === 'string' && !defaultHeaders['Content-Type']) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
+
     const defaultOptions: RequestInit = {
         credentials: 'include', // デフォルトでCookieを含める
         ...options,
-        headers: {
-            ...options?.headers,
-            // CSRF トークンをヘッダーに追加（POSTなどの場合）
-            ...(csrfToken && options?.method !== 'GET' && { 'X-XSRF-TOKEN': csrfToken }),
-        },
+        headers: defaultHeaders,
     };
 
     try {
@@ -133,9 +136,12 @@ export async function fetchApi<T>(
             throw new ApiError(response.status, errorMessage);
         }
 
-        const data = await response.json();
+        // ボディが空の場合は空のオブジェクトを返す（Void対応）
+        const text = await response.text();
+        const data = text ? JSON.parse(text) : {};
+        
         addLog(`[API Success] ${endpoint}`);
-        return data;
+        return data as T;
     } catch (error) {
         if (error instanceof ApiError) {
             throw error;
@@ -147,13 +153,6 @@ export async function fetchApi<T>(
 }
 
 /**
- * UUID でファイル名を生成
- */
-function generateFileName(): string {
-    return crypto.randomUUID();
-}
-
-/**
  * ImageFormatをMIMEタイプ用に変換
  */
 function formatToMimeFormat(format: ImageFormat): 'jpeg' | 'png' | 'webp' {
@@ -162,10 +161,13 @@ function formatToMimeFormat(format: ImageFormat): 'jpeg' | 'png' | 'webp' {
 
 /**
  * 画像を vgm-media (R2) にアップロード
+ * JWTトークンによる認証付き
  */
 export async function uploadImage(
     file: File,
     format: ImageFormat = 'jpg',
+    token: string,
+    filename: string, // バックエンドから指定されたファイル名を使用
 ): Promise<string> {
     const maxSize = 300 * 1024;
     if (file.size > maxSize) {
@@ -176,17 +178,18 @@ export async function uploadImage(
         throw new Error('画像ファイルのみアップロード可能です');
     }
 
-    const fileName = generateFileName();
+    // filenameはBE発行のものを使用するためgenerateFileNameは不要
     const arrayBuffer = await file.arrayBuffer();
     const mediaUrl = getMediaUrl();
     const mimeFormat = formatToMimeFormat(format);
     const contentType = `image/${mimeFormat}`;
 
     try {
-        const response = await fetch(`${mediaUrl}/${fileName}`, {
+        const response = await fetch(`${mediaUrl}/${filename}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': contentType,
+                'Authorization': `Bearer ${token}` // JWTトークン付与
             },
             body: arrayBuffer,
         });
@@ -197,7 +200,7 @@ export async function uploadImage(
         }
 
         const result = await response.json();
-        return result.id || fileName;
+        return result.id || filename;
     } catch (error) {
         if (error instanceof ApiError) {
             throw error;

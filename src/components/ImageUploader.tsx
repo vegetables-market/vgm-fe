@@ -9,11 +9,12 @@ import { useImageUpload } from '@/hooks/useImageUpload';
 import UploadResult from './UploadResult';
 import { formatFileSize } from '@/lib/utils/imageCompression';
 
-type Props = {
+interface ImageUploaderProps {
   onUploadCompleteAction?: (filename: string) => void;
-};
+  fetchToken?: () => Promise<{ token: string; filename: string }>;
+}
 
-export default function ImageUploader({ onUploadCompleteAction }: Props) {
+export default function ImageUploader({ onUploadCompleteAction, fetchToken }: ImageUploaderProps) {
   const {
     file,
     preview,
@@ -29,7 +30,7 @@ export default function ImageUploader({ onUploadCompleteAction }: Props) {
     handleFileSelect,
     upload,
     reset,
-  } = useImageUpload();
+  } = useImageUpload({ fetchToken });
 
   // ファイル選択時
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

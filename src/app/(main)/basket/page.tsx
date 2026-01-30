@@ -1,4 +1,3 @@
-import React from "react";
 import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
 
 export default function BasketPage() {
@@ -10,7 +9,7 @@ export default function BasketPage() {
         <br />
         <br />
         <br />
-        <h1 className="text-2xl font-bold mb-4">Basket</h1>
+        <h1 className="mb-4 text-2xl font-bold">Basket</h1>
       </div>
     </ProtectedRoute>
   );

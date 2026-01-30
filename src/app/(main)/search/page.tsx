@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
 export default function SearchPage() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,11 +33,11 @@ export default function SearchPage() {
       <br />
       <br />
       <br />
-      <h1 className="text-2xl font-bold mb-4">Search</h1>
+      <h1 className="mb-4 text-2xl font-bold">Search</h1>
       <input
         ref={inputRef}
         type="text"
-        className="w-[90%] h-10 bg-blue-300 border border-gray-300 rounded px-3"
+        className="h-10 w-[90%] rounded border border-gray-300 bg-blue-300 px-3"
         placeholder="検索..."
         onFocus={handleInputFocus}
         autoComplete="off"

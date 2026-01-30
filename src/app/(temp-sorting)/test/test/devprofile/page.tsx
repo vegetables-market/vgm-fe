@@ -23,8 +23,8 @@ export default function ProfilePage() {
         // localStorageからユーザー情報を取得
         const storedUser = localStorage.getItem('user');
         if (!storedUser) {
-          router.push('/login');
-          return;
+          // router.push('/login');
+          // return;
         }
 
         // const user = JSON.parse(storedUser) as UserData;

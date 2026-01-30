@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -67,11 +67,11 @@ function PurchaseContent() {
   // 購入完了画面
   if (isPurchased) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="bg-background flex min-h-screen items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-xl dark:border-gray-700 dark:bg-gray-800">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500">
             <svg
-              className="w-10 h-10 text-white"
+              className="h-10 w-10 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -84,17 +84,17 @@ function PurchaseContent() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+          <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
             購入が完了しました
           </h1>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="mb-6 text-gray-600 dark:text-gray-400">
             ご注文ありがとうございます。
             <br />
             商品の発送まで今しばらくお待ちください。
           </p>
           <Link
             href="/"
-            className="inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-lg transition-colors"
+            className="inline-block rounded-lg bg-red-500 px-8 py-3 font-bold text-white transition-colors hover:bg-red-600"
           >
             トップページに戻る
           </Link>
@@ -104,16 +104,16 @@ function PurchaseContent() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="bg-background text-foreground min-h-screen">
       {/* ヘッダー */}
-      <header className="border-b border-gray-200 dark:border-gray-700 py-4 px-6 bg-white dark:bg-gray-900">
-        <div className="max-w-6xl mx-auto flex items-center">
+      <header className="border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
+        <div className="mx-auto flex max-w-6xl items-center">
           <Link
             href="/products"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors flex items-center gap-2"
+            className="flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
           >
             <svg
-              className="w-6 h-6"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -130,24 +130,24 @@ function PurchaseContent() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-4 md:p-8">
-        <h1 className="text-2xl font-bold mb-8" style={{ color: "inherit" }}>
+      <main className="mx-auto max-w-6xl p-4 md:p-8">
+        <h1 className="mb-8 text-2xl font-bold" style={{ color: "inherit" }}>
           購入の確認
         </h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid gap-8 lg:grid-cols-3">
           {/* 左側：商品情報と各種設定 */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             {/* 注意事項 */}
             <div
-              className="rounded-lg p-4 flex items-start gap-3"
+              className="flex items-start gap-3 rounded-lg p-4"
               style={{
                 backgroundColor: "rgb(254 243 199)",
                 border: "1px solid rgb(217 119 6)",
               }}
             >
               <svg
-                className="w-6 h-6 flex-shrink-0 mt-0.5"
+                className="mt-0.5 h-6 w-6 flex-shrink-0"
                 style={{ color: "rgb(146 64 14)" }}
                 fill="none"
                 stroke="currentColor"
@@ -174,8 +174,8 @@ function PurchaseContent() {
             </div>
 
             {/* 商品情報 */}
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex gap-4 shadow-sm">
-              <div className="w-20 h-20 relative rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 dark:bg-gray-700">
+            <div className="flex gap-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                 <Image
                   src={product.imageUrl}
                   alt={product.name}
@@ -185,15 +185,15 @@ function PurchaseContent() {
                 />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-lg text-gray-900 dark:text-white">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {product.name}
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {product.producer}
                 </p>
-                <p className="text-red-500 font-bold mt-1">
+                <p className="mt-1 font-bold text-red-500">
                   ¥{product.price.toLocaleString()}
-                  <span className="text-gray-400 text-xs ml-1">
+                  <span className="ml-1 text-xs text-gray-400">
                     (税込) 送料込み
                   </span>
                 </p>
@@ -221,23 +221,23 @@ function PurchaseContent() {
 
           {/* 右側：注文サマリー */}
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 sticky top-4 shadow-sm">
-              <div className="space-y-4 mb-6">
+            <div className="sticky top-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+              <div className="mb-6 space-y-4">
                 <div className="flex justify-between text-gray-600 dark:text-gray-400">
                   <span>商品代金</span>
                   <span className="text-gray-900 dark:text-white">
                     ¥{product.price.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="flex justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
                   <span className="font-bold text-gray-900 dark:text-white">
                     支払い金額
                   </span>
-                  <span className="text-red-500 font-bold text-xl">
+                  <span className="text-xl font-bold text-red-500">
                     ¥{product.price.toLocaleString()}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-500 dark:text-gray-400 text-sm">
+                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                   <span>支払い方法</span>
                   <span>
                     {selectedPayment.type === "credit_card"
@@ -247,25 +247,25 @@ function PurchaseContent() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="mb-4 text-xs text-gray-500">
                 <span className="text-blue-500">利用規約</span>および
                 <span className="text-blue-500">プライバシーポリシー</span>
                 に同意の上、ご購入ください。
               </p>
 
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="mb-4 text-xs text-gray-400">
                 ※不正利用検知および不正利用防止のために、お客さまの情報をクレジットカード発行会社に提供させていただくことがあります
               </p>
 
               <button
                 onClick={handlePurchase}
                 disabled={isProcessing}
-                className="w-full bg-red-500 hover:bg-red-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-4 font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-400"
               >
                 {isProcessing ? (
                   <>
                     <svg
-                      className="animate-spin w-5 h-5"
+                      className="h-5 w-5 animate-spin"
                       fill="none"
                       viewBox="0 0 24 24"
                     >
@@ -333,7 +333,7 @@ export default function PurchasePage() {
     <ProtectedRoute>
       <Suspense
         fallback={
-          <div className="min-h-screen bg-background flex items-center justify-center text-gray-900 dark:text-white">
+          <div className="bg-background flex min-h-screen items-center justify-center text-gray-900 dark:text-white">
             読み込み中...
           </div>
         }
