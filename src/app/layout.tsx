@@ -1,10 +1,13 @@
-import type {Metadata, Viewport} from "next"; // ★Viewportを追加
+import type { Metadata, Viewport } from "next"; // ★Viewportを追加
 import SmoothScroll from "@/components/SmoothScroll";
 import DeviceInfoWrapper from "@/components/DeviceInfoWrapper";
 import "./globals.css";
-import {CartProvider} from "@/context/CartContext";
-import {ThemeProvider} from "@/context/ThemeContext";
-import {SerwistProvider} from "./serwist";
+import { CartProvider } from "@/context/CartContext";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { SerwistProvider } from "./serwist";
+import DebugConsole from "@/components/features/auth/DebugConsole";
+
 
 //Viewport設定
 export const viewport: Viewport = {
@@ -88,26 +91,30 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-                                       children,
-                                   }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
     // 完全静的サイト: localStorageのみを使用
     // デバイス判定はクライアント側で実施（DeviceInfoWrapper内部で処理）
     return (
         <html lang="ja">
-        <body className="antialiased">
-        <SerwistProvider swUrl="/sw.js">
-            <ThemeProvider>
-            <CartProvider>
-                <SmoothScroll/>
-                <DeviceInfoWrapper initialIsPWA={false} initialDeviceType={undefined}>
-                    {children}
-                </DeviceInfoWrapper>
-            </CartProvider>
-            </ThemeProvider>
-        </SerwistProvider>
-        </body>
+            <body className="antialiased">
+                <SerwistProvider swUrl="/sw.js">
+                    <ThemeProvider>
+                        <AuthProvider>
+                            <CartProvider>
+                                <SmoothScroll />
+                                <DeviceInfoWrapper initialIsPWA={false} initialDeviceType={undefined}>
+      <DebugConsole />
+
+                                    {children}
+                                </DeviceInfoWrapper>
+                            </CartProvider>
+                        </AuthProvider>
+                    </ThemeProvider>
+                </SerwistProvider>
+            </body>
         </html>
     );
 }

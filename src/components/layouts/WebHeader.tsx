@@ -5,24 +5,56 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import { logout } from "@/services/authService";
+import { UserInfo } from "@/types/auth";
 
-import { FaMagnifyingGlass, FaRegHeart } from "react-icons/fa6";
+import { FaMagnifyingGlass, FaRegHeart, FaUser } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
 
 export default function WebHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserInfo | null>(null);
   const { totalItems } = useCart();
 
   useEffect(() => {
-    setIsLoggedIn(!!sessionStorage.getItem("harvest_is_logged_in"));
+    // localStorageからユーザー情報を取得
+    const storedUser = localStorage.getItem("vgm_user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user info", e);
+      }
+    }
+    
+    // ログイン状態の変更を検知するためのイベントリスナー（簡易的）
+    const handleStorageChange = () => {
+      const updatedUser = localStorage.getItem("vgm_user");
+      if (updatedUser) {
+        setUser(JSON.parse(updatedUser));
+      } else {
+        setUser(null);
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    // カスタムイベント（DebugConsoleなどからの更新用）
+    // ※本来はContextで管理すべきだが、今回は簡易実装
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
-  const handleLogout = () => {
-    if (confirm("ログアウトしますか？")) {
-      sessionStorage.removeItem("harvest_is_logged_in");
-      setIsLoggedIn(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (e) {
+      console.error("Logout failed", e);
+    } finally {
+      localStorage.removeItem("vgm_user");
+      setUser(null);
       setIsMenuOpen(false);
       router.push("/login");
     }
@@ -86,15 +118,17 @@ export default function WebHeader() {
         </div>
 
         {/* ユーザーメニュー */}
-        {isLoggedIn ? (
+        {user ? (
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden cursor-pointer border border-gray-300 hover:ring-2 hover:ring-amber-500 transition-all flex items-center justify-center"
+              className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden cursor-pointer border border-gray-300 dark:border-gray-700 hover:ring-2 hover:ring-amber-500 transition-all flex items-center justify-center"
             >
-              {/* プレースホルダーまたは実際のアイコン */}
-              <span className="text-xs font-bold text-gray-500">USER</span>
-              {/* <img src="https://placehold.co/100" alt="User" className="w-full h-full object-cover" /> */}
+              {user.avatar_url ? (
+                <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+              ) : (
+                <FaUser className="text-gray-500 dark:text-gray-400" />
+              )}
             </button>
 
             <AnimatePresence>
@@ -108,26 +142,33 @@ export default function WebHeader() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-20 overflow-hidden"
+                    className="absolute right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-xl shadow-xl border border-gray-100 dark:border-zinc-800 py-2 z-20 overflow-hidden"
                   >
+                    <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800">
+                      <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{user.display_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
+                    </div>
+                    
                     <Link
                       href="/profile"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 font-bold"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       マイページ
                     </Link>
                     <Link
-                      href="/basket"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 font-bold"
+                      href="/settings"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800 font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      カートを見る
+                      設定
                     </Link>
-                    <div className="h-px bg-gray-100 my-1 mx-4"></div>
+                    
+                    <div className="h-px bg-gray-100 dark:bg-zinc-800 my-1 mx-2"></div>
+                    
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 font-bold"
+                      className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold"
                     >
                       ログアウト
                     </button>
@@ -137,12 +178,20 @@ export default function WebHeader() {
             </AnimatePresence>
           </div>
         ) : (
-          <Link
-            href="/login"
-            className="text-sm font-bold bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition"
-          >
-            ログイン
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/login"
+              className="text-xs sm:text-sm font-bold bg-gray-800 dark:bg-white text-white dark:text-black px-4 py-2 rounded-full hover:opacity-90 transition"
+            >
+              ログイン
+            </Link>
+            <Link
+              href="/signup"
+              className="hidden sm:block text-xs sm:text-sm font-bold border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full hover:bg-gray-50 dark:hover:bg-zinc-800 transition"
+            >
+              新規登録
+            </Link>
+          </div>
         )}
       </div>
     </header>

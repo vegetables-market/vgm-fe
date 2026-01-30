@@ -4,9 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-
 export default function MainPage() {
-
     return (
         <div className="p-8">
             <h1 className="text-2xl font-bold mb-4">VGM Top Page</h1>
@@ -22,77 +20,11 @@ export default function MainPage() {
                 <Link href="/test" className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
                     Test Pages
                 </Link>
-                <ThemeToggle/>
-
+                <Link href="/products" className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+                    購入する
+                </Link>
+                <ThemeToggle />
             </div>
-
-            <div>ここ</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
-            <div>a</div>
         </div>
     );
 }
