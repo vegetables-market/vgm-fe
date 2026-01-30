@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 
 const securityItems = [
@@ -8,38 +7,38 @@ const securityItems = [
     href: "/settings/security/email",
     label: "メールアドレス",
     description: "登録メールアドレスの確認・変更",
-    icon: "📧"
+    icon: "📧",
   },
   {
     href: "/settings/security/password",
     label: "パスワード",
     description: "パスワードの変更",
-    icon: "🔑"
+    icon: "🔑",
   },
   {
     href: "/settings/security/user-name",
     label: "ユーザー名",
     description: "ログイン用のユーザー名を変更",
-    icon: "✏️"
+    icon: "✏️",
   },
   {
     href: "/settings/security/signinoptions",
     label: "二段階認証",
     description: "認証アプリ、メール認証の設定",
-    icon: "🔐"
+    icon: "🔐",
   },
   {
     href: "/settings/security/oauth",
     label: "外部サービス連携",
     description: "Google、Appleなどとのアカウント連携",
-    icon: "🔗"
+    icon: "🔗",
   },
   {
     href: "/settings/security/devices",
     label: "ログイン中のデバイス",
     description: "接続中のデバイスを管理",
-    icon: "💻"
-  }
+    icon: "💻",
+  },
 ];
 
 export default function SecurityPage() {

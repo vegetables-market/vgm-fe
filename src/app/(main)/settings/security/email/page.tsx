@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
 
 interface EmailInfo {
@@ -13,7 +12,6 @@ interface EmailInfo {
 }
 
 export default function EmailManagementPage() {
-  const router = useRouter();
   const [emails, setEmails] = useState<EmailInfo[]>([]);
   const [newEmail, setNewEmail] = useState("");
   const [flowId, setFlowId] = useState<string | null>(null);
@@ -29,7 +27,7 @@ export default function EmailManagementPage() {
   const fetchEmails = async () => {
     try {
       const data = await fetchApi<{ emails: EmailInfo[] }>("/v1/user/emails", {
-        credentials: "include"
+        credentials: "include",
       });
       setEmails(data.emails);
     } catch (err) {
@@ -49,8 +47,8 @@ export default function EmailManagementPage() {
         {
           method: "POST",
           credentials: "include",
-          body: JSON.stringify({ email: newEmail })
-        }
+          body: JSON.stringify({ email: newEmail }),
+        },
       );
 
       setFlowId(data.flow_id);
@@ -70,14 +68,11 @@ export default function EmailManagementPage() {
     setIsLoading(true);
 
     try {
-      await fetchApi<{ success: boolean }>(
-        "/v1/user/emails/verify",
-        {
-          method: "POST",
-          credentials: "include",
-          body: JSON.stringify({ flowId, code: verificationCode })
-        }
-      );
+      await fetchApi<{ success: boolean }>("/v1/user/emails/verify", {
+        method: "POST",
+        credentials: "include",
+        body: JSON.stringify({ flowId, code: verificationCode }),
+      });
 
       setSuccess("メールアドレスを追加しました");
       setFlowId(null);
@@ -98,8 +93,8 @@ export default function EmailManagementPage() {
         `/v1/user/emails/${emailId}/primary`,
         {
           method: "PUT",
-          credentials: "include"
-        }
+          credentials: "include",
+        },
       );
       setSuccess("プライマリメールアドレスを変更しました");
       fetchEmails();
@@ -113,13 +108,10 @@ export default function EmailManagementPage() {
 
     setError("");
     try {
-      await fetchApi<{ success: boolean }>(
-        `/v1/user/emails/${emailId}`,
-        {
-          method: "DELETE",
-          credentials: "include"
-        }
-      );
+      await fetchApi<{ success: boolean }>(`/v1/user/emails/${emailId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       setSuccess("メールアドレスを削除しました");
       fetchEmails();
     } catch (err: any) {
@@ -141,8 +133,12 @@ export default function EmailManagementPage() {
           <div key={email.emailId} className="email-item">
             <div className="email-info">
               <span className="email-address">{email.email}</span>
-              {email.isPrimary && <span className="badge primary">プライマリ</span>}
-              {email.isVerified && <span className="badge verified">認証済み</span>}
+              {email.isPrimary && (
+                <span className="badge primary">プライマリ</span>
+              )}
+              {email.isVerified && (
+                <span className="badge verified">認証済み</span>
+              )}
             </div>
             <div className="email-actions">
               {!email.isPrimary && email.isVerified && (
@@ -169,7 +165,7 @@ export default function EmailManagementPage() {
       {/* メールアドレス追加フォーム */}
       <div className="add-section">
         <h2 className="section-title">メールアドレスを追加</h2>
-        
+
         {!flowId ? (
           <form onSubmit={handleAddEmail} className="add-form">
             <input
@@ -191,7 +187,11 @@ export default function EmailManagementPage() {
               type="text"
               className="form-input"
               value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value.replace(/[^0-9]/g, "").slice(0, 6))}
+              onChange={(e) =>
+                setVerificationCode(
+                  e.target.value.replace(/[^0-9]/g, "").slice(0, 6),
+                )
+              }
               placeholder="認証コード（6桁）"
               maxLength={6}
               required
@@ -200,11 +200,18 @@ export default function EmailManagementPage() {
               <button
                 type="button"
                 className="btn-cancel"
-                onClick={() => { setFlowId(null); setVerificationCode(""); }}
+                onClick={() => {
+                  setFlowId(null);
+                  setVerificationCode("");
+                }}
               >
                 キャンセル
               </button>
-              <button type="submit" className="btn-verify" disabled={isLoading || verificationCode.length !== 6}>
+              <button
+                type="submit"
+                className="btn-verify"
+                disabled={isLoading || verificationCode.length !== 6}
+              >
                 {isLoading ? "確認中..." : "確認"}
               </button>
             </div>

@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function favoritesPage() {
   return (
     <div className="p-8">
@@ -8,7 +6,7 @@ export default function favoritesPage() {
       <br />
       <br />
       <br />
-      <h1 className="text-2xl font-bold mb-4">favorites</h1>
+      <h1 className="mb-4 text-2xl font-bold">favorites</h1>
     </div>
   );
 }

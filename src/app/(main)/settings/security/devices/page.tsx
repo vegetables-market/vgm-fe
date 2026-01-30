@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
 
 interface SessionInfo {
@@ -15,7 +14,6 @@ interface SessionInfo {
 }
 
 export default function DevicesPage() {
-  const router = useRouter();
   const [sessions, setSessions] = useState<SessionInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,9 +25,12 @@ export default function DevicesPage() {
 
   const fetchSessions = async () => {
     try {
-      const data = await fetchApi<{ sessions: SessionInfo[] }>("/v1/user/sessions", {
-        credentials: "include"
-      });
+      const data = await fetchApi<{ sessions: SessionInfo[] }>(
+        "/v1/user/sessions",
+        {
+          credentials: "include",
+        },
+      );
       setSessions(data.sessions);
     } catch (err) {
       console.error("Failed to fetch sessions", err);
@@ -43,7 +44,7 @@ export default function DevicesPage() {
       month: "2-digit",
       day: "2-digit",
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     });
   };
 
@@ -54,13 +55,10 @@ export default function DevicesPage() {
     setIsLoading(true);
 
     try {
-      await fetchApi<{ success: boolean }>(
-        `/v1/user/sessions/${sessionId}`,
-        {
-          method: "DELETE",
-          credentials: "include"
-        }
-      );
+      await fetchApi<{ success: boolean }>(`/v1/user/sessions/${sessionId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
       setSuccess("デバイスをログアウトさせました");
       fetchSessions();
     } catch (err: any) {
@@ -71,7 +69,10 @@ export default function DevicesPage() {
   };
 
   const handleRevokeAllOther = async () => {
-    if (!confirm("現在のデバイス以外のすべてのデバイスをログアウトさせますか？")) return;
+    if (
+      !confirm("現在のデバイス以外のすべてのデバイスをログアウトさせますか？")
+    )
+      return;
 
     setError("");
     setIsLoading(true);
@@ -81,8 +82,8 @@ export default function DevicesPage() {
         "/v1/user/sessions",
         {
           method: "DELETE",
-          credentials: "include"
-        }
+          credentials: "include",
+        },
       );
       setSuccess(`${result.revokedCount}件のデバイスをログアウトさせました`);
       fetchSessions();
@@ -95,7 +96,7 @@ export default function DevicesPage() {
 
   const parseDeviceInfo = (deviceInfo: string | null) => {
     if (!deviceInfo) return { browser: "不明", os: "不明" };
-    
+
     // 簡易的なUser-Agent解析
     let browser = "不明";
     let os = "不明";
@@ -109,17 +110,20 @@ export default function DevicesPage() {
     else if (deviceInfo.includes("Mac")) os = "macOS";
     else if (deviceInfo.includes("Linux")) os = "Linux";
     else if (deviceInfo.includes("Android")) os = "Android";
-    else if (deviceInfo.includes("iPhone") || deviceInfo.includes("iPad")) os = "iOS";
+    else if (deviceInfo.includes("iPhone") || deviceInfo.includes("iPad"))
+      os = "iOS";
 
     return { browser, os };
   };
 
-  const otherSessionsCount = sessions.filter(s => !s.isCurrent).length;
+  const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length;
 
   return (
     <div className="devices-page">
       <h1 className="page-title">ログイン中のデバイス</h1>
-      <p className="page-subtitle">現在あなたのアカウントにログインしているデバイス一覧です</p>
+      <p className="page-subtitle">
+        現在あなたのアカウントにログインしているデバイス一覧です
+      </p>
 
       {error && <div className="error-box">{error}</div>}
       {success && <div className="success-box">{success}</div>}
@@ -129,16 +133,27 @@ export default function DevicesPage() {
         {sessions.map((session) => {
           const device = parseDeviceInfo(session.deviceInfo);
           return (
-            <div key={session.sessionId} className={`session-item ${session.isCurrent ? 'current' : ''}`}>
+            <div
+              key={session.sessionId}
+              className={`session-item ${session.isCurrent ? "current" : ""}`}
+            >
               <div className="session-icon">
-                {device.os === "Windows" ? "💻" : 
-                 device.os === "macOS" ? "🖥️" :
-                 device.os === "iOS" || device.os === "Android" ? "📱" : "🌐"}
+                {device.os === "Windows"
+                  ? "💻"
+                  : device.os === "macOS"
+                    ? "🖥️"
+                    : device.os === "iOS" || device.os === "Android"
+                      ? "📱"
+                      : "🌐"}
               </div>
               <div className="session-info">
                 <div className="session-header">
-                  <span className="session-device">{device.browser} / {device.os}</span>
-                  {session.isCurrent && <span className="badge current">現在のデバイス</span>}
+                  <span className="session-device">
+                    {device.browser} / {device.os}
+                  </span>
+                  {session.isCurrent && (
+                    <span className="badge current">現在のデバイス</span>
+                  )}
                 </div>
                 <div className="session-details">
                   {session.ipAddress && <span>IP: {session.ipAddress}</span>}
@@ -169,7 +184,9 @@ export default function DevicesPage() {
           >
             他のすべてのデバイスをログアウト ({otherSessionsCount}件)
           </button>
-          <p className="bulk-note">不審なログインがある場合に使用してください</p>
+          <p className="bulk-note">
+            不審なログインがある場合に使用してください
+          </p>
         </div>
       )}
 

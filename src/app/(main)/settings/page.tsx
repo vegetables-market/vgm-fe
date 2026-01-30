@@ -1,37 +1,62 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 
 const settingsSections = [
   {
     title: "アカウント",
     items: [
-      { href: "/settings/profile", label: "プロフィール編集", description: "表示名、自己紹介などを変更" },
-      { href: "/settings/security", label: "セキュリティ", description: "パスワード、2段階認証の設定" },
-    ]
+      {
+        href: "/settings/profile",
+        label: "プロフィール編集",
+        description: "表示名、自己紹介などを変更",
+      },
+      {
+        href: "/settings/security",
+        label: "セキュリティ",
+        description: "パスワード、2段階認証の設定",
+      },
+    ],
   },
   {
     title: "取引設定",
     items: [
-      { href: "/settings/payment", label: "支払い方法", description: "クレジットカード、電子マネーの管理" },
-      { href: "/settings/shipping", label: "配送設定", description: "住所、配送方法の設定" },
-    ]
+      {
+        href: "/settings/payment",
+        label: "支払い方法",
+        description: "クレジットカード、電子マネーの管理",
+      },
+      {
+        href: "/settings/shipping",
+        label: "配送設定",
+        description: "住所、配送方法の設定",
+      },
+    ],
   },
   {
     title: "通知・プライバシー",
     items: [
-      { href: "/settings/notifications", label: "通知設定", description: "メール、プッシュ通知の設定" },
-      { href: "/settings/privacy", label: "プライバシー", description: "公開情報、ブロックリストの管理" },
-    ]
-  }
+      {
+        href: "/settings/notifications",
+        label: "通知設定",
+        description: "メール、プッシュ通知の設定",
+      },
+      {
+        href: "/settings/privacy",
+        label: "プライバシー",
+        description: "公開情報、ブロックリストの管理",
+      },
+    ],
+  },
 ];
 
 export default function SettingsPage() {
   return (
     <div className="settings-home">
       <h1 className="settings-title">設定</h1>
-      <p className="settings-subtitle">アカウントや取引に関する各種設定を行えます</p>
+      <p className="settings-subtitle">
+        アカウントや取引に関する各種設定を行えます
+      </p>
 
       {settingsSections.map((section) => (
         <div key={section.title} className="settings-section">

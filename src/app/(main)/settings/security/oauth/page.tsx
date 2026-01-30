@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
 
 interface OAuthConnection {
@@ -18,7 +17,6 @@ interface ProviderInfo {
 }
 
 export default function OAuthPage() {
-  const router = useRouter();
   const [connections, setConnections] = useState<OAuthConnection[]>([]);
   const [availableProviders, setAvailableProviders] = useState<ProviderInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
