@@ -3,12 +3,14 @@ import { FaCircleExclamation } from "react-icons/fa6";
 import EmailVerification from "@/components/features/auth/verification/EmailVerification";
 import TotpVerification from "@/components/features/auth/verification/TotpVerification";
 import EmailMfaVerification from "@/components/features/auth/verification/EmailMfaVerification";
+import DeleteAccountVerification from "@/components/features/auth/verification/DeleteAccountVerification";
 
 interface ChallengeState {
   error: string;
   type: string | null;
   flowId: string | null;
   mfaToken: string | null;
+  action: string | null;
 }
 
 interface ChallengeActions {
@@ -21,10 +23,14 @@ interface ChallengeFormProps {
 }
 
 export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
-  const { error, type, flowId, mfaToken } = state;
+  const { error, type, flowId, mfaToken, action } = state;
   const { handleReturnToLogin } = actions;
 
   const renderContent = () => {
+    // アカウント削除の確認
+    if (action === "delete_account" && flowId) {
+      return <DeleteAccountVerification flowId={flowId} />;
+    }
     // 1. Email Verification (Signup / Login Unknown Device) -> flow_id
     if (type === "email" && flowId) {
       return <EmailVerification flowId={flowId} />;
@@ -45,10 +51,17 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
     return null;
   };
 
+  const getTitle = () => {
+    if (action === "delete_account") {
+      return "アカウント削除の確認";
+    }
+    return "セキュリティ確認";
+  };
+
   return (
     <div className="flex w-75 flex-col items-center">
       <h2 className="mb-6 w-fit cursor-default text-center text-3xl font-bold text-white">
-        セキュリティ確認
+        {getTitle()}
       </h2>
 
       {error && (
@@ -65,7 +78,7 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
           onClick={handleReturnToLogin}
           className="cursor-pointer border-none bg-transparent text-xs text-zinc-500 underline transition-colors hover:text-zinc-300"
         >
-          ログイン画面に戻る
+          {action === "delete_account" ? "設定に戻る" : "ログイン画面に戻る"}
         </button>
       </div>
     </div>

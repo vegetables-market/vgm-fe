@@ -11,6 +11,7 @@ export function useChallenge() {
     searchParams.get("type") || (searchParams.get("flow_id") ? "email" : null);
   const flowId = searchParams.get("flow_id");
   const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
+  const action = searchParams.get("action"); // delete_account など
 
   useEffect(() => {
     if (!type) {
@@ -28,6 +29,7 @@ export function useChallenge() {
       type,
       flowId,
       mfaToken,
+      action,
     },
     actions: {
       handleReturnToLogin,
