@@ -11,6 +11,7 @@ type AuthContextType = {
     login: (user: UserInfo) => void;
     logout: () => Promise<void>;
     refreshAuth: () => void;
+    updateUser: (user: UserInfo) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,10 +82,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshAuthInternal();
     };
 
+    // ユーザー情報を更新
+    const updateUser = (userData: UserInfo) => {
+        setUser(userData);
+        localStorage.setItem('vgm_user', JSON.stringify(userData));
+    };
+
     const isAuthenticated = user !== null;
 
     return (
-        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, logout, refreshAuth }}>
+        <AuthContext.Provider value={{ user, isLoading, isAuthenticated, login, logout, refreshAuth, updateUser }}>
             {children}
         </AuthContext.Provider>
     );
