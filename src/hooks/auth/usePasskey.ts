@@ -66,5 +66,27 @@ export const usePasskey = () => {
         }
     };
 
-    return { registerPasskey, loginWithPasskey, isLoading, error };
+    const fetchCredentials = async (): Promise<any[]> => {
+        try {
+            return await fetchApi('/auth/webauthn/credentials', { method: 'GET' }) as any[];
+        } catch (err) {
+            console.error(err);
+            return [];
+        }
+    };
+
+    const deleteCredential = async (credentialId: string) => {
+        setIsLoading(true);
+        try {
+            await fetchApi(`/auth/webauthn/credentials/${credentialId}`, { method: 'DELETE' });
+            return true;
+        } catch (err: any) {
+            setError(err.message || 'Deletion failed');
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { registerPasskey, loginWithPasskey, fetchCredentials, deleteCredential, isLoading, error };
 };

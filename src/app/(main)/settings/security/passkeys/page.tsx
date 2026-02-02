@@ -5,15 +5,36 @@ import { useState } from "react";
 import { FaFingerprint } from "react-icons/fa";
 
 export default function PasskeySettingsPage() {
-    const { registerPasskey, isLoading, error } = usePasskey();
-    const [passkeyName, setPasskeyName] = useState("My Passkey");
+    const { registerPasskey, fetchCredentials, deleteCredential, isLoading, error } = usePasskey();
+    const [passkeyName, setPasskeyName] = useState("My Device");
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [credentials, setCredentials] = useState<any[]>([]);
+
+    const loadCredentials = async () => {
+        const list = await fetchCredentials();
+        setCredentials(list);
+    };
+
+    // Load on mount
+    useState(() => {
+        loadCredentials();
+    });
 
     const handleRegister = async () => {
         setSuccessMessage(null);
         const success = await registerPasskey(passkeyName);
         if (success) {
             setSuccessMessage("パスキーを登録しました");
+            setPasskeyName("My Device");
+            loadCredentials(); // Refresh list
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("このパスキーを削除してもよろしいですか？")) return;
+        const success = await deleteCredential(id);
+        if (success) {
+            loadCredentials();
         }
     };
 
@@ -58,11 +79,28 @@ export default function PasskeySettingsPage() {
                 {successMessage && <p className="mt-2 text-green-600 text-sm">{successMessage}</p>}
             </div>
 
-            {/* TODO: List existing passkeys here */}
             <h3 className="font-bold mb-2 text-gray-700">登録済みのパスキー</h3>
-            <p className="text-sm text-gray-500">
-                （登録済みパスキーの一覧表示機能は準備中です）
-            </p>
+
+            {credentials.length === 0 ? (
+                <p className="text-sm text-gray-500">登録済みのパスキーはありません。</p>
+            ) : (
+                <div className="space-y-2">
+                    {credentials.map((cred) => (
+                        <div key={cred.credentialId} className="flex justify-between items-center bg-white p-3 rounded border border-gray-200">
+                            <div>
+                                <p className="font-medium text-sm">{cred.name}</p>
+                                <p className="text-xs text-gray-500">登録日: {new Date(cred.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <button
+                                onClick={() => handleDelete(cred.credentialId)}
+                                className="text-red-500 hover:text-red-700 text-xs px-2 py-1"
+                            >
+                                削除
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
