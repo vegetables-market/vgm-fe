@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
     LOGIN_TOTP: '/auth/login/totp',
     // 商品関連
     ITEMS: '/v1/market/items',
+    CATEGORIES: '/v1/market/categories',
     // 注文関連
     ORDERS: '/orders',
     // 決済関連

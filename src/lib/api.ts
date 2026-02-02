@@ -203,9 +203,10 @@ export interface Category {
 }
 
 export const getCategories = async (): Promise<Category[]> => {
-    return await fetchApi<Category[]>(`${API_ENDPOINTS.CATEGORIES}`, {
+    const response = await fetchApi<{ categories: Category[] }>(`${API_ENDPOINTS.CATEGORIES}`, {
         method: 'GET',
     });
+    return response.categories;
 };
 
 // ==================== Upload Token 関連 ====================
