@@ -20,6 +20,10 @@ export function getErrorMessage(error: unknown): string {
     if (error instanceof ApiError) {
         // バックエンドから具体的なメッセージが返ってきている場合はそれを優先
         if (error.message && !error.message.startsWith('API Error:')) {
+            // バリデーションエラーなどで詳細がある場合はそれを追加
+            if (error.details && error.details.length > 0) {
+                return `${error.message}\n${error.details.join('\n')}`;
+            }
             return error.message;
         }
         // ステータスコードに基づくデフォルトメッセージ

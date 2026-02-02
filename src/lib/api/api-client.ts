@@ -32,6 +32,8 @@ export class ApiError extends Error {
     constructor(
         public status: number,
         message: string,
+        public errorCode?: string,
+        public details?: string[],
     ) {
         super(message);
         this.name = 'ApiError';
@@ -119,27 +121,34 @@ export async function fetchApi<T>(
             if (response.status === 401) {
                 addLog('[API Error] 401 Unauthorized - Auto logout');
                 handleUnauthorized();
-                throw new ApiError(401, 'Unauthorized');
+                addLog('[API Error] 401 Unauthorized - Auto logout');
+                handleUnauthorized();
+                throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
             }
 
             let errorMessage = `API Error: ${response.status}`;
+            let errorCode: string | undefined;
+            let details: string[] | undefined;
+
             try {
                 const errorData = await response.json();
-                if (errorData && errorData.message) {
-                    errorMessage = errorData.message;
+                if (errorData) {
+                    if (errorData.message) errorMessage = errorData.message;
+                    if (errorData.errorCode) errorCode = errorData.errorCode;
+                    if (errorData.details) details = errorData.details;
                 }
             } catch (jsonError) {
                 // JSONパース失敗
             }
 
             addLog(`[API Error] ${response.status}: ${errorMessage}`);
-            throw new ApiError(response.status, errorMessage);
+            throw new ApiError(response.status, errorMessage, errorCode, details);
         }
 
         // ボディが空の場合は空のオブジェクトを返す（Void対応）
         const text = await response.text();
         const data = text ? JSON.parse(text) : {};
-        
+
         addLog(`[API Success] ${endpoint}`);
         return data as T;
     } catch (error) {
@@ -196,7 +205,8 @@ export async function uploadImage(
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new ApiError(response.status, `アップロード失敗: ${errorText}`);
+
+            throw new ApiError(response.status, `アップロード失敗: ${errorText}`, 'UPLOAD_ERROR');
         }
 
         const result = await response.json();
@@ -205,6 +215,6 @@ export async function uploadImage(
         if (error instanceof ApiError) {
             throw error;
         }
-        throw new Error(`画像のアップロードに失敗しました: ${error}`);
+        throw new Error(`画像のアップロードに失敗しました: ${String(error)}`);
     }
 }

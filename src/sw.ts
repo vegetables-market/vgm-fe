@@ -34,3 +34,20 @@ const serwist = new Serwist({
 
 // 4. イベントリスナーの登録
 serwist.addEventListeners();
+
+// 5. オフラインフォールバックの設定
+// ナビゲーションリクエストが失敗した場合（オフライン時）、/offline.html を返します
+serwist.setCatchHandler(async ({ request }) => {
+  if (request.destination === "document") {
+    const offlinePage = await serwist.matchPrecache("/offline.html");
+    if (offlinePage) {
+      return offlinePage;
+    }
+    // プリキャッシュに見つからない場合は /offline を試す（念のため）
+    const offlineRoute = await serwist.matchPrecache("/offline");
+    if (offlineRoute) {
+      return offlineRoute;
+    }
+  }
+  return Response.error();
+});
