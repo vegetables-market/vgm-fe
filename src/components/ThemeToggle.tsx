@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useTheme } from "@/context/ThemeContext";
 import { FaMoon, FaSun } from "react-icons/fa";
 
@@ -10,13 +9,13 @@ export const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors focus:outline-none"
+      className="rounded-full p-2 transition-colors hover:bg-gray-200 focus:outline-none dark:hover:bg-gray-700"
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
-        <FaSun className="text-yellow-400 w-5 h-5" />
+        <FaSun className="h-5 w-5 text-yellow-400" />
       ) : (
-        <FaMoon className="text-slate-700 w-5 h-5" />
+        <FaMoon className="h-5 w-5 text-slate-700" />
       )}
     </button>
   );

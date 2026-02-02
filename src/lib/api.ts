@@ -48,116 +48,197 @@ export interface CreateOrderResponse {
     sellerAmount?: number;
 }
 
-export interface CreatePaymentRequest {
-    orderId: number;
-    userId: number;
-    paymentMethod: 'CREDIT_CARD' | 'PAYPAY';
-    amount: number;
+export async function getTestItems(): Promise<TestItem[]> {
+    return await fetchApi<TestItem[]>('/api/test-items', { method: 'GET' });
 }
 
-export interface CreatePaymentResponse {
-    success: boolean;
-    message: string;
-    paymentId?: number;
-    clientSecret?: string;
-    paypayUrl?: string;
-    paypayDeeplink?: string;
+export async function createProduct(productData: CreateProductRequest): Promise<Product> {
+    return await fetchApi<Product>('/api/products', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
+    });
 }
 
-export interface ConfirmPaymentRequest {
-    paymentIntentId: string;
+export async function getProduct(id: number): Promise<Product> {
+    return await fetchApi<Product>(`/api/products/${id}`, { method: 'GET' });
 }
 
-export interface ReleaseEscrowRequest {
-    orderId: number;
+export async function createOrder(orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
+    return await fetchApi<CreateOrderResponse>('/api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+    });
 }
 
+export async function getOrder(orderId: number): Promise<any> {
+    return await fetchApi(`/api/orders/${orderId}`, { method: 'GET' });
+}
 
+export async function getOrders(buyerId: number): Promise<any[]> {
+    return await fetchApi(`/api/orders?buyerId=${buyerId}`, { method: 'GET' });
+}
 
-/**
- * 商品一覧取得
- */
-export async function getProducts(): Promise<{ success: boolean; products: Product[] }> {
-    return fetchApi(API_ENDPOINTS.PRODUCTS, {
+export async function getPaymentIntent(orderId: number): Promise<any> {
+    return await fetchApi(`/api/payment/intent/${orderId}`, { method: 'GET' });
+}
+
+export async function confirmPayment(orderId: number, paymentIntentId: string): Promise<any> {
+    return await fetchApi(`/api/payment/confirm/${orderId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentIntentId }),
+    });
+}
+
+// ==================== Item (Market) 関連 ====================
+
+// 商品ステータス定義
+export const ITEM_STATUS = {
+    WORK_IN_PROGRESS: 0, // 出品作業中
+    DRAFT: 1,            // 下書き
+    ON_SALE: 2,          // 出品中
+    TRADING: 3,          // 取引中
+    SOLD_OUT: 4,         // 売り切れ
+    SUSPENDED: 5,        // 停止
+} as const;
+
+export type ItemStatus = typeof ITEM_STATUS[keyof typeof ITEM_STATUS];
+
+export interface Item {
+    id: number;
+    name: string | null;
+    price: number | null;
+    status: ItemStatus;
+    imageUrl?: string | null;
+    createdAt: string;
+}
+
+export interface CreateDraftResponse {
+    item_id: number;
+}
+
+export interface LinkImagesRequest {
+    filenames: string[];
+}
+
+export const getMyItems = async () => {
+    return await fetchApi<Item[]>(`${API_ENDPOINTS.ITEMS}/me`, {
         method: 'GET',
-        credentials: 'include',
     });
-}
+};
 
-/**
- * 商品作成
- */
-export async function createProduct(request: CreateProductRequest): Promise<{
-    success: boolean;
-    message: string;
-    productId?: number
-}> {
-    return fetchApi(API_ENDPOINTS.PRODUCTS, {
+export const createDraft = async (): Promise<CreateDraftResponse> => {
+    return await fetchApi<CreateDraftResponse>(`${API_ENDPOINTS.ITEMS}/draft`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
-        credentials: 'include',
     });
-}
+};
 
-/**
- * 注文作成
- */
-export async function createOrder(request: CreateOrderRequest): Promise<CreateOrderResponse> {
-    return fetchApi(API_ENDPOINTS.ORDERS, {
+export const linkImages = async (itemId: number, filenames: string[]) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/images`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
-        credentials: 'include',
+        body: JSON.stringify({ filenames }),
     });
+};
+
+export const updateItem = async (itemId: number, data: any) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+};
+
+export const deleteItem = async (itemId: number) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {
+        method: 'DELETE',
+    });
+};
+
+export const updateItemStatus = async (itemId: number, status: number) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+    });
+};
+
+
+// Legacy support (optional, can be removed if not used)
+export const createItem = async (data: any) => {
+    // If we want to support the old flow, we might need a separate endpoint or just map to draft->publish here ?
+    // For now, keeping it as a wrapper around POST /items (which is deprecated/legacy in controller)
+  return await fetchApi(`${API_ENDPOINTS.ITEMS}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+};
+
+// ==================== Category 関連 ====================
+
+export interface Category {
+    categoryId: number;
+    name: string;
+    parentCategoryId: number | null;
 }
 
-/**
- * 決済開始
- */
-export async function createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponse> {
-    console.log('[createPayment] Request:', request);
-    console.log('[createPayment] Endpoint:', API_ENDPOINTS.PAYMENT_CREATE);
-    console.log('[createPayment] Method: POST');
+export const getCategories = async (): Promise<Category[]> => {
+    return await fetchApi<Category[]>(`${API_ENDPOINTS.CATEGORIES}`, {
+        method: 'GET',
+    });
+};
 
-    return fetchApi(API_ENDPOINTS.PAYMENT_CREATE, {
+// ==================== Upload Token 関連 ====================
+
+export interface UploadTokenResponse {
+    token: string;
+    filename: string;
+    expiresAt: number;
+}
+
+export const getUploadToken = async (): Promise<UploadTokenResponse> => {
+    return await fetchApi<UploadTokenResponse>(`${API_ENDPOINTS.ITEMS}/upload-token`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(request),
-        credentials: 'include',
     });
-}
+};
 
-/**
- * 決済確認（エスクロー化）
- */
-export async function confirmPayment(request: ConfirmPaymentRequest): Promise<{ success: boolean; message: string }> {
-    return fetchApi(API_ENDPOINTS.PAYMENT_CONFIRM, {
+// ==================== Direct Upload 関連 ====================
+
+export const uploadImageDirect = async (token: string, filename: string, file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const uploadUrl = process.env.NEXT_PUBLIC_MEDIA_UPLOAD_URL || 'http://localhost:8787/upload';
+    
+    await fetch(uploadUrl, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-Filename': filename,
         },
-        body: JSON.stringify(request),
-        credentials: 'include',
+        body: formData,
     });
-}
-
-/**
- * エスクロー解除（出品者への入金）
- */
-export async function releaseEscrow(request: ReleaseEscrowRequest): Promise<{ success: boolean; message: string }> {
-    return fetchApi(API_ENDPOINTS.PAYMENT_RELEASE_ESCROW, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
+};

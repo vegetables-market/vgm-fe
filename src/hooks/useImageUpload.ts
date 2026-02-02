@@ -3,10 +3,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { uploadImage, type ImageFormat } from '@/lib/api';
+import { uploadImage, getUploadToken, type ImageFormat } from '@/lib/api';
 import { compressImage } from '@/lib/utils/imageCompression';
 
-export function useImageUpload() {
+type UseImageUploadProps = {
+  fetchToken?: () => Promise<{ token: string; filename: string }>;
+};
+
+export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
   const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -91,8 +95,18 @@ export function useImageUpload() {
     setError(null);
 
     try {
-      const fileName = await uploadImage(file, format);
-      setUploadedFileName(fileName);
+      // 1. アップロード用トークンと許可済みファイル名を取得
+      // カスタム関数があればそれを使い、なければデフォルト(一般用)を使う
+      const { token, filename } = fetchToken 
+        ? await fetchToken() 
+        : await getUploadToken();
+
+      // 2. トークンを使ってアップロード
+      // uploadImage内部で Authorization: Bearer {token} が付与される
+      // filenameはBEが発行したUUIDを使用
+      const uploadedName = await uploadImage(file, format, token, filename);
+      
+      setUploadedFileName(uploadedName);
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'アップロード失敗');

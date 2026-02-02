@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 import { HiHome, HiOutlineHome } from "react-icons/hi";
@@ -80,7 +80,7 @@ const TabletLeftNavigation = () => {
   };
 
   return (
-    <nav className="shrink-0 block bg-white h-dvh overflow-y-auto w-1/4  border-r border-slate-100 p-6 sticky top-0">
+    <nav className="sticky top-0 block h-dvh w-1/4 shrink-0 overflow-y-auto border-r border-slate-100 bg-white p-6">
       <style>{`
         @keyframes bounce-icon {
           0%, 100% { transform: scale(1); }
@@ -91,10 +91,10 @@ const TabletLeftNavigation = () => {
         }
       `}</style>
 
-      <div className="flex flex-col h-full">
+      <div className="flex h-full flex-col">
         {/* ロゴエリア */}
-        <div className="mb-10 px-2 mt-2">
-          <h1 className="text-2xl font-bold text-green-800 tracking-tight">
+        <div className="mt-2 mb-10 px-2">
+          <h1 className="text-2xl font-bold tracking-tight text-green-800">
             GrandMarket
           </h1>
         </div>
@@ -110,12 +110,11 @@ const TabletLeftNavigation = () => {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item)}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl transition-all w-full text-left group
-                  ${
-                    active
-                      ? "bg-green-50 text-emerald-600 font-bold shadow-sm"
-                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-                  }`}
+                className={`group flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left transition-all ${
+                  active
+                    ? "bg-green-50 font-bold text-emerald-600 shadow-sm"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }`}
               >
                 <div
                   className={`relative ${isAnimating ? "animate-bounce-icon" : ""}`}
