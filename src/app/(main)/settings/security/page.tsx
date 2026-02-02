@@ -39,6 +39,12 @@ const securityItems = [
     description: "接続中のデバイスを管理",
     icon: "💻",
   },
+  {
+    href: "/settings/security/passkeys",
+    label: "パスキー設定",
+    description: "指紋や顔認証でログイン",
+    icon: "👆",
+  },
 ];
 
 export default function SecurityPage() {

@@ -8,6 +8,7 @@ import { useIsPWA } from "@/hooks/useIsPWA";
 const Header = dynamic(() => import("@/components/layouts/WebHeader"));
 const MobileNavigation = dynamic(() => import("@/components/layouts/MobileNavigation"));
 const TabletLeftNavigation = dynamic(() => import("@/components/layouts/TabletLeftNavigation"));
+const InstallPrompt = dynamic(() => import("@/components/layout/InstallPrompt"), { ssr: false });
 
 export default function MainLayoutClient({
   children,
@@ -52,6 +53,7 @@ export default function MainLayoutClient({
       {showMobileNav && <MobileNavigation />}
       {showTabletNav && <TabletLeftNavigation />}
       <main className="w-full">{children}</main>
+      <InstallPrompt />
     </section>
   );
 }
