@@ -48,55 +48,57 @@ export interface CreateOrderResponse {
     sellerAmount?: number;
 }
 
-export interface CreatePaymentRequest {
-    orderId: number;
-    userId: number;
-    paymentMethod: 'CREDIT_CARD' | 'PAYPAY';
-    amount: number;
+export async function getTestItems(): Promise<TestItem[]> {
+    return await fetchApi<TestItem[]>('/api/test-items', { method: 'GET' });
 }
 
-export interface CreatePaymentResponse {
-    success: boolean;
-    message: string;
-    paymentId?: number;
-    clientSecret?: string;
-    paypayUrl?: string;
-    paypayDeeplink?: string;
-}
-
-export interface ConfirmPaymentRequest {
-    paymentIntentId: string;
-}
-
-export interface ReleaseEscrowRequest {
-    orderId: number;
-}
-
-export interface UploadTokenResponse {
-    token: string;
-    filename: string;
-    expiresAt: number;
-}
-
-// カテゴリ一覧取得
-export async function getCategories(): Promise<any[]> {
-    return fetchApi(`${API_ENDPOINTS.ITEMS}/categories`, {
-        method: 'GET',
+export async function createProduct(productData: CreateProductRequest): Promise<Product> {
+    return await fetchApi<Product>('/api/products', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(productData),
     });
 }
 
-/**
- * アップロードトークン取得 (一般ユーザー用)
- */
-export const getUploadToken = async (): Promise<{ token: string; key_prefix: string; bucket: string; filename: string }> => {
-  const result = await fetchApi<{ token: string; key_prefix: string; bucket: string; filename: string }>(
-    `${API_ENDPOINTS.ITEMS}/upload-token`,
-    {
-      method: 'POST',
-    }
-  );
-  return result;
-};
+export async function getProduct(id: number): Promise<Product> {
+    return await fetchApi<Product>(`/api/products/${id}`, { method: 'GET' });
+}
+
+export async function createOrder(orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
+    return await fetchApi<CreateOrderResponse>('/api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+    });
+}
+
+export async function getOrder(orderId: number): Promise<any> {
+    return await fetchApi(`/api/orders/${orderId}`, { method: 'GET' });
+}
+
+export async function getOrders(buyerId: number): Promise<any[]> {
+    return await fetchApi(`/api/orders?buyerId=${buyerId}`, { method: 'GET' });
+}
+
+export async function getPaymentIntent(orderId: number): Promise<any> {
+    return await fetchApi(`/api/payment/intent/${orderId}`, { method: 'GET' });
+}
+
+export async function confirmPayment(orderId: number, paymentIntentId: string): Promise<any> {
+    return await fetchApi(`/api/payment/confirm/${orderId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ paymentIntentId }),
+    });
+}
+
+// ==================== Item (Market) 関連 ====================
 
 // 商品ステータス定義
 export const ITEM_STATUS = {
@@ -162,6 +164,23 @@ export const updateItem = async (itemId: number, data: any) => {
     });
 };
 
+export const deleteItem = async (itemId: number) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {
+        method: 'DELETE',
+    });
+};
+
+export const updateItemStatus = async (itemId: number, status: number) => {
+    return await fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/status`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+    });
+};
+
+
 // Legacy support (optional, can be removed if not used)
 export const createItem = async (data: any) => {
     // If we want to support the old flow, we might need a separate endpoint or just map to draft->publish here ?
@@ -169,85 +188,57 @@ export const createItem = async (data: any) => {
   return await fetchApi(`${API_ENDPOINTS.ITEMS}`, {
     method: 'POST',
     headers: {
-        'Content-Type': 'application/json',
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
   });
 };
-/**
- * アップロードトークン取得 (管理者用)
- */
-export async function getAdminUploadToken(filename: string): Promise<UploadTokenResponse> {
-    // API_ENDPOINTS.ADMIN が未定義な可能性があるため、パスを直接指定、あるいはendpoint追加が必要
-    // ここでは直接パスを指定するが、本来は api-endpoint.ts に定義すべき
-    return fetchApi('/v1/admin/media/upload-token', {
+
+// ==================== Category 関連 ====================
+
+export interface Category {
+    categoryId: number;
+    name: string;
+    parentCategoryId: number | null;
+}
+
+export const getCategories = async (): Promise<Category[]> => {
+    return await fetchApi<Category[]>(`${API_ENDPOINTS.CATEGORIES}`, {
+        method: 'GET',
+    });
+};
+
+// ==================== Upload Token 関連 ====================
+
+export interface UploadTokenResponse {
+    token: string;
+    filename: string;
+    expiresAt: number;
+}
+
+export const getUploadToken = async (): Promise<UploadTokenResponse> => {
+    return await fetchApi<UploadTokenResponse>(`${API_ENDPOINTS.ITEMS}/upload-token`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ filename }),
-        credentials: 'include',
     });
-}
+};
 
+// ==================== Direct Upload 関連 ====================
 
+export const uploadImageDirect = async (token: string, filename: string, file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append('file', file);
 
-/**
- * 注文作成
- */
-export async function createOrder(request: CreateOrderRequest): Promise<CreateOrderResponse> {
-    return fetchApi(API_ENDPOINTS.ORDERS, {
+    const uploadUrl = process.env.NEXT_PUBLIC_MEDIA_UPLOAD_URL || 'http://localhost:8787/upload';
+    
+    await fetch(uploadUrl, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'X-Filename': filename,
         },
-        body: JSON.stringify(request),
-        credentials: 'include',
+        body: formData,
     });
-}
-
-/**
- * 決済開始
- */
-export async function createPayment(request: CreatePaymentRequest): Promise<CreatePaymentResponse> {
-    console.log('[createPayment] Request:', request);
-    console.log('[createPayment] Endpoint:', API_ENDPOINTS.PAYMENT_CREATE);
-    console.log('[createPayment] Method: POST');
-
-    return fetchApi(API_ENDPOINTS.PAYMENT_CREATE, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
-
-/**
- * 決済確認（エスクロー化）
- */
-export async function confirmPayment(request: ConfirmPaymentRequest): Promise<{ success: boolean; message: string }> {
-    return fetchApi(API_ENDPOINTS.PAYMENT_CONFIRM, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
-
-/**
- * エスクロー解除（出品者への入金）
- */
-export async function releaseEscrow(request: ReleaseEscrowRequest): Promise<{ success: boolean; message: string }> {
-    return fetchApi(API_ENDPOINTS.PAYMENT_RELEASE_ESCROW, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
+};

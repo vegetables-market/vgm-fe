@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
 
 interface Product {
@@ -34,8 +34,10 @@ interface PaginatedResponse {
   };
 }
 
-export default function FavoritesPage() {
+export default function ProductsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -46,55 +48,61 @@ export default function FavoritesPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
+  // 検索パラメータ
+  const [keyword, setKeyword] = useState(searchParams.get("q") || "");
+  const [categoryId, setCategoryId] = useState(searchParams.get("categoryId") || "");
+  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
+  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
+  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
 
-  const fetchFavorites = async (page: number = 1) => {
+  useEffect(() => {
+    searchProducts();
+  }, [searchParams]);
+
+  const searchProducts = async () => {
     setIsLoading(true);
     setError("");
 
     try {
+      const params = new URLSearchParams();
+      if (keyword) params.append("q", keyword);
+      if (categoryId) params.append("categoryId", categoryId);
+      if (minPrice) params.append("minPrice", minPrice);
+      if (maxPrice) params.append("maxPrice", maxPrice);
+      params.append("sort", sort);
+      params.append("page", searchParams.get("page") || "1");
+      params.append("limit", "20");
+
       const data = await fetchApi<PaginatedResponse>(
-        `/v1/user/favorites?page=${page}&limit=20`,
+        `/v1/market/items/search?${params.toString()}`,
         { credentials: "include" }
       );
 
       setProducts(data.items);
       setPagination(data.pagination);
     } catch (err: any) {
-      setError(err.message || "お気に入りの取得に失敗しました");
+      setError(err.message || "在庫の取得に失敗しました");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRemoveFavorite = async (itemId: number, event: React.MouseEvent) => {
-    event.stopPropagation();
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (keyword) params.append("q", keyword);
+    if (categoryId) params.append("categoryId", categoryId);
+    if (minPrice) params.append("minPrice", minPrice);
+    if (maxPrice) params.append("maxPrice", maxPrice);
+    params.append("sort", sort);
+    params.append("page", "1");
 
-    if (!confirm("お気に入りから削除しますか？")) {
-      return;
-    }
-
-    try {
-      await fetchApi(`/v1/user/favorites/${itemId}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
-
-      // リストから削除
-      setProducts(products.filter(p => p.itemId !== itemId));
-      setPagination({
-        ...pagination,
-        total: pagination.total - 1
-      });
-    } catch (err: any) {
-      alert(err.message || "削除に失敗しました");
-    }
+    router.push(`/stocks?${params.toString()}`);  
   };
 
   const handlePageChange = (page: number) => {
-    fetchFavorites(page);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.push(`/stocks?${params.toString()}`);
   };
 
   const formatPrice = (price: number) => {
@@ -105,32 +113,78 @@ export default function FavoritesPage() {
   };
 
   return (
-    <div className="favorites-page">
+    <div className="products-page">
       <div className="page-header">
-        <h1 className="page-title">お気に入り</h1>
-        <p className="page-subtitle">
-          {pagination.total > 0 && `${pagination.total}件のお気に入り在庫`}
-        </p>
+        <h1 className="page-title">在庫検索</h1>
       </div>
 
-      {error && <div className="error-box">{error}</div>}
-
-      {isLoading && <div className="loading">読み込み中...</div>}
-
-      {!isLoading && products.length === 0 && (
-        <div className="empty-state">
-          <div className="empty-icon">♡</div>
-          <p className="empty-text">お気に入りの在庫がありません</p>
-          <button
-            onClick={() => router.push("/stocks")}
-            className="browse-button"
-          >
-            在庫を探す
+      {/* 検索バー */}
+      <div className="search-section">
+        <div className="search-bar">
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+            placeholder="在庫を検索..."
+            className="search-input"
+          />
+          <button onClick={handleSearch} className="search-button">
+            検索
           </button>
         </div>
-      )}
 
-      {!isLoading && products.length > 0 && (
+        {/* フィルター */}
+        <div className="filters">
+          <div className="filter-group">
+            <label>価格範囲</label>
+            <div className="price-range">
+              <input
+                type="number"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                placeholder="最低価格"
+                className="price-input"
+              />
+              <span>〜</span>
+              <input
+                type="number"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                placeholder="最高価格"
+                className="price-input"
+              />
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label>並び替え</label>
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="sort-select"
+            >
+              <option value="newest">新着順</option>
+              <option value="price_asc">価格が安い順</option>
+              <option value="price_desc">価格が高い順</option>
+              <option value="popular">人気順</option>
+            </select>
+          </div>
+
+          <button onClick={handleSearch} className="filter-apply-button">
+            適用
+          </button>
+        </div>
+      </div>
+
+      {/* エラー表示 */}
+      {error && <div className="error-box">{error}</div>}
+
+      {/* ローディング */}
+      {isLoading && <div className="loading">読み込み中...</div>}
+
+      {/* 商品一覧 */}
+      {!isLoading && (
         <>
           <div className="products-grid">
             {products.map((product) => (
@@ -139,14 +193,6 @@ export default function FavoritesPage() {
                 className="product-card"
                 onClick={() => router.push(`/stocks/${product.itemId}`)}
               >
-                <button
-                  className="remove-button"
-                  onClick={(e) => handleRemoveFavorite(product.itemId, e)}
-                  title="お気に入りから削除"
-                >
-                  ×
-                </button>
-
                 <div className="product-image">
                   {product.thumbnailUrl ? (
                     <img src={product.thumbnailUrl} alt={product.title} />
@@ -154,7 +200,6 @@ export default function FavoritesPage() {
                     <div className="no-image">画像なし</div>
                   )}
                 </div>
-
                 <div className="product-info">
                   <h3 className="product-title">{product.title}</h3>
                   <p className="product-price">{formatPrice(product.price)}</p>
@@ -172,6 +217,7 @@ export default function FavoritesPage() {
             ))}
           </div>
 
+          {/* ページネーション */}
           {pagination.totalPages > 1 && (
             <div className="pagination">
               <button
@@ -193,31 +239,125 @@ export default function FavoritesPage() {
               </button>
             </div>
           )}
+
+          {products.length === 0 && !isLoading && (
+            <div className="no-results">
+              <p>在庫が見つかりませんでした</p>
+            </div>
+          )}
         </>
       )}
 
       <style jsx>{`
-        .favorites-page {
+        .products-page {
           max-width: 1200px;
           margin: 0 auto;
           padding: 24px;
         }
 
         .page-header {
-          margin-bottom: 32px;
+          margin-bottom: 24px;
         }
 
         .page-title {
           font-size: 28px;
           font-weight: 700;
           color: #333;
-          margin: 0 0 8px 0;
+          margin: 0;
         }
 
-        .page-subtitle {
+        .search-section {
+          background: #fff;
+          border-radius: 12px;
+          padding: 24px;
+          margin-bottom: 24px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        .search-input {
+          flex: 1;
+          padding: 12px 16px;
+          border: 1px solid #ddd;
+          border-radius: 8px;
           font-size: 14px;
-          color: #999;
-          margin: 0;
+        }
+
+        .search-button {
+          padding: 12px 32px;
+          background: #333;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+
+        .search-button:hover {
+          background: #555;
+        }
+
+        .filters {
+          display: flex;
+          gap: 16px;
+          align-items: flex-end;
+          flex-wrap: wrap;
+        }
+
+        .filter-group {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .filter-group label {
+          font-size: 12px;
+          font-weight: 600;
+          color: #666;
+        }
+
+        .price-range {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .price-input {
+          width: 120px;
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+        }
+
+        .sort-select {
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          min-width: 150px;
+        }
+
+        .filter-apply-button {
+          padding: 8px 24px;
+          background: #f5f5f5;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .filter-apply-button:hover {
+          background: #e5e5e5;
         }
 
         .error-box {
@@ -230,41 +370,8 @@ export default function FavoritesPage() {
 
         .loading {
           text-align: center;
-          padding: 64px 24px;
+          padding: 48px;
           color: #999;
-        }
-
-        .empty-state {
-          text-align: center;
-          padding: 80px 24px;
-        }
-
-        .empty-icon {
-          font-size: 64px;
-          color: #ddd;
-          margin-bottom: 16px;
-        }
-
-        .empty-text {
-          font-size: 16px;
-          color: #999;
-          margin: 0 0 24px 0;
-        }
-
-        .browse-button {
-          padding: 12px 32px;
-          background: #333;
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          font-size: 14px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background 0.2s;
-        }
-
-        .browse-button:hover {
-          background: #555;
         }
 
         .products-grid {
@@ -275,7 +382,6 @@ export default function FavoritesPage() {
         }
 
         .product-card {
-          position: relative;
           background: #fff;
           border-radius: 12px;
           overflow: hidden;
@@ -287,32 +393,6 @@ export default function FavoritesPage() {
         .product-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .remove-button {
-          position: absolute;
-          top: 8px;
-          right: 8px;
-          width: 32px;
-          height: 32px;
-          background: rgba(255, 255, 255, 0.9);
-          border: none;
-          border-radius: 50%;
-          font-size: 20px;
-          line-height: 1;
-          color: #666;
-          cursor: pointer;
-          z-index: 10;
-          transition: all 0.2s;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .remove-button:hover {
-          background: #e91e63;
-          color: #fff;
-          transform: scale(1.1);
         }
 
         .product-image {
@@ -411,6 +491,12 @@ export default function FavoritesPage() {
         .pagination-info {
           font-size: 14px;
           color: #666;
+        }
+
+        .no-results {
+          text-align: center;
+          padding: 64px 24px;
+          color: #999;
         }
       `}</style>
     </div>
