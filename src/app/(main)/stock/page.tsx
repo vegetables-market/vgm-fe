@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getMyItems } from '@/lib/api';
+import { getMyItems, deleteItem, updateItemStatus } from '@/lib/api';
 
 interface Item {
   id: number;
@@ -16,8 +16,11 @@ interface Item {
 export default function StockPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState<number | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
 
-  useEffect(() => {
+  const loadItems = () => {
+    setLoading(true);
     getMyItems()
       .then((data: any[]) => {
         setItems(data);
@@ -27,14 +30,56 @@ export default function StockPage() {
         console.error(err);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    loadItems();
   }, []);
+
+  const handleDelete = async (itemId: number, itemName: string) => {
+    if (!confirm(`「${itemName}」を削除しますか？この操作は取り消せません。`)) {
+      return;
+    }
+
+    setDeleting(itemId);
+    try {
+      await deleteItem(itemId);
+      loadItems(); // 一覧を再読み込み
+    } catch (err) {
+      console.error(err);
+      alert('削除に失敗しました');
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const handleToggleStatus = async (itemId: number, currentStatus: number) => {
+    // status 2 (出品中) ⇔ status 5 (停止中) の切り替え
+    const newStatus = currentStatus === 2 ? 5 : 2;
+    const statusText = newStatus === 2 ? '出品中' : '停止中';
+    
+    if (!confirm(`ステータスを「${statusText}」に変更しますか？`)) {
+      return;
+    }
+
+    setUpdatingStatus(itemId);
+    try {
+      await updateItemStatus(itemId, newStatus);
+      loadItems(); // 一覧を再読み込み
+    } catch (err) {
+      console.error(err);
+      alert('ステータスの更新に失敗しました');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
 
   const getStatusLabel = (status: number) => {
     switch (status) {
-      case 1: return <span className="text-green-600 font-bold">出品中</span>;
-      case 2: return <span className="text-blue-600 font-bold">取引中</span>;
-      case 3: return <span className="text-gray-600 font-bold">売却済</span>;
-      case 4: return <span className="text-red-600 font-bold">停止中</span>;
+      case 2: return <span className="text-green-600 font-bold">出品中</span>;
+      case 3: return <span className="text-blue-600 font-bold">取引中</span>;
+      case 4: return <span className="text-gray-600 font-bold">売却済</span>;
+      case 5: return <span className="text-red-600 font-bold">停止中</span>;
       default: return <span>不明</span>;
     }
   };
@@ -130,9 +175,28 @@ export default function StockPage() {
                     {new Date(item.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link href={`/stock/${item.id}`} className="text-indigo-600 hover:text-indigo-900">
-                      編集
-                    </Link>
+                    <div className="flex gap-2 justify-end items-center">
+                      {/* ステータス切り替えボタン（出品中⇔停止中のみ） */}
+                      {(item.status === 2 || item.status === 5) && (
+                        <button
+                          onClick={() => handleToggleStatus(item.id, item.status)}
+                          disabled={updatingStatus === item.id}
+                          className="text-blue-600 hover:text-blue-900 disabled:opacity-50 disabled:cursor-not-allowed text-xs"
+                        >
+                          {updatingStatus === item.id ? '更新中...' : item.status === 2 ? '停止' : '再開'}
+                        </button>
+                      )}
+                      <Link href={`/stock/${item.id}/edit`} className="text-indigo-600 hover:text-indigo-900">
+                        編集
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(item.id, item.name)}
+                        disabled={deleting === item.id}
+                        className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {deleting === item.id ? '削除中...' : '削除'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
