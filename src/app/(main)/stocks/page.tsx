@@ -37,20 +37,22 @@ interface PaginatedResponse {
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
   // 検索パラメータ
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
-  const [categoryId, setCategoryId] = useState(searchParams.get("categoryId") || "");
+  const [categoryId /*setCategoryId*/] = useState(
+    searchParams.get("categoryId") || "",
+  );
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "newest");
@@ -75,7 +77,7 @@ export default function ProductsPage() {
 
       const data = await fetchApi<PaginatedResponse>(
         `/v1/market/items/search?${params.toString()}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
 
       setProducts(data.items);
@@ -96,7 +98,7 @@ export default function ProductsPage() {
     params.append("sort", sort);
     params.append("page", "1");
 
-    router.push(`/stocks?${params.toString()}`);  
+    router.push(`/stocks?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -108,7 +110,7 @@ export default function ProductsPage() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP", {
       style: "currency",
-      currency: "JPY"
+      currency: "JPY",
     }).format(price);
   };
 
@@ -210,7 +212,9 @@ export default function ProductsPage() {
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{product.seller.displayName}</span>
+                    <span className="seller-name">
+                      {product.seller.displayName}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -386,7 +390,9 @@ export default function ProductsPage() {
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 

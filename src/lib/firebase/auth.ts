@@ -55,7 +55,7 @@ export const loginWithGithub = async (): Promise<string> => {
 };
 
 // FCMトークンをバックエンドに登録
-const registerFCMToken = async (authToken: string) => {
+const registerFCMToken = async (_authToken: string) => {
   try {
     const fcmToken = await getFCMToken();
     if (!fcmToken) return;
