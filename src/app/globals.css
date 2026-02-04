@@ -84,6 +84,17 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* フォーム要素のスタイル（ダークモードでも見やすく） */
+input, textarea, select {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
+select option {
+  color: #171717 !important;
+  background-color: #ffffff !important;
+}
+
 /* GSAPアニメーションに必要な基本設定 */
 :root { --font-primary: "PP Neue Montreal", sans-serif; }
 
