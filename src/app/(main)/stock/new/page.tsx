@@ -9,7 +9,7 @@ import { useMultiImageUpload } from '@/hooks/useMultiImageUpload';
 export default function StockNewPage() {
   const router = useRouter();
   const { itemId, initDraft, loading: draftLoading } = useItemDraft();
-  const { files, addFiles, removeFile, isAllCompleted, hasError, pendingCount } = useMultiImageUpload(itemId);
+  const { files, addFiles, removeFile, isAllCompleted, hasError, pendingCount } = useMultiImageUpload(itemId, { initDraft });
   
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
@@ -43,15 +43,12 @@ export default function StockNewPage() {
   const [shippingPayerType, setShippingPayerType] = useState(0); // 0:送料込
   const [itemCondition, setItemCondition] = useState(0); // 0:新品
 
-  // Initialize Draft on Mount
+  // Fetch categories on mount (draft is created when first image is added)
   useEffect(() => {
-    initDraft().catch(err => console.error("Failed to init draft", err));
-    
-    // Fetch categories
     getCategories()
       .then(data => setCategories(data))
       .catch(err => console.error('Failed to fetch categories', err));
-  }, [initDraft]);
+  }, []);
 
   // Drag & Drop Handlers
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -139,8 +136,8 @@ export default function StockNewPage() {
     }
   };
 
-  if (draftLoading && !itemId) {
-      return <div className="p-8 text-center">Loading draft...</div>;
+  if (draftLoading) {
+      return <div className="p-8 text-center">読み込み中...</div>;
   }
 
   return (
@@ -228,7 +225,7 @@ export default function StockNewPage() {
           <label className="block text-sm font-medium text-gray-700">商品名 (必須)</label>
           <input
             type="text"
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -238,7 +235,7 @@ export default function StockNewPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700">商品の説明 (必須)</label>
           <textarea
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -250,7 +247,7 @@ export default function StockNewPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700">カテゴリー (必須)</label>
           <select
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={categoryId}
             onChange={(e) => setCategoryId(Number(e.target.value))}
             required
@@ -266,7 +263,7 @@ export default function StockNewPage() {
         <div>
           <label className="block text-sm font-medium text-gray-700">商品の状態</label>
           <select
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={itemCondition}
             onChange={(e) => setItemCondition(Number(e.target.value))}
           >
@@ -283,7 +280,7 @@ export default function StockNewPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700">配送料の負担</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingPayerType}
                 onChange={(e) => setShippingPayerType(Number(e.target.value))}
               >
@@ -291,11 +288,11 @@ export default function StockNewPage() {
                 <option value="1">着払い (購入者負担)</option>
               </select>
             </div>
-            
+
             <div>
                <label className="block text-sm font-medium text-gray-700">発送元の地域</label>
-               <select 
-                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+               <select
+                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                  value={prefectureId}
                  onChange={(e) => setPrefectureId(Number(e.target.value))}
                >
@@ -306,18 +303,18 @@ export default function StockNewPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700">発送までの日数</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingDaysId}
                 onChange={(e) => setShippingDaysId(Number(e.target.value))}
               >
                 {shippingDaysOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
               </select>
             </div>
-            
+
              <div>
               <label className="block text-sm font-medium text-gray-700">配送方法</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingMethodId}
                 onChange={(e) => setShippingMethodId(Number(e.target.value))}
               >
@@ -339,7 +336,7 @@ export default function StockNewPage() {
                 </div>
                 <input
                   type="number"
-                  className="focus:ring-green-500 focus:border-green-500 block w-full pl-7 p-2 sm:text-sm border-gray-300 rounded-md"
+                  className="focus:ring-green-500 focus:border-green-500 block w-full pl-7 p-2 sm:text-sm border border-gray-300 rounded-md text-gray-900 bg-white"
                   placeholder="0"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
@@ -351,7 +348,7 @@ export default function StockNewPage() {
               <label className="block text-sm font-medium text-gray-700">在庫数</label>
               <input
                 type="number"
-                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full p-2 sm:text-sm border-gray-300 rounded-md"
+                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full p-2 sm:text-sm border border-gray-300 rounded-md text-gray-900 bg-white"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 min="1"

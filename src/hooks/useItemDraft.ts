@@ -9,31 +9,21 @@ export function useItemDraft() {
   // 重複呼び出し防止用のRef
   const isCreatingRef = useRef(false);
   const createdIdRef = useRef<number | null>(null);
+  // 待機中のPromise resolver を保持
+  const waitingResolversRef = useRef<Array<(id: number) => void>>([]);
 
   /**
    * Draft Itemを作成または既存のIDを返却
    * 既にitemIdがある場合はAPIコールせずそのIDを返す
    */
-  const initDraft = useCallback(async () => {
+  const initDraft = useCallback(async (): Promise<number> => {
     // 既に作成済みの場合は即座に返す
     if (createdIdRef.current) return createdIdRef.current;
-    if (itemId) return itemId;
 
-    // 作成中の場合は待機（重複防止）
+    // 作成中の場合は完了を待機（重複防止）
     if (isCreatingRef.current) {
-      // 作成完了を待つ
-      return new Promise<number>((resolve, reject) => {
-        const checkInterval = setInterval(() => {
-          if (createdIdRef.current) {
-            clearInterval(checkInterval);
-            resolve(createdIdRef.current);
-          }
-        }, 100);
-        // タイムアウト
-        setTimeout(() => {
-          clearInterval(checkInterval);
-          reject(new Error('Draft creation timeout'));
-        }, 10000);
+      return new Promise<number>((resolve) => {
+        waitingResolversRef.current.push(resolve);
       });
     }
 
@@ -45,6 +35,11 @@ export function useItemDraft() {
       console.log('Draft created:', response.item_id);
       createdIdRef.current = response.item_id;
       setItemId(response.item_id);
+
+      // 待機中の呼び出しに結果を通知
+      waitingResolversRef.current.forEach(resolve => resolve(response.item_id));
+      waitingResolversRef.current = [];
+
       return response.item_id;
     } catch (err) {
       console.error('Failed to create draft:', err);
@@ -53,9 +48,12 @@ export function useItemDraft() {
       throw errorObj;
     } finally {
       setLoading(false);
-      isCreatingRef.current = false;
+      // エラー時のみリセット（成功時は createdIdRef が設定されているので再試行されない）
+      if (!createdIdRef.current) {
+        isCreatingRef.current = false;
+      }
     }
-  }, [itemId]);
+  }, []); // 依存配列を空に - Refで状態管理しているので不要
 
   return {
     itemId,
