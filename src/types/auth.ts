@@ -95,6 +95,7 @@ export interface ResendCodeResponse {
     message: string;
     flow_id: string;
     expires_at: string;
+    next_resend_at?: string;
 }
 
 export interface LoginResponse {

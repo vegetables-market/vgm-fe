@@ -266,6 +266,8 @@ export async function resendAuthCode(flow_id: string): Promise<{ flow_id: string
     });
 }
 
+import { SessionResponse, RevokeSessionResponse } from '@/types/session';
+
 /**
  * 認証コードの検証 (事前認証フロー用)
  */
@@ -273,6 +275,24 @@ export async function verifyAuthCode(flow_id: string, code: string): Promise<{ v
     return fetchApi<{ verified: boolean; email: string }>(`/v1/auth/verify-code`, {
         method: 'POST',
         body: JSON.stringify({ flow_id, code }),
+    });
+}
+
+/**
+ * アクティブセッション一覧取得
+ */
+export async function getSessions(): Promise<{ sessions: SessionResponse[] }> {
+    return fetchApi<{ sessions: SessionResponse[] }>('/v1/user/sessions', {
+        method: 'GET',
+    });
+}
+
+/**
+ * セッション無効化 (ログアウト)
+ */
+export async function revokeSession(sessionId: number): Promise<RevokeSessionResponse> {
+    return fetchApi<RevokeSessionResponse>(`/v1/user/sessions/${sessionId}`, {
+        method: 'DELETE',
     });
 }
 
