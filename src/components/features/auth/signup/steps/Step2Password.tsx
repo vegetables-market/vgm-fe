@@ -39,7 +39,7 @@ export default function Step2Password({ formData, setFormData, onNext }: Step2Pr
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-7">
-        <p className="mb-1 text-base text-[#b3b3b3]">ステップ 2 / 4</p>
+        <p className="mb-1 text-base text-[#b3b3b3]">ステップ 3 / 4</p>
         <p className="text-base font-bold text-white">パスワードを作成</p>
       </div>
 

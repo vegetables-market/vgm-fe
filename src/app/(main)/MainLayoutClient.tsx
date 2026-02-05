@@ -8,7 +8,7 @@ import { useIsPWA } from "@/hooks/useIsPWA";
 const Header = dynamic(() => import("@/components/layouts/WebHeader"));
 const MobileNavigation = dynamic(() => import("@/components/layouts/MobileNavigation"));
 const TabletLeftNavigation = dynamic(() => import("@/components/layouts/TabletLeftNavigation"));
-const InstallPrompt = dynamic(() => import("@/components/layout/InstallPrompt"), { ssr: false });
+const InstallPrompt = dynamic(() => import("@/components/layouts/InstallPrompt"), { ssr: false });
 
 export default function MainLayoutClient({
   children,

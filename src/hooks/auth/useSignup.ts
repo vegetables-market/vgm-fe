@@ -1,15 +1,19 @@
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/services/authService";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth";
 
 export function useSignup() {
-  const [step, setStep] = useState(0); // 0:Email, 1:Username, 2:Password, 3:Profile, 4:Terms
+  const searchParams = useSearchParams();
+  const initialEmail = searchParams.get("email") || "";
+  const initialFlowId = searchParams.get("flow_id") || "";
+  
+  const [step, setStep] = useState(initialFlowId ? 1 : 0); // flow_idがあればVerifyStep(1)から開始
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SignupFormData>({
-    email: "",
+    email: initialEmail,
     username: "",
     password: "",
     name: "",
@@ -17,6 +21,7 @@ export function useSignup() {
     birthYear: "",
     birthMonth: "",
     birthDay: "",
+    flow_id: initialFlowId || undefined,
   });
   const router = useRouter();
 
@@ -57,15 +62,9 @@ export function useSignup() {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        display_name: formData.name,
-        birth_year: formData.birthYear
-          ? parseInt(formData.birthYear)
-          : undefined,
-        birth_month: formData.birthMonth
-          ? parseInt(formData.birthMonth)
-          : undefined,
-        birth_day: formData.birthDay ? parseInt(formData.birthDay) : undefined,
-        gender: formData.gender || undefined,
+        display_name: formData.username, // display_nameをusernameで初期化
+        flow_id: formData.flow_id,
+        // プロフィール関連は省略（バックエンドがNullableまたはデフォルト値を持つ前提）
       });
 
       addLog(`Signup successful: ${JSON.stringify(data)}`);

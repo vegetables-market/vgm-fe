@@ -20,6 +20,8 @@ export interface SignupFormData {
     birthYear: string;
     birthMonth: string;
     birthDay: string;
+    flow_id?: string;
+    expiresAt?: string;
 }
 
 // Requests
@@ -32,6 +34,7 @@ export interface RegisterRequest {
     birth_month?: number;
     birth_day?: number;
     gender?: string;
+    flow_id?: string;
 }
 
 export interface VerifyEmailRequest {
@@ -91,6 +94,7 @@ export interface ResendCodeResponse {
     success: boolean;
     message: string;
     flow_id: string;
+    expires_at: string;
 }
 
 export interface LoginResponse {

@@ -11,6 +11,8 @@ interface ChallengeState {
   flowId: string | null;
   mfaToken: string | null;
   action: string | null;
+  expiresAt: string | null;
+  nextResendAt: string | null;
 }
 
 interface ChallengeActions {
@@ -23,7 +25,7 @@ interface ChallengeFormProps {
 }
 
 export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
-  const { error, type, flowId, mfaToken, action } = state;
+  const { error, type, flowId, mfaToken, action, expiresAt, nextResendAt } = state;
   const { handleReturnToLogin } = actions;
 
   const renderContent = () => {
@@ -33,7 +35,7 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
     }
     // 1. Email Verification (Signup / Login Unknown Device) -> flow_id
     if (type === "email" && flowId) {
-      return <EmailVerification flowId={flowId} />;
+      return <EmailVerification flowId={flowId} expiresAt={expiresAt || undefined} nextResendAt={nextResendAt || undefined} />;
     }
     // 2. Email MFA (Login Known Device) -> mfa_token
     if (type === "email" && mfaToken) {
