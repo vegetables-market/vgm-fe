@@ -45,6 +45,7 @@ export interface VerifyEmailRequest {
 export interface VerifyChallengeRequest {
     flow_id: string;
     code: string;
+    action?: string;
 }
 
 export interface ResendCodeRequest {
@@ -73,6 +74,7 @@ export interface DisableTotpRequest {
 export interface TotpLoginRequest {
     mfa_token: string;
     code: string;
+    action?: string;
 }
 
 // Responses

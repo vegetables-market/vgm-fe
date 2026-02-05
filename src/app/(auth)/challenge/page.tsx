@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useChallenge } from "@/hooks/auth/useChallenge";
-import ChallengeForm from "@/components/features/auth/ChallengeForm";
+import ChallengeForm from "@/components/features/auth/form/ChallengeForm";
 
 function ChallengeContent() {
   const { state, actions } = useChallenge();

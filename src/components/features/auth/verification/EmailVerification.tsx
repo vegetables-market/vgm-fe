@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyChallenge, resendCode } from '@/services/authService';
+import { verifyAuth, AuthMethod, resendCode } from '@/services/authService';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 import EmailVerificationForm from './EmailVerificationForm';
@@ -11,15 +11,18 @@ interface EmailVerificationProps {
   flowId: string;
   expiresAt?: string;
   nextResendAt?: string;
+  action?: string;
+  redirectTo?: string;
+  maskedEmail?: string;
 }
 
-export default function EmailVerification({ flowId, expiresAt, nextResendAt }: EmailVerificationProps) {
+export default function EmailVerification({ flowId, expiresAt, nextResendAt, action, redirectTo, maskedEmail: propMaskedEmail }: EmailVerificationProps) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
-  const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
+  const [maskedEmail, setMaskedEmail] = useState<string | null>(propMaskedEmail || null);
   
   // 有効期限の残り時間（秒）
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
@@ -109,8 +112,20 @@ export default function EmailVerification({ flowId, expiresAt, nextResendAt }: E
     addLog(`Submitting challenge for flow_id: ${flowId}`);
 
     try {
-      const data = await verifyChallenge({ flow_id: flowId, code });
+      const data = await verifyAuth({
+        method: AuthMethod.EMAIL,
+        identifier: flowId,
+        code,
+        action
+      });
       addLog(`Challenge successful: ${JSON.stringify(data)}`);
+
+      if ((data as any).action_token && redirectTo) {
+          // Action Token Flow
+          const separator = redirectTo.includes('?') ? '&' : '?';
+          router.push(`${redirectTo}${separator}action_token=${(data as any).action_token}`);
+          return;
+      }
 
       if (data.user) {
         authLogin(data.user);
