@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 
-interface Step4Props {
+interface TermsAgreementProps {
   onSubmit: () => void;
   loading: boolean;
 }
 
-export default function Step4Terms({ onSubmit, loading }: Step4Props) {
+export default function TermsAgreement({ onSubmit, loading }: TermsAgreementProps) {
   const [agreed, setAgreed] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {

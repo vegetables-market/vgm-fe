@@ -6,7 +6,7 @@ import AuthButton from "@/components/features/auth/ui/AuthButton";
 import { verifyAuthCode } from "@/lib/api/api-client";
 import OtpInput from 'react-otp-input';
 
-interface StepNoticeProps {
+interface CodeVerificationProps {
   formData: any;
   setFormData: any;
   onNext: () => void;
@@ -14,13 +14,13 @@ interface StepNoticeProps {
   expiresAt?: string;
 }
 
-export default function StepVerifyCode({
+export default function CodeVerification({
   formData,
   setFormData: _,
   onNext,
   flowId,
   expiresAt
-}: StepNoticeProps) {
+}: CodeVerificationProps) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);

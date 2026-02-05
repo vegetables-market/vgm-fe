@@ -6,13 +6,13 @@ import { useDebouncedCallback } from "use-debounce";
 import { checkUsername } from "@/lib/api/api-client";
 import { SignupFormData } from "@/types/auth";
 
-interface Step1Props {
+interface UsernameEntryProps {
   formData: SignupFormData;
   setFormData: React.Dispatch<React.SetStateAction<SignupFormData>>;
   onNext: () => void;
 }
 
-export default function Step1Username({ formData, setFormData, onNext }: Step1Props) {
+export default function UsernameEntry({ formData, setFormData, onNext }: UsernameEntryProps) {
   const [showError, setShowError] = useState(false);
   const [checking, setChecking] = useState(false);
   const [usernameError, setUsernameError] = useState("");

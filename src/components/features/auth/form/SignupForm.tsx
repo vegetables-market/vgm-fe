@@ -1,11 +1,11 @@
 import React from "react";
 import { FaCircleExclamation, FaCircleChevronLeft } from "react-icons/fa6";
 import AuthTitle from "@/components/features/auth/ui/AuthTitle";
-import Step0Email from "@/components/features/auth/signup/steps/Step0Email";
-import StepVerifyCode from "@/components/features/auth/signup/steps/StepVerifyCode";
-import Step1Username from "@/components/features/auth/signup/steps/Step1Username";
-import Step2Password from "@/components/features/auth/signup/steps/Step2Password";
-import Step4Terms from "@/components/features/auth/signup/steps/Step4Terms";
+import EmailEntry from "@/components/features/auth/signup/steps/EmailEntry";
+import CodeVerification from "@/components/features/auth/signup/steps/CodeVerification";
+import UsernameEntry from "@/components/features/auth/signup/steps/UsernameEntry";
+import PasswordEntry from "@/components/features/auth/signup/steps/PasswordEntry";
+import TermsAgreement from "@/components/features/auth/signup/steps/TermsAgreement";
 
 import ProgressBar from "@/components/features/auth/signup/ProgressBar";
 import { SignupFormData } from "@/types/auth";
@@ -58,15 +58,14 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
 
         <div className="mb-5 w-full">
           {step === 0 && (
-            <Step0Email
+            <EmailEntry
               formData={formData}
               setFormData={setFormData}
-              onNext={handleNext}
               addLog={addLog}
             />
           )}
           {step === 1 && (
-             <StepVerifyCode
+             <CodeVerification
                formData={formData}
                setFormData={setFormData}
                onNext={handleNext}
@@ -75,21 +74,21 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
              />
           )}
           {step === 2 && (
-            <Step1Username
+            <UsernameEntry
               formData={formData}
               setFormData={setFormData}
               onNext={handleNext}
             />
           )}
           {step === 3 && (
-            <Step2Password
+            <PasswordEntry
               formData={formData}
               setFormData={setFormData}
               onNext={handleNext}
             />
           )}
           {step === 4 && (
-            <Step4Terms onSubmit={handleSubmit} loading={loading} />
+            <TermsAgreement onSubmit={handleSubmit} loading={loading} />
           )}
         </div>
       </div>

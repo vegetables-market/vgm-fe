@@ -6,19 +6,17 @@ import SocialLoginButtons from "@/components/features/auth/SocialLoginButtons";
 import { SignupFormData } from "@/types/auth";
 import AuthDivider from "@/components/features/auth/ui/AuthDivider";
 
-interface Step0Props {
+interface EmailEntryProps {
   formData: SignupFormData;
   setFormData: React.Dispatch<React.SetStateAction<SignupFormData>>;
-  onNext: () => void;
   addLog: (msg: string) => void;
 }
 
-export default function Step0Email({
+export default function EmailEntry({
   formData,
   setFormData,
-  onNext,
   addLog,
-}: Step0Props) {
+}: EmailEntryProps) {
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
