@@ -218,3 +218,81 @@ export async function uploadImage(
         throw new Error(`画像のアップロードに失敗しました: ${String(error)}`);
     }
 }
+
+/**
+ * アップロード用トークン取得 (Admin)
+ */
+export async function getAdminUploadToken(filename: string): Promise<{ token: string; filename: string }> {
+    return fetchApi<{ token: string; filename: string }>(`/v1/admin/media/upload-token?filename=${filename}`, {
+        method: 'GET',
+    });
+}
+
+/**
+ * ユーザー名の重複チェック
+ */
+export async function checkUsername(username: string): Promise<{ available: boolean; message?: string; suggestions?: string[] }> {
+    return fetchApi<{ available: boolean; message?: string; suggestions?: string[] }>(`/v1/auth/check-username?username=${username}`, {
+        method: 'GET',
+    });
+}
+
+/**
+ * 初期おすすめユーザー名の取得
+ */
+export async function getInitialUsernameSuggestions(): Promise<{ suggestions: string[] }> {
+    return fetchApi<{ suggestions: string[] }>(`/v1/auth/suggestions`, {
+        method: 'GET',
+    });
+}
+
+/**
+ * 認証フロー開始 (Login or Register判定)
+ */
+export async function initAuthFlow(email: string): Promise<{ flow: "LOGIN" | "REGISTER" | "CHALLENGE"; flow_id?: string; expires_at?: string; next_resend_at?: string }> {
+    return fetchApi<{ flow: "LOGIN" | "REGISTER" | "CHALLENGE"; flow_id?: string; expires_at?: string; next_resend_at?: string }>(`/v1/auth/init-flow`, {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+    });
+}
+
+/**
+ * 認証コード再送信
+ */
+export async function resendAuthCode(flow_id: string): Promise<{ flow_id: string; expires_at: string; message: string; next_resend_at: string }> {
+    return fetchApi<{ flow_id: string; expires_at: string; message: string; next_resend_at: string }>(`/v1/auth/resend-code`, {
+        method: 'POST',
+        body: JSON.stringify({ flow_id }),
+    });
+}
+
+import { SessionResponse, RevokeSessionResponse } from '@/types/session';
+
+/**
+ * 認証コードの検証 (事前認証フロー用)
+ */
+export async function verifyAuthCode(flow_id: string, code: string): Promise<{ verified: boolean; email: string }> {
+    return fetchApi<{ verified: boolean; email: string }>(`/v1/auth/verify-code`, {
+        method: 'POST',
+        body: JSON.stringify({ flow_id, code }),
+    });
+}
+
+/**
+ * アクティブセッション一覧取得
+ */
+export async function getSessions(): Promise<{ sessions: SessionResponse[] }> {
+    return fetchApi<{ sessions: SessionResponse[] }>('/v1/user/sessions', {
+        method: 'GET',
+    });
+}
+
+/**
+ * セッション無効化 (ログアウト)
+ */
+export async function revokeSession(sessionId: number): Promise<RevokeSessionResponse> {
+    return fetchApi<RevokeSessionResponse>(`/v1/user/sessions/${sessionId}`, {
+        method: 'DELETE',
+    });
+}
+

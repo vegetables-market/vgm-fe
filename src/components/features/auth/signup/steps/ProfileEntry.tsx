@@ -10,13 +10,13 @@ const GENDER_OPTIONS = [
   { value: "other", label: "その他" },
 ];
 
-interface Step3Props {
+interface ProfileEntryProps {
   formData: SignupFormData;
   setFormData: React.Dispatch<React.SetStateAction<SignupFormData>>;
   onNext: () => void;
 }
 
-export default function Step3Profile({ formData, setFormData, onNext }: Step3Props) {
+export default function ProfileEntry({ formData, setFormData, onNext }: ProfileEntryProps) {
   const [showError, setShowError] = useState(false);
 
   const { isNameValid, isBirthDateValid, isGenderValid, isBirthDatePartiallyFilled, isBirthYearValid, isBirthMonthValid, isBirthDayValid } = useMemo(() => {

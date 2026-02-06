@@ -12,6 +12,10 @@ export function useChallenge() {
   const flowId = searchParams.get("flow_id");
   const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
   const action = searchParams.get("action"); // delete_account など
+  const maskedEmail = searchParams.get("masked_email");
+  const expiresAt = searchParams.get("expires_at");
+  const nextResendAt = searchParams.get("next_resend_at");
+  const redirectTo = searchParams.get("redirect_to");
 
   useEffect(() => {
     if (!type) {
@@ -30,6 +34,10 @@ export function useChallenge() {
       flowId,
       mfaToken,
       action,
+      maskedEmail,
+      expiresAt,
+      nextResendAt,
+      redirectTo,
     },
     actions: {
       handleReturnToLogin,

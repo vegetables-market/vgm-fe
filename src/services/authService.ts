@@ -50,17 +50,20 @@ export async function verifyEmail(
 /**
  * セキュリティチャレンジ（flow_id）認証
  */
-export async function verifyChallenge(
-    request: VerifyChallengeRequest,
-): Promise<VerifyEmailResponse> {
-    return fetchApi<VerifyEmailResponse>('/v1/auth/verify-challenge', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
+/**
+ * @deprecated Use verifyAuth instead
+ */
+export async function verifyChallenge(data: VerifyChallengeRequest): Promise<VerifyEmailResponse | LoginResponse> {
+    // Forward to new endpoint
+    const response = await verifyAuth({
+        method: AuthMethod.EMAIL,
+        identifier: data.flow_id,
+        code: data.code,
+        action: data.action
     });
+    
+    // Adapt response if necessary, but verifyAuth returns LoginResponse-like structure which is superset of VerifyEmailResponse
+    return response as any;
 }
 
 /**
@@ -118,16 +121,44 @@ export async function getUserById(userId: number): Promise<LoginResponse> {
 /**
  * MFA検証（ログイン時）
  */
-export async function verifyMfa(
-    mfaToken: string,
-    code: string
+export enum AuthMethod {
+    EMAIL = 'EMAIL',
+    TOTP = 'TOTP'
+}
+
+export interface VerifyAuthRequest {
+    method: AuthMethod;
+    identifier: String;
+    code: String;
+    action?: String;
+}
+
+export async function verifyAuth(
+    request: VerifyAuthRequest
 ): Promise<LoginResponse> {
-    return fetchApi<LoginResponse>('/v1/auth/verify-mfa', {
+    return fetchApi<LoginResponse>('/v1/auth/verify', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ mfa_token: mfaToken, code }),
+        body: JSON.stringify(request),
         credentials: 'include',
+    });
+}
+
+/**
+ * @deprecated Use verifyAuth instead
+ */
+export async function verifyMfa(
+    mfaToken: string,
+    code: string,
+    action?: string
+): Promise<LoginResponse> {
+    // Forward to new endpoint for compatibility or keep old until fully migrated
+    return verifyAuth({
+        method: AuthMethod.TOTP,
+        identifier: mfaToken,
+        code,
+        action
     });
 }

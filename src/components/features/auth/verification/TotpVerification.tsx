@@ -3,16 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaCircleExclamation } from 'react-icons/fa6';
-import { verifyMfa } from '@/services/authService';
+import { verifyAuth, AuthMethod } from '@/services/authService';
 import { getErrorMessage } from '@/lib/api/error-handler';
 import OtpInput from '@/components/features/auth/OtpInput';
 import { useAuth } from '@/context/AuthContext';
 
 interface TotpVerificationProps {
   mfaToken: string;
+  action?: string;
+  redirectTo?: string;
 }
 
-export default function TotpVerification({ mfaToken }: TotpVerificationProps) {
+export default function TotpVerification({ mfaToken, action, redirectTo }: TotpVerificationProps) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +39,20 @@ export default function TotpVerification({ mfaToken }: TotpVerificationProps) {
     addLog('Verifying MFA code...');
 
     try {
-      const data = await verifyMfa(mfaToken, code);
+      const data = await verifyAuth({
+          method: AuthMethod.TOTP,
+          identifier: mfaToken,
+          code,
+          action
+      });
       addLog(`MFA Verify response: ${data.status}`);
+
+      if ((data as any).action_token && redirectTo) {
+          // Action Token Flow
+          const separator = redirectTo.includes('?') ? '&' : '?';
+          router.push(`${redirectTo}${separator}action_token=${(data as any).action_token}`);
+          return;
+      }
 
       if (data.user) {
         addLog('MFA login successful!');

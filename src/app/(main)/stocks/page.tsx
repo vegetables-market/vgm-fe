@@ -50,7 +50,7 @@ export default function ProductsPage() {
 
   // 検索パラメータ
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
-  const [categoryId, setCategoryId] = useState(searchParams.get("categoryId") || "");
+  const categoryId = searchParams.get("categoryId") || "";
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
   const [sort, setSort] = useState(searchParams.get("sort") || "newest");

@@ -29,7 +29,7 @@ export default function StockEditPage() {
   const params = useParams();
   const itemId = Number(params.id);
   
-  const { files, addFiles, removeFile, isAllCompleted, hasError, pendingCount } = useMultiImageUpload(itemId);
+  const { files, addFiles, removeFile, hasError, pendingCount } = useMultiImageUpload(itemId);
   
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);

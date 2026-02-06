@@ -1,39 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { IoClose, IoDownloadOutline } from "react-icons/io5";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
-}
+import { useEffect, useState } from "react";
 
 export default function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // 既にPWAとしてインストールされている場合は表示しない
-    if (window.matchMedia("(display-mode: standalone)").matches) {
-      return;
-    }
-
-    // 以前に非表示にした場合は表示しない
-    const dismissedAt = localStorage.getItem("installPromptDismissed");
-    if (dismissedAt) {
-      const dismissedDate = new Date(dismissedAt);
-      const now = new Date();
-      // 7日間は再表示しない
-      if (now.getTime() - dismissedDate.getTime() < 7 * 24 * 60 * 60 * 1000) {
-        return;
-      }
-    }
-
-    const handler = (e: Event) => {
+    const handler = (e: any) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      setShowPrompt(true);
+      setDeferredPrompt(e);
+      setIsVisible(true);
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -43,55 +20,52 @@ export default function InstallPrompt() {
     };
   }, []);
 
-  const handleInstall = async () => {
+  const handleInstallClick = async () => {
     if (!deferredPrompt) return;
 
-    await deferredPrompt.prompt();
+    deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === "accepted") {
-      setShowPrompt(false);
+      setDeferredPrompt(null);
     }
-    setDeferredPrompt(null);
+    setIsVisible(false);
   };
 
-  const handleDismiss = () => {
-    setShowPrompt(false);
-    setDismissed(true);
-    localStorage.setItem("installPromptDismissed", new Date().toISOString());
-  };
-
-  if (!showPrompt || dismissed) {
-    return null;
-  }
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-20 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-4 z-50">
-      <button
-        onClick={handleDismiss}
-        className="absolute top-2 right-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-        aria-label="閉じる"
-      >
-        <IoClose className="text-xl" />
-      </button>
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 bg-emerald-100 dark:bg-emerald-900 rounded-lg flex items-center justify-center">
-          <IoDownloadOutline className="text-xl text-emerald-600 dark:text-emerald-400" />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-semibold text-slate-900 dark:text-white text-sm">
-            アプリをインストール
-          </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            ホーム画面に追加して、より快適にご利用いただけます
-          </p>
+    <div className="fixed right-4 bottom-4 left-4 z-50 rounded-lg border border-gray-200 bg-white p-4 shadow-lg md:right-4 md:left-auto md:w-96 dark:border-gray-700 dark:bg-gray-800">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+              アプリをインストール
+            </h3>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              ホーム画面に追加して、より快適に利用できます。
+            </p>
+          </div>
           <button
-            onClick={handleInstall}
-            className="mt-3 w-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors"
+            onClick={() => setIsVisible(false)}
+            className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
           >
-            インストール
+            <span className="sr-only">閉じる</span>
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fillRule="evenodd"
+                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
           </button>
         </div>
+        <button
+          onClick={handleInstallClick}
+          className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+        >
+          インストールする
+        </button>
       </div>
     </div>
   );
