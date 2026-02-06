@@ -183,7 +183,7 @@ export default function StockEditPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* 画像アップロード UI */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">在庫画像</label>
+          <label className="block text-sm font-medium text-gray-900 mb-2">在庫画像</label>
           
           <div 
             className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer"
@@ -252,10 +252,10 @@ export default function StockEditPage() {
 
         {/* 商品詳細 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">在庫名 (必須)</label>
+          <label className="block text-sm font-medium text-gray-900">在庫名 (必須)</label>
           <input
             type="text"
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -263,9 +263,9 @@ export default function StockEditPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">在庫の説明 (必須)</label>
+          <label className="block text-sm font-medium text-gray-900">在庫の説明 (必須)</label>
           <textarea
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -275,31 +275,31 @@ export default function StockEditPage() {
 
         {/* カテゴリ */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">カテゴリー (必須)</label>
+          <label className="block text-sm font-medium text-gray-900">カテゴリー (必須)</label>
           <select
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={categoryId}
             onChange={(e) => setCategoryId(Number(e.target.value))}
             required
           >
-            <option value="">選択してください</option>
+            <option value="" className="text-gray-900">選択してください</option>
             {categories.map((cat) => (
-              <option key={cat.categoryId} value={cat.categoryId}>{cat.name}</option>
+              <option key={cat.categoryId} value={cat.categoryId} className="text-gray-900">{cat.name}</option>
             ))}
           </select>
         </div>
 
         {/* 商品の状態 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">在庫の状態</label>
+          <label className="block text-sm font-medium text-gray-900">在庫の状態</label>
           <select
-            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500"
+            className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm focus:ring-green-500 focus:border-green-500 text-gray-900 bg-white"
             value={itemCondition}
             onChange={(e) => setItemCondition(Number(e.target.value))}
           >
-            <option value="0">新品、未使用</option>
-            <option value="1">未使用に近い</option>
-            <option value="2">目立った傷や汚れなし</option>
+            <option value="0" className="text-gray-900">新品、未使用</option>
+            <option value="1" className="text-gray-900">未使用に近い</option>
+            <option value="2" className="text-gray-900">目立った傷や汚れなし</option>
           </select>
         </div>
 
@@ -308,47 +308,47 @@ export default function StockEditPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">配送について</h3>
           <div className="grid grid-cols-1 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">配送料の負担</label>
+              <label className="block text-sm font-medium text-gray-900">配送料の負担</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingPayerType}
                 onChange={(e) => setShippingPayerType(Number(e.target.value))}
               >
-                <option value="0">送料込み (出品者負担)</option>
-                <option value="1">着払い (購入者負担)</option>
+                <option value="0" className="text-gray-900">送料込み (出品者負担)</option>
+                <option value="1" className="text-gray-900">着払い (購入者負担)</option>
               </select>
             </div>
-            
+
             <div>
-               <label className="block text-sm font-medium text-gray-700">発送元の地域</label>
-               <select 
-                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+               <label className="block text-sm font-medium text-gray-900">発送元の地域</label>
+               <select
+                 className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                  value={prefectureId}
                  onChange={(e) => setPrefectureId(Number(e.target.value))}
                >
-                 {prefectureOptions.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                 {prefectureOptions.map(p => <option key={p.id} value={p.id} className="text-gray-900">{p.name}</option>)}
                </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">発送までの日数</label>
+              <label className="block text-sm font-medium text-gray-900">発送までの日数</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingDaysId}
                 onChange={(e) => setShippingDaysId(Number(e.target.value))}
               >
-                {shippingDaysOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+                {shippingDaysOptions.map(opt => <option key={opt.id} value={opt.id} className="text-gray-900">{opt.name}</option>)}
               </select>
             </div>
-            
+
              <div>
-              <label className="block text-sm font-medium text-gray-700">配送方法</label>
+              <label className="block text-sm font-medium text-gray-900">配送方法</label>
               <select
-                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm"
+                className="mt-1 block w-full border border-gray-300 rounded-md p-2 shadow-sm text-gray-900 bg-white"
                 value={shippingMethodId}
                 onChange={(e) => setShippingMethodId(Number(e.target.value))}
               >
-                {shippingMethodOptions.map(opt => <option key={opt.id} value={opt.id}>{opt.name}</option>)}
+                {shippingMethodOptions.map(opt => <option key={opt.id} value={opt.id} className="text-gray-900">{opt.name}</option>)}
               </select>
             </div>
           </div>
@@ -359,14 +359,14 @@ export default function StockEditPage() {
           <h3 className="text-lg font-medium text-gray-900 mb-4">価格と在庫</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">販売価格 (必須)</label>
+              <label className="block text-sm font-medium text-gray-900">販売価格 (必須)</label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <span className="text-gray-500 sm:text-sm">¥</span>
                 </div>
                 <input
                   type="number"
-                  className="focus:ring-green-500 focus:border-green-500 block w-full pl-7 p-2 sm:text-sm border-gray-300 rounded-md"
+                  className="focus:ring-green-500 focus:border-green-500 block w-full pl-7 p-2 sm:text-sm border border-gray-300 rounded-md text-gray-900 bg-white"
                   placeholder="0"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
@@ -375,10 +375,10 @@ export default function StockEditPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">在庫数</label>
+              <label className="block text-sm font-medium text-gray-900">在庫数</label>
               <input
                 type="number"
-                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full p-2 sm:text-sm border-gray-300 rounded-md"
+                className="mt-1 focus:ring-green-500 focus:border-green-500 block w-full p-2 sm:text-sm border border-gray-300 rounded-md text-gray-900 bg-white"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 min="1"
@@ -391,7 +391,7 @@ export default function StockEditPage() {
           <button
             type="button"
             onClick={() => router.push('/stock')}
-            className="flex-1 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="flex-1 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-900 bg-white hover:bg-gray-50"
           >
             キャンセル
           </button>
