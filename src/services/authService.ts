@@ -2,12 +2,6 @@ import { API_ENDPOINTS, fetchApi } from '@/lib/api/api-client';
 import {
     RegisterRequest,
     RegisterResponse,
-    VerifyEmailRequest,
-    VerifyEmailResponse,
-    VerifyChallengeRequest,
-    ResendCodeRequest,
-    ResendCodeResponse,
-    LoginRequest,
     LoginResponse
 } from '@/types/auth';
 
@@ -32,61 +26,10 @@ export async function register(
 }
 
 /**
- * メールアドレス認証
- */
-export async function verifyEmail(
-    request: VerifyEmailRequest,
-): Promise<VerifyEmailResponse> {
-    return fetchApi<VerifyEmailResponse>(API_ENDPOINTS.VERIFY_EMAIL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
-
-/**
- * セキュリティチャレンジ（flow_id）認証
- */
-/**
- * @deprecated Use verifyAuth instead
- */
-export async function verifyChallenge(data: VerifyChallengeRequest): Promise<VerifyEmailResponse | LoginResponse> {
-    // Forward to new endpoint
-    const response = await verifyAuth({
-        method: AuthMethod.EMAIL,
-        identifier: data.flow_id,
-        code: data.code,
-        action: data.action
-    });
-    
-    // Adapt response if necessary, but verifyAuth returns LoginResponse-like structure which is superset of VerifyEmailResponse
-    return response as any;
-}
-
-/**
- * 認証コード再送信
- */
-export async function resendCode(
-    request: ResendCodeRequest,
-): Promise<ResendCodeResponse> {
-    return fetchApi<ResendCodeResponse>('/v1/auth/resend-code', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-        credentials: 'include',
-    });
-}
-
-/**
  * ログイン
  */
 export async function login(
-    loginRequest: LoginRequest,
+    loginRequest: { email: string; password: string },
 ): Promise<LoginResponse> {
     return fetchApi<LoginResponse>(API_ENDPOINTS.LOGIN, {
         method: 'POST',
@@ -109,34 +52,12 @@ export async function logout(): Promise<void> {
 }
 
 /**
- * ユーザー情報取得
+ * 認証コード再送信
  */
-export async function getUserById(userId: number): Promise<LoginResponse> {
-    return fetchApi<LoginResponse>(`${API_ENDPOINTS.USER}/${userId}`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-}
-
-/**
- * MFA検証（ログイン時）
- */
-export enum AuthMethod {
-    EMAIL = 'EMAIL',
-    TOTP = 'TOTP'
-}
-
-export interface VerifyAuthRequest {
-    method: AuthMethod;
-    identifier: String;
-    code: String;
-    action?: String;
-}
-
-export async function verifyAuth(
-    request: VerifyAuthRequest
-): Promise<LoginResponse> {
-    return fetchApi<LoginResponse>('/v1/auth/verify', {
+export async function resendCode(
+    request: { flow_id: string },
+): Promise<{ flow_id: string; expires_at: string; message: string; next_resend_at: string }> {
+    return fetchApi<{ flow_id: string; expires_at: string; message: string; next_resend_at: string }>('/v1/auth/resend-code', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -147,18 +68,60 @@ export async function verifyAuth(
 }
 
 /**
- * @deprecated Use verifyAuth instead
+ * ユーザー情報取得
  */
-export async function verifyMfa(
-    mfaToken: string,
-    code: string,
-    action?: string
+export async function getUserById(userId: number): Promise<LoginResponse> {
+    return fetchApi<LoginResponse>(`${API_ENDPOINTS.USER}/${userId}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+}
+
+/**
+ * 認証方式
+ */
+export enum AuthMethod {
+    EMAIL = 'EMAIL',
+    TOTP = 'TOTP'
+}
+
+export interface VerifyAuthRequest {
+    method: AuthMethod;
+    identifier: string;
+    code: string;
+    action?: string;
+}
+
+/**
+ * ログイン完了
+ * EMAIL/TOTP認証後にセッションを作成してログインを完了する
+ */
+export async function verifyLogin(
+    request: VerifyAuthRequest
 ): Promise<LoginResponse> {
-    // Forward to new endpoint for compatibility or keep old until fully migrated
-    return verifyAuth({
-        method: AuthMethod.TOTP,
-        identifier: mfaToken,
-        code,
-        action
+    return fetchApi<LoginResponse>('/v1/auth/verify-login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+        credentials: 'include',
+    });
+}
+
+/**
+ * セキュリティ確認
+ * 重要アクション実行前の再認証でアクショントークンを発行する
+ */
+export async function verifyAction(
+    request: VerifyAuthRequest
+): Promise<{ success: boolean; action_token: string; user: any; action: string }> {
+    return fetchApi<{ success: boolean; action_token: string; user: any; action: string }>('/v1/auth/verify-action', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+        credentials: 'include',
     });
 }

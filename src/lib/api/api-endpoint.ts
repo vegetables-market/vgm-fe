@@ -5,7 +5,6 @@ export const API_ENDPOINTS = {
     TEST: '/test',
     REGISTER: '/v1/auth/signup',
     LOGIN: '/v1/auth/login',
-    VERIFY_EMAIL: '/v1/auth/verify-email',
     USER: '/auth/user',
     TOTP_ENABLE: '/auth/totp/enable',
     TOTP_VERIFY: '/auth/totp/verify-and-enable',

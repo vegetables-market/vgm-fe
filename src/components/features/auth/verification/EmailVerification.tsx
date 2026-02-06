@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyAuth, AuthMethod, resendCode } from '@/services/authService';
+import { verifyLogin, verifyAction, AuthMethod, resendCode } from '@/services/authService';
+import { verifyAuthCode } from '@/lib/api/api-client';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 import EmailVerificationForm from './EmailVerificationForm';
@@ -112,29 +113,59 @@ export default function EmailVerification({ flowId, expiresAt, nextResendAt, act
     addLog(`Submitting challenge for flow_id: ${flowId}`);
 
     try {
-      const data = await verifyAuth({
-        method: AuthMethod.EMAIL,
-        identifier: flowId,
-        code,
-        action
-      });
-      addLog(`Challenge successful: ${JSON.stringify(data)}`);
+      // フロー1: セキュリティ確認フロー（action パラメータあり）
+      if (action) {
+        const data = await verifyAction({
+          method: AuthMethod.EMAIL,
+          identifier: flowId,
+          code,
+          action
+        });
+        addLog(`Action verification successful: ${JSON.stringify(data)}`);
 
-      if ((data as any).action_token && redirectTo) {
-          // Action Token Flow
+        // Action Token Flow
+        if (data.action_token && redirectTo) {
           const separator = redirectTo.includes('?') ? '&' : '?';
-          router.push(`${redirectTo}${separator}action_token=${(data as any).action_token}`);
-          return;
-      }
+          router.push(`${redirectTo}${separator}action_token=${data.action_token}`);
+        } else {
+          // redirectTo がない場合もエラーにせず、成功として扱う
+          addLog('Action verification completed without redirect');
+        }
+        return; // セキュリティ確認フロー完了
+      } 
+      // フロー2 & 3: 新規登録フローまたはログインフロー
+      else {
+        // まず /verify-code を試す（新規登録フロー）
+        try {
+          const codeResult = await verifyAuthCode(flowId, code);
+          addLog(`Code verification successful: ${JSON.stringify(codeResult)}`);
 
-      if (data.user) {
-        authLogin(data.user);
-        localStorage.removeItem('vgm_masked_email');
-        router.push('/');
-      } else {
-        // 新規ユーザー -> 登録画面へ
-        const targetEmail = (data as any).email || "";
-        router.push(`/signup?email=${encodeURIComponent(targetEmail)}&flow_id=${flowId}&verified=true`);
+          if (codeResult.verified) {
+            // 新規登録フロー: 登録画面へ
+            const targetEmail = codeResult.email || "";
+            router.push(`/signup?email=${encodeURIComponent(targetEmail)}&flow_id=${flowId}&verified=true`);
+            return;
+          }
+        } catch (codeErr: any) {
+          // /verify-code が失敗した場合は、ログインフローとして /verify-login を試す
+          addLog(`Code verification failed, trying login flow: ${getErrorMessage(codeErr)}`);
+          
+          const data = await verifyLogin({
+            method: AuthMethod.EMAIL,
+            identifier: flowId,
+            code
+          });
+          addLog(`Login verification successful: ${JSON.stringify(data)}`);
+
+          if (data.user) {
+            // ログインフロー: ログイン完了
+            authLogin(data.user);
+            localStorage.removeItem('vgm_masked_email');
+            router.push('/');
+          } else {
+            setError('ログインに失敗しました。');
+          }
+        }
       }
     } catch (err: any) {
       const message = getErrorMessage(err);

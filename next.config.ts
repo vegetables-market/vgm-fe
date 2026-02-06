@@ -1,10 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // 本番ビルド時のみ静的エクスポート（開発時は無効）
-  ...(process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT === 'true'
-    ? { output: 'export' }
-    : {}),
+  output: 'export', // 完全静的サイトとしてエクスポート
   productionBrowserSourceMaps: false,
   trailingSlash: true,
   images: {

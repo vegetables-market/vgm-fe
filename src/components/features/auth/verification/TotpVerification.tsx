@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaCircleExclamation } from 'react-icons/fa6';
-import { verifyAuth, AuthMethod } from '@/services/authService';
+import { verifyLogin, verifyAction, AuthMethod } from '@/services/authService';
 import { getErrorMessage } from '@/lib/api/error-handler';
 import OtpInput from '@/components/features/auth/OtpInput';
 import { useAuth } from '@/context/AuthContext';
@@ -39,30 +39,37 @@ export default function TotpVerification({ mfaToken, action, redirectTo }: TotpV
     addLog('Verifying MFA code...');
 
     try {
-      const data = await verifyAuth({
-          method: AuthMethod.TOTP,
-          identifier: mfaToken,
-          code,
-          action
-      });
-      addLog(`MFA Verify response: ${data.status}`);
+      const request = {
+        method: AuthMethod.TOTP,
+        identifier: mfaToken,
+        code
+      };
 
-      if ((data as any).action_token && redirectTo) {
-          // Action Token Flow
+      // アクションがある場合は verifyAction、ない場合は verifyLogin
+      if (action) {
+        const data = await verifyAction({ ...request, action });
+        addLog(`Action verification successful: ${JSON.stringify(data)}`);
+
+        // Action Token Flow
+        if (data.action_token && redirectTo) {
           const separator = redirectTo.includes('?') ? '&' : '?';
-          router.push(`${redirectTo}${separator}action_token=${(data as any).action_token}`);
+          router.push(`${redirectTo}${separator}action_token=${data.action_token}`);
           return;
-      }
-
-      if (data.user) {
-        addLog('MFA login successful!');
-        authLogin(data.user);
-        router.push('/');
-      } else if (data.require_verification && data.flow_id) {
-        // MFA後にさらにメール認証が必要な場合（まれなケース）
-        router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+        }
       } else {
-        setError('ログインに失敗しました。');
+        const data = await verifyLogin(request);
+        addLog(`MFA Verify response: ${data.status}`);
+
+        if (data.user) {
+          addLog('MFA login successful!');
+          authLogin(data.user);
+          router.push('/');
+        } else if (data.require_verification && data.flow_id) {
+          // MFA後にさらにメール認証が必要な場合（まれなケース）
+          router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+        } else {
+          setError('ログインに失敗しました。');
+        }
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
