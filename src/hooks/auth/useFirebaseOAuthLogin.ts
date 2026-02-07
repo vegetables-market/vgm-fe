@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loginWithGoogle, loginWithMicrosoft, loginWithGithub } from "@/lib/firebase/auth";
-import { fetchApi } from "@/lib/api";
+import { fetchApi, API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
 interface LoginResponse {
@@ -30,15 +30,15 @@ export function useFirebaseOAuthLogin() {
       switch (provider) {
         case "google":
           token = await loginWithGoogle();
-          endpoint = "/v1/auth/login/google";
+          endpoint = API_ENDPOINTS.AUTH_GOOGLE;
           break;
         case "microsoft":
           token = await loginWithMicrosoft();
-          endpoint = "/v1/auth/login/microsoft";
+          endpoint = API_ENDPOINTS.AUTH_MICROSOFT;
           break;
         case "github":
           token = await loginWithGithub();
-          endpoint = "/v1/auth/login/github";
+          endpoint = API_ENDPOINTS.AUTH_GITHUB;
           break;
       }
 
