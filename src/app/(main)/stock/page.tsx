@@ -10,7 +10,7 @@ interface Item {
   price: number;
   status: number;
   imageUrl: string | null;
-  created_at: string;
+  createdAt: string;
 }
 
 export default function StockPage() {
@@ -172,7 +172,7 @@ export default function StockPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(item.created_at).toLocaleDateString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex gap-2 justify-end items-center">

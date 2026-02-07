@@ -7,18 +7,18 @@ import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
 
 interface CartItem {
-  cart_item_id: number;
-  item_id: number;
+  cartItemId: number;
+  itemId: number;
   name: string;
   price: number;
   quantity: number;
   subtotal: number;
-  thumbnail_url: string | null;
+  thumbnailUrl: string | null;
 }
 
 interface CartResponse {
   items: CartItem[];
-  total_amount: number;
+  totalAmount: number;
 }
 
 export default function BasketPage() {
@@ -114,13 +114,13 @@ export default function BasketPage() {
       <div className="space-y-6">
         {cart.items.map((item) => (
           <div
-            key={item.cart_item_id}
+            key={item.cartItemId}
             className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg shadow-sm"
           >
             {/* Image */}
             <div className="relative w-24 h-24 flex-shrink-0 bg-gray-100 rounded overflow-hidden">
                <Image
-                 src={getMediaUrl(item.thumbnail_url)}
+                 src={getMediaUrl(item.thumbnailUrl)}
                  alt={item.name}
                  fill
                  className="object-cover"
@@ -131,7 +131,7 @@ export default function BasketPage() {
 
             {/* Info */}
             <div className="flex-1">
-              <Link href={`/products/${item.item_id}`} className="font-bold text-lg text-gray-800 hover:text-red-500">
+              <Link href={`/products/${item.itemId}`} className="font-bold text-lg text-gray-800 hover:text-red-500">
                 {item.name}
               </Link>
               <p className="text-red-500 font-bold mt-1">¥{item.price.toLocaleString()}</p>
@@ -141,7 +141,7 @@ export default function BasketPage() {
             <div className="flex flex-col items-end gap-2 text-gray-800">
               <div className="flex items-center border rounded">
                 <button
-                  onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity - 1)}
+                  onClick={() => handleUpdateQuantity(item.cartItemId, item.quantity - 1)}
                   disabled={isUpdating || item.quantity <= 1}
                   className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
                 >
@@ -149,7 +149,7 @@ export default function BasketPage() {
                 </button>
                 <div className="px-3 py-1 min-w-[40px] text-center font-bold">{item.quantity}</div>
                 <button
-                  onClick={() => handleUpdateQuantity(item.cart_item_id, item.quantity + 1)}
+                  onClick={() => handleUpdateQuantity(item.cartItemId, item.quantity + 1)}
                   disabled={isUpdating}
                   className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
                 >
@@ -157,7 +157,7 @@ export default function BasketPage() {
                 </button>
               </div>
               <button
-                onClick={() => handleRemoveItem(item.cart_item_id)}
+                onClick={() => handleRemoveItem(item.cartItemId)}
                 disabled={isUpdating}
                 className="text-sm text-gray-500 hover:text-red-500 underline"
               >
@@ -176,7 +176,7 @@ export default function BasketPage() {
       <div className="mt-8 border-t pt-6">
         <div className="flex justify-between items-center text-xl font-bold mb-6 text-gray-900">
           <span>合計金額</span>
-          <span className="text-red-500">¥{cart.total_amount.toLocaleString()}</span>
+          <span className="text-red-500">¥{cart.totalAmount.toLocaleString()}</span>
         </div>
 
         <div className="flex flex-col gap-4">

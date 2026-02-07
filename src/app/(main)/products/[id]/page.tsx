@@ -124,7 +124,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       await fetchApi("/v1/market/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item_id: product.item.itemId, quantity: 1 }),
+        body: JSON.stringify({ itemId: product.item.itemId, quantity: 1 }),
         credentials: "include",
       });
       if (confirm("カートに追加しました。カートへ移動しますか？")) {
