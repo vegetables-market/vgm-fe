@@ -7,10 +7,10 @@ interface LoginResponse {
   status: string;
   user: {
     username: string;
-    display_name: string;
+    displayName: string;
     email: string;
-    avatar_url: string | null;
-    is_email_verified: boolean;
+    avatarUrl: string | null;
+    isEmailVerified: boolean;
   } | null;
   flow_id?: string;
   message?: string;
@@ -53,10 +53,10 @@ export function useFirebaseOAuthLogin() {
         // Save user info to AuthContext (which also saves to localStorage)
         login({
           username: response.user.username,
-          display_name: response.user.display_name,
+          displayName: response.user.displayName,
           email: response.user.email,
-          avatar_url: response.user.avatar_url,
-          is_email_verified: response.user.is_email_verified,
+          avatarUrl: response.user.avatarUrl,
+          isEmailVerified: response.user.isEmailVerified,
         });
         
         // Settings/OAuthページからの連携フローの場合、そこに戻る
