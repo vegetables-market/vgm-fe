@@ -57,8 +57,6 @@ export default function CodeVerification({
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loading) return;
-
     if (!flowId) {
         setError("システムエラー: 認証IDが見つかりません。最初からやり直してください。");
         return;
