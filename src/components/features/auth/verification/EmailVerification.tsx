@@ -130,7 +130,8 @@ export default function EmailVerification({ flowId, expiresAt, nextResendAt, act
       if (data.user) {
         authLogin(data.user);
         localStorage.removeItem('vgm_masked_email');
-        router.push('/');
+        const safeRedirect = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/';
+        router.push(safeRedirect);
       } else {
         // 新規ユーザー -> 登録画面へ
         const targetEmail = (data as any).email || "";
@@ -159,8 +160,14 @@ export default function EmailVerification({ flowId, expiresAt, nextResendAt, act
       
       // レスポンスに含まれる next_resend_at をURLに反映させることで
       // 上記のuseEffectが発火し、クールダウンがセットされる
-      const newUrl = `/challenge?type=email&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
-      router.replace(newUrl);
+      const params = new URLSearchParams();
+      params.set('type', 'email');
+      params.set('flow_id', data.flow_id);
+      if (data.expires_at) params.set('expires_at', data.expires_at);
+      if (data.next_resend_at) params.set('next_resend_at', data.next_resend_at);
+      if (action) params.set('action', action);
+      if (redirectTo) params.set('redirect_to', redirectTo);
+      router.replace(`/challenge?${params.toString()}`);
     } catch (err: any) {
       // 再送信制限エラーの場合
       if (err.info?.error === 'RESEND_LIMIT_EXCEEDED' || err.message?.includes('再送信回数の上限')) {

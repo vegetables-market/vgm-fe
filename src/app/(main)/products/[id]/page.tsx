@@ -52,6 +52,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const loginRedirect = (target: string) => `/login?redirect_to=${encodeURIComponent(target)}`;
 
   useEffect(() => {
     fetchProductDetail();
@@ -109,6 +110,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         }
       }
     } catch (err: any) {
+      if (err?.status === 401) {
+        router.push(loginRedirect(`/products/${id}`));
+        return;
+      }
       alert(err.message || "お気に入りの操作に失敗しました");
     }
   };

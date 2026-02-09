@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api/api-client";
+import { useAuth } from "@/context/AuthContext";
 
 interface Product {
   itemId: number;
@@ -37,6 +38,7 @@ interface PaginatedResponse {
 export default function ProductsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { isAuthenticated } = useAuth();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [pagination, setPagination] = useState({
@@ -47,6 +49,8 @@ export default function ProductsPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [favoriteIds, setFavoriteIds] = useState<Set<number>>(new Set());
+  const [favoriteLoadingIds, setFavoriteLoadingIds] = useState<Set<number>>(new Set());
 
   // 検索パラメータ
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
@@ -58,6 +62,14 @@ export default function ProductsPage() {
   useEffect(() => {
     searchProducts();
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setFavoriteIds(new Set());
+      return;
+    }
+    loadFavorites();
+  }, [isAuthenticated]);
 
   const searchProducts = async () => {
     setIsLoading(true);
@@ -84,6 +96,34 @@ export default function ProductsPage() {
       setError(err.message || "商品の取得に失敗しました");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadFavorites = async () => {
+    try {
+      const limit = 200;
+      let page = 1;
+      const ids = new Set<number>();
+
+      while (true) {
+        const data = await fetchApi<PaginatedResponse>(
+          `/v1/user/favorites?page=${page}&limit=${limit}`,
+          { credentials: "include" }
+        );
+        data.items.forEach((item) => ids.add(item.itemId));
+
+        if (page >= data.pagination.totalPages) {
+          break;
+        }
+        page += 1;
+      }
+
+      setFavoriteIds(ids);
+    } catch (err: any) {
+      if (err?.status === 401) {
+        setFavoriteIds(new Set());
+        return;
+      }
     }
   };
 
@@ -118,6 +158,70 @@ export default function ProductsPage() {
     const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
     const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
     return `${baseUrl}/${url}`;
+  };
+
+  const loginRedirect = (target: string) => `/login?redirect_to=${encodeURIComponent(target)}`;
+
+  const handleToggleFavorite = async (event: MouseEvent, itemId: number) => {
+    event.stopPropagation();
+    const redirectTarget = `/products/${itemId}`;
+
+    if (!isAuthenticated) {
+      router.push(loginRedirect(redirectTarget));
+      return;
+    }
+
+    if (favoriteLoadingIds.has(itemId)) {
+      return;
+    }
+
+    setFavoriteLoadingIds((prev) => new Set(prev).add(itemId));
+
+    try {
+      if (favoriteIds.has(itemId)) {
+        await fetchApi(`/v1/user/favorites/${itemId}`, {
+          method: "DELETE",
+          credentials: "include"
+        });
+        setFavoriteIds((prev) => {
+          const next = new Set(prev);
+          next.delete(itemId);
+          return next;
+        });
+        setProducts((prev) =>
+          prev.map((product) =>
+            product.itemId === itemId
+              ? { ...product, likesCount: Math.max(0, product.likesCount - 1) }
+              : product
+          )
+        );
+      } else {
+        await fetchApi(`/v1/user/favorites/${itemId}`, {
+          method: "POST",
+          credentials: "include"
+        });
+        setFavoriteIds((prev) => new Set(prev).add(itemId));
+        setProducts((prev) =>
+          prev.map((product) =>
+            product.itemId === itemId
+              ? { ...product, likesCount: product.likesCount + 1 }
+              : product
+          )
+        );
+      }
+    } catch (err: any) {
+      if (err?.status === 401) {
+        router.push(loginRedirect(redirectTarget));
+        return;
+      }
+      alert(err.message || "お気に入りの操作に失敗しました");
+    } finally {
+      setFavoriteLoadingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(itemId);
+        return next;
+      });
+    }
   };
 
   return (
@@ -207,6 +311,15 @@ export default function ProductsPage() {
                   ) : (
                     <div className="no-image">画像なし</div>
                   )}
+                  <button
+                    className={`favorite-toggle ${favoriteIds.has(product.itemId) ? "liked" : ""}`}
+                    onClick={(e) => handleToggleFavorite(e, product.itemId)}
+                    disabled={favoriteLoadingIds.has(product.itemId)}
+                    title={favoriteIds.has(product.itemId) ? "お気に入り解除" : "お気に入りに追加"}
+                    aria-label={favoriteIds.has(product.itemId) ? "お気に入り解除" : "お気に入りに追加"}
+                  >
+                    {favoriteIds.has(product.itemId) ? "♥" : "♡"}
+                  </button>
                 </div>
                 <div className="product-info">
                   <h3 className="product-title">{product.title}</h3>
@@ -407,6 +520,7 @@ export default function ProductsPage() {
           width: 100%;
           height: 200px;
           background: #f5f5f5;
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -421,6 +535,41 @@ export default function ProductsPage() {
         .no-image {
           color: #999;
           font-size: 14px;
+        }
+
+        .favorite-toggle {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          width: 36px;
+          height: 36px;
+          border-radius: 999px;
+          border: 1px solid #eee;
+          background: rgba(255, 255, 255, 0.95);
+          color: #e91e63;
+          font-size: 18px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+          transition: transform 0.2s, box-shadow 0.2s, background 0.2s, color 0.2s;
+        }
+
+        .favorite-toggle:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+        }
+
+        .favorite-toggle.liked {
+          background: #e91e63;
+          color: #fff;
+          border-color: #e91e63;
+        }
+
+        .favorite-toggle:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
         }
 
         .product-info {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { login } from "@/services/authService";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
@@ -11,7 +11,14 @@ export function useLogin() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { login: authLogin } = useAuth();
+  const redirectParam = searchParams.get("redirect_to") || searchParams.get("redirect");
+  const getSafeRedirect = (value: string | null) => {
+    if (!value) return "/";
+    return value.startsWith("/") ? value : "/";
+  };
+  const redirectTo = getSafeRedirect(redirectParam);
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -56,6 +63,7 @@ export function useLogin() {
               if (result.next_resend_at) params.set("next_resend_at", result.next_resend_at);
               // アクションを指定しても良い (action=login)
               params.set("action", "login"); 
+              if (redirectParam) params.set("redirect_to", redirectParam);
               
               router.push(`/challenge?${params.toString()}`);
           } else {
@@ -94,7 +102,7 @@ export function useLogin() {
 
           const mfaType = data.mfa_type?.toLowerCase() || "totp";
           router.push(
-            `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
+            `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}${redirectParam ? `&redirect_to=${encodeURIComponent(redirectParam)}` : ""}`,
           );
         } else if (data.require_verification) {
           if (data.flow_id) {
@@ -102,7 +110,7 @@ export function useLogin() {
             if (data.masked_email) {
               localStorage.setItem("vgm_masked_email", data.masked_email);
             }
-            router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+            router.push(`/challenge?type=email&flow_id=${data.flow_id}${redirectParam ? `&redirect_to=${encodeURIComponent(redirectParam)}` : ""}`);
           } else {
             addLog("Login failed: Invalid credentials.");
             setError(
@@ -112,7 +120,7 @@ export function useLogin() {
         } else if (data.user) {
           addLog("Login successful!");
           authLogin(data.user);
-          router.push("/");
+          router.push(redirectTo);
         }
       } catch (err: any) {
         const message = getErrorMessage(err);

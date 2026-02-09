@@ -51,6 +51,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const loginRedirect = (target: string) => `/login?redirect_to=${encodeURIComponent(target)}`;
 
   useEffect(() => {
     fetchProductDetail();
@@ -108,6 +109,10 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
         }
       }
     } catch (err: any) {
+      if (err?.status === 401) {
+        router.push(loginRedirect(`/stocks/${params.id}`));
+        return;
+      }
       alert(err.message || "お気に入りの操作に失敗しました");
     }
   };

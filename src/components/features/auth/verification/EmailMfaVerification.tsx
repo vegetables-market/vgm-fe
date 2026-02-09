@@ -9,9 +9,10 @@ import EmailVerificationForm from './EmailVerificationForm';
 
 interface EmailMfaVerificationProps {
   mfaToken: string;
+  redirectTo?: string;
 }
 
-export default function EmailMfaVerification({ mfaToken }: EmailMfaVerificationProps) {
+export default function EmailMfaVerification({ mfaToken, redirectTo }: EmailMfaVerificationProps) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +45,8 @@ export default function EmailMfaVerification({ mfaToken }: EmailMfaVerificationP
       if (data.user) {
         authLogin(data.user);
         localStorage.removeItem('vgm_masked_email');
-        router.push('/');
+        const safeRedirect = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/';
+        router.push(safeRedirect);
       } else if (data.require_verification && data.flow_id) {
         // 万が一、MFA後にさらにEmail Verificationが必要な場合
         router.push(`/challenge?type=email&flow_id=${data.flow_id}`);

@@ -57,7 +57,8 @@ export default function TotpVerification({ mfaToken, action, redirectTo }: TotpV
       if (data.user) {
         addLog('MFA login successful!');
         authLogin(data.user);
-        router.push('/');
+        const safeRedirect = redirectTo && redirectTo.startsWith('/') ? redirectTo : '/';
+        router.push(safeRedirect);
       } else if (data.require_verification && data.flow_id) {
         // MFA後にさらにメール認証が必要な場合（まれなケース）
         router.push(`/challenge?type=email&flow_id=${data.flow_id}`);

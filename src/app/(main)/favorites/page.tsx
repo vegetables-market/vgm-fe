@@ -98,7 +98,7 @@ export default function FavoritesPage() {
   };
 
   const handleProductClick = (itemId: number) => {
-    router.push(`/items/${itemId}`);
+    router.push(`/products/${itemId}`);
   };
 
   return (

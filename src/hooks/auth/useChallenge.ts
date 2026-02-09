@@ -24,6 +24,10 @@ export function useChallenge() {
   }, [type]);
 
   const handleReturnToLogin = () => {
+    if (redirectTo) {
+      router.push(`/login?redirect_to=${encodeURIComponent(redirectTo)}`);
+      return;
+    }
     router.push("/login");
   };
 
