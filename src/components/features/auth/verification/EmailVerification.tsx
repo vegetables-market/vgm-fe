@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyLogin, verifyAction, AuthMethod, resendCode } from '@/services/authService';
+import { verifyLogin, verifyAction, AuthMethod, resendCode } from '@/lib/api/services/auth';
 import { verifyAuthCode } from '@/lib/api/client';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';

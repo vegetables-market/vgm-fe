@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { logout } from "@/services/authService";
+import { logout } from "@/lib/api/services/auth";
 
 export default function AuthDebugConsole() {
   const [logs, setLogs] = useState<string[]>([]);

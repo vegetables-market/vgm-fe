@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaCircleExclamation } from 'react-icons/fa6';
-import { verifyLogin, verifyAction, AuthMethod } from '@/services/authService';
+import { verifyLogin, verifyAction, AuthMethod } from '@/lib/api/services/auth';
 import { getErrorMessage } from '@/lib/api/error-handler';
 import OtpInput from '@/components/features/auth/OtpInput';
 import { useAuth } from '@/context/AuthContext';

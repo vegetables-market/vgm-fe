@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { UserInfo } from '@/types/auth';
-import { logout as logoutApi } from '@/services/authService';
+import { logout as logoutApi } from '@/lib/api/services/auth';
 
 type AuthContextType = {
     user: UserInfo | null;
