@@ -35,7 +35,7 @@ export default function EmailEntry({
     
     setIsLoading(true);
     try {
-        const { initAuthFlow } = await import("@/lib/api/api-client");
+        const { initAuthFlow } = await import("@/lib/api/client");
         addLog(`Checking email status: ${formData.email}`);
         
         // 認証フロー初期化 (Backendで統一的に処理)

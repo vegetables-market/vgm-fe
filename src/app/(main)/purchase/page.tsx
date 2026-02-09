@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi } from "@/lib/api/client";
 import {
   MOCK_ADDRESSES,
   MOCK_PAYMENT_METHODS,
@@ -68,7 +68,6 @@ interface ProductDetail {
 
 function PurchaseContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const itemId = searchParams.get("itemId");
 
   // 商品データ

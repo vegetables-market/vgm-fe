@@ -43,7 +43,7 @@ export function useLogin() {
 
       setIsLoading(true);
       try {
-          const { initAuthFlow } = await import("@/lib/api/api-client");
+          const { initAuthFlow } = await import("@/lib/api/client");
           const result = await initAuthFlow(emailOrUsername);
 
           if (result.flow_id) {
@@ -83,7 +83,7 @@ export function useLogin() {
       setIsLoading(true);
       addLog(`Attempting login with password for: ${emailOrUsername}`);
       try {
-        const data = await login({ username: emailOrUsername, password });
+        const data = await login({ email: emailOrUsername, password });
 
         if (data.status === "MFA_REQUIRED" && data.mfa_token) {
           addLog("MFA Required. Redirecting to challenge page.");

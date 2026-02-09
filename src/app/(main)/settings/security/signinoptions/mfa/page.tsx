@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi } from "@/lib/api/client";
 
 type MfaStatus = {
   isEnabled: boolean;

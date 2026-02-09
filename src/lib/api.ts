@@ -1,6 +1,6 @@
-import { API_ENDPOINTS, fetchApi } from './api/api-client';
+import { API_ENDPOINTS, fetchApi } from './api/client';
 
-export * from './api/api-client'; // 共通部分を再エクスポート
+export * from './api/client'; // 共通部分を再エクスポート
 
 // ==================== 商品・注文・決済関連 ====================
 
