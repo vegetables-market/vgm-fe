@@ -106,7 +106,7 @@ export default function AuthDebugConsole() {
             <div className="flex items-center justify-between gap-4">
               <span className="font-bold text-gray-400">User:</span>
               <span className="text-blue-300 truncate max-w-[100px]">
-                {user.display_name}
+                {user.displayName}
               </span>
             </div>
           )}

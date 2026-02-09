@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Btn from "@/components/features/settings/ui/Btn";
 import BtnWrappers from "@/components/features/settings/ui/BtnWrappers";
-import { getSessions } from "@/lib/api/api-client";
+import { getSessions } from "@/lib/api/client";
 import { SessionResponse } from "@/types/session";
 import { formatDistanceToNow } from "date-fns";
 import { ja } from "date-fns/locale";

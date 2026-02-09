@@ -3,7 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
-import { checkUsername } from "@/lib/api/api-client";
+import { checkUsername } from "@/lib/api/client";
 import { SignupFormData } from "@/types/auth";
 
 interface UsernameEntryProps {
@@ -30,7 +30,7 @@ export default function UsernameEntry({ formData, setFormData, onNext }: Usernam
 
     const fetchInitialSuggestions = async () => {
         try {
-            const { getInitialUsernameSuggestions } = await import("@/lib/api/api-client");
+            const { getInitialUsernameSuggestions } = await import("@/lib/api/client");
             const result = await getInitialUsernameSuggestions();
             if (result.suggestions && result.suggestions.length > 0) {
                 setSuggestions(result.suggestions);

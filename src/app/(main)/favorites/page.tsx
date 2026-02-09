@@ -2,49 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi, getMediaUrl } from "@/lib/api/api-client";
-
-interface Product {
-  itemId: number;
-  title: string;
-  description: string | null;
-  price: number;
-  categoryId: number | null;
-  categoryName: string | null;
-  condition: number;
-  status: number;
-  likesCount: number;
-  thumbnailUrl: string | null;
-  seller: {
-    userId: number;
-    username: string;
-    displayName: string;
-    avatarUrl: string | null;
-  };
-  createdAt: string;
-}
-
-interface PaginatedResponse {
-  items: Product[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-const toMediaUrl = (url: string | null) => {
-  if (!url) return null;
-  if (url.startsWith("http")) return url;
-  const mediaUrl = getMediaUrl();
-  const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
-  return `${baseUrl}/${url}`;
-};
+import { favoriteApi } from "@/lib/api/services";
+import type { ItemResponse } from "@/lib/api/types";
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ItemResponse[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -63,11 +26,7 @@ export default function FavoritesPage() {
     setError("");
 
     try {
-      const data = await fetchApi<PaginatedResponse>(
-        `/v1/user/favorites?page=${page}&limit=20`,
-        { credentials: "include" }
-      );
-
+      const data = await favoriteApi.getFavorites(page, 20);
       setProducts(data.items);
       setPagination(data.pagination);
     } catch (err: any) {
@@ -80,15 +39,12 @@ export default function FavoritesPage() {
   const handleRemoveFavorite = async (itemId: number, event: React.MouseEvent) => {
     event.stopPropagation();
 
-    if (!confirm("お気に入りから削除しますか？")) {
+    if (!confirm("お気に入りから削除しますか?")) {
       return;
     }
 
     try {
-      await fetchApi(`/v1/user/favorites/${itemId}`, {
-        method: "DELETE",
-        credentials: "include"
-      });
+      await favoriteApi.removeFavorite(itemId);
       // 削除後にリストを更新
       setProducts(products.filter(p => p.itemId !== itemId));
       setPagination(prev => ({ ...prev, total: prev.total - 1 }));
@@ -98,7 +54,7 @@ export default function FavoritesPage() {
   };
 
   const handleProductClick = (itemId: number) => {
-    router.push(`/products/${itemId}`);
+    router.push(`/items/${itemId}`);
   };
 
   return (
@@ -127,7 +83,7 @@ export default function FavoritesPage() {
                 <div className="aspect-square bg-gray-100 relative">
                   {product.thumbnailUrl ? (
                     <img
-                      src={toMediaUrl(product.thumbnailUrl) || ""}
+                      src={product.thumbnailUrl}
                       alt={product.title}
                       className="w-full h-full object-cover"
                     />

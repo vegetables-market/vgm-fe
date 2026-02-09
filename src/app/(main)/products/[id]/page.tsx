@@ -2,7 +2,7 @@
 
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi } from "@/lib/api/client";
 
 interface ProductDetail {
   item: {
@@ -118,6 +118,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   };
 
+
+
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    setIsProcessing(true);
+    try {
+      await fetchApi("/v1/market/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: product.item.itemId, quantity: 1 }),
+        credentials: "include",
+      });
+      if (confirm("カートに追加しました。カートへ移動しますか？")) {
+        router.push("/basket");
+      }
+    } catch (err: any) {
+      alert(err.message || "カートへの追加に失敗しました");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handlePurchase = () => {
     // 購入ページへ遷移（商品IDをクエリパラメータで渡す）
     router.push(`/purchase?itemId=${id}`);
@@ -220,9 +244,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {/* 購入ボタン */}
           <div className="action-buttons">
             {isOnSale && (
-              <button onClick={handlePurchase} className="purchase-button">
-                購入手続きへ
-              </button>
+              <>
+                <button onClick={handlePurchase} className="purchase-button">
+                  購入手続きへ
+                </button>
+                <button 
+                  onClick={handleAddToCart} 
+                  disabled={isProcessing}
+                  className="cart-button"
+                >
+                  {isProcessing ? "処理中..." : "カートに入れる"}
+                </button>
+              </>
             )}
             {isSoldOut && (
               <button disabled className="purchase-button sold-out">
@@ -498,6 +531,29 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
         .purchase-button.sold-out {
           background: #999;
+          cursor: not-allowed;
+        }
+
+        .cart-button {
+          width: 100%;
+          padding: 16px;
+          background: #fff;
+          border: 2px solid #e53935;
+          border-radius: 8px;
+          font-size: 18px;
+          font-weight: 700;
+          color: #e53935;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .cart-button:hover:not(:disabled) {
+          background: #e53935;
+          color: #fff;
+        }
+        
+        .cart-button:disabled {
+          opacity: 0.5;
           cursor: not-allowed;
         }
 

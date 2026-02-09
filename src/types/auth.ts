@@ -4,10 +4,10 @@
 
 export interface UserInfo {
     username: string; // user_id -> username
-    display_name: string;
+    displayName: string;
     email: string | null;
-    avatar_url: string | null;
-    is_email_verified?: boolean;
+    avatarUrl: string | null;
+    isEmailVerified?: boolean;
 }
 
 // フロントエンド用フォームデータ型

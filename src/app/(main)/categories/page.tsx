@@ -2,28 +2,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { fetchApi } from '@/lib/api';
-
-interface Category {
-  categoryId: number;
-  categoryName: string;
-  parentId: number | null;
-  level: number;
-  iconUrl: string | null;
-  sortOrder: number;
-  children?: Category[];
-}
+import { categoryApi } from '@/lib/api/services';
+import type { CategoryResponse } from '@/lib/api/types';
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<CategoryResponse[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchApi<{ categories: Category[] }>('/v1/market/categories', {
-      credentials: 'include'
-    })
+    categoryApi.getAllCategories()
       .then(data => {
-        setCategories(data.categories || []);
+        setCategories(data);
         setLoading(false);
       })
       .catch(err => {

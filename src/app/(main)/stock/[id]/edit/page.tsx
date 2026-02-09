@@ -146,14 +146,14 @@ export default function StockEditPage() {
       const payload = {
         name,
         description,
-        category_id: Number(categoryId),
+        categoryId: Number(categoryId),
         price: Number(price),
         quantity: Number(quantity),
-        shipping_payer_type: shippingPayerType,
-        shipping_origin_area: prefectureId,
-        shipping_days_id: shippingDaysId,
-        shipping_method_id: shippingMethodId,
-        item_condition: itemCondition,
+        shippingPayerType: shippingPayerType,
+        shippingOriginArea: prefectureId,
+        shippingDaysId: shippingDaysId,
+        shippingMethodId: shippingMethodId,
+        itemCondition: itemCondition,
       };
 
       await updateItem(itemId, payload);

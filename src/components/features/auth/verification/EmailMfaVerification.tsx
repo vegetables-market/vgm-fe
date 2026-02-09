@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyMfa } from '@/services/authService';
+import { verifyLogin, AuthMethod } from '@/services/authService';
 import { getErrorMessage } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 import EmailVerificationForm from './EmailVerificationForm';
@@ -39,8 +39,12 @@ export default function EmailMfaVerification({ mfaToken, redirectTo }: EmailMfaV
     setError('');
 
     try {
-      // MFA認証 (verifyMfa) を使用
-      const data = await verifyMfa(mfaToken, code);
+      // MFA認証 (verifyLogin) を使用
+      const data = await verifyLogin({
+        method: AuthMethod.TOTP,
+        identifier: mfaToken,
+        code
+      });
       
       if (data.user) {
         authLogin(data.user);

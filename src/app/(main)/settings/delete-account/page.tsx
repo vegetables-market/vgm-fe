@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi } from "@/lib/api/client";
 import { FaCircleExclamation } from "react-icons/fa6";
 import AuthButton from "@/components/features/auth/ui/AuthButton";
 import { useAuth } from "@/context/AuthContext";
