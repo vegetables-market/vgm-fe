@@ -1,6 +1,6 @@
 "use client";
 
-import { useSignup } from "@/hooks/auth/useSignup";
+import { useSignup } from "@/hooks/auth/signup/useSignup";
 import SignupForm from "@/components/features/auth/form/SignupForm";
 
 export default function SignupPage() {

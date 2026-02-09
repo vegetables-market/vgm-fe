@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { useChallenge } from "@/hooks/auth/useChallenge";
+import { useChallenge } from "@/hooks/auth/challenge/useChallenge";
 import ChallengeForm from "@/components/features/auth/form/ChallengeForm";
 
 function ChallengeContent() {

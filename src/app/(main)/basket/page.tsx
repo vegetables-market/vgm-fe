@@ -3,26 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { fetchApi } from "@/lib/api/api-client";
-
-interface CartItem {
-  cartItemId: number;
-  itemId: number;
-  name: string;
-  price: number;
-  quantity: number;
-  subtotal: number;
-  thumbnailUrl: string | null;
-}
-
-interface CartResponse {
-  items: CartItem[];
-  totalAmount: number;
-}
+import { cartApi } from "@/lib/api/services";
+import type { CartResponse } from "@/lib/api/types";
 
 export default function BasketPage() {
-  const router = useRouter();
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -33,9 +17,7 @@ export default function BasketPage() {
 
   const fetchCart = async () => {
     try {
-      const data = await fetchApi<CartResponse>("/v1/market/cart", {
-        credentials: "include",
-      });
+      const data = await cartApi.getCart();
       setCart(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -48,12 +30,7 @@ export default function BasketPage() {
     if (newQuantity < 1) return;
     setIsUpdating(true);
     try {
-      await fetchApi(`/v1/market/cart/${cartItemId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ quantity: newQuantity }),
-        credentials: "include",
-      });
+      await cartApi.updateCartItemQuantity(cartItemId, { quantity: newQuantity });
       await fetchCart(); // Refresh cart
     } catch (error) {
       alert("数量の変更に失敗しました");
@@ -67,10 +44,7 @@ export default function BasketPage() {
     if (!confirm("商品をカートから削除しますか？")) return;
     setIsUpdating(true);
     try {
-      await fetchApi(`/v1/market/cart/${cartItemId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+      await cartApi.removeFromCart(cartItemId);
       await fetchCart(); // Refresh cart
     } catch (error) {
       alert("削除に失敗しました");
