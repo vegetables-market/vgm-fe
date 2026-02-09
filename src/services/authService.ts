@@ -1,4 +1,4 @@
-import { API_ENDPOINTS, fetchApi } from '@/lib/api/api-client';
+import { fetchApi, API_ENDPOINTS } from '@/lib/api/client';
 import {
     RegisterRequest,
     RegisterResponse,

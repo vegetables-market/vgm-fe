@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { verifyLogin, verifyAction, AuthMethod, resendCode } from '@/services/authService';
-import { verifyAuthCode } from '@/lib/api/api-client';
+import { verifyAuthCode } from '@/lib/api/client';
 import { getErrorMessage, handleGlobalError } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 import EmailVerificationForm from './EmailVerificationForm';
