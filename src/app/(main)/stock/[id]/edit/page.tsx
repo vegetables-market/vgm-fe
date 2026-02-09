@@ -13,9 +13,9 @@ interface ItemDetail {
   price: number;
   quantity: number;
   shippingPayerType: number;
-  shippingOriginArea: number;
-  shippingDaysId: number;
-  shippingMethodId: number;
+  shippingOriginArea: number | null;
+  shippingDaysId: number | null;
+  shippingMethodId: number | null;
   itemCondition: number;
   images: Array<{
     imageId: number;
@@ -78,11 +78,11 @@ export default function StockEditPage() {
         setCategoryId(item.categoryId);
         setPrice(item.price.toString());
         setQuantity(item.quantity.toString());
-        setShippingPayerType(item.shippingPayerType);
-        setPrefectureId(item.shippingOriginArea);
-        setShippingDaysId(item.shippingDaysId);
-        setShippingMethodId(item.shippingMethodId);
-        setItemCondition(item.itemCondition);
+        setShippingPayerType(item.shippingPayerType ?? 0);
+        setPrefectureId(item.shippingOriginArea ?? 13);
+        setShippingDaysId(item.shippingDaysId ?? 1);
+        setShippingMethodId(item.shippingMethodId ?? 1);
+        setItemCondition(item.itemCondition ?? 0);
         
         setDataLoading(false);
       } catch (err) {

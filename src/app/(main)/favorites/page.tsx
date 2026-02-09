@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi, getMediaUrl } from "@/lib/api/api-client";
 
 interface Product {
   itemId: number;
@@ -33,6 +33,14 @@ interface PaginatedResponse {
     totalPages: number;
   };
 }
+
+const toMediaUrl = (url: string | null) => {
+  if (!url) return null;
+  if (url.startsWith("http")) return url;
+  const mediaUrl = getMediaUrl();
+  const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+  return `${baseUrl}/${url}`;
+};
 
 export default function FavoritesPage() {
   const router = useRouter();
@@ -77,7 +85,7 @@ export default function FavoritesPage() {
     }
 
     try {
-      await fetchApi(`/v1/items/${itemId}/favorite`, {
+      await fetchApi(`/v1/user/favorites/${itemId}`, {
         method: "DELETE",
         credentials: "include"
       });
@@ -119,7 +127,7 @@ export default function FavoritesPage() {
                 <div className="aspect-square bg-gray-100 relative">
                   {product.thumbnailUrl ? (
                     <img
-                      src={product.thumbnailUrl}
+                      src={toMediaUrl(product.thumbnailUrl) || ""}
                       alt={product.title}
                       className="w-full h-full object-cover"
                     />
