@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { useIsPWA } from "@/hooks/useIsPWA";
+import { useIsPWA } from "@/hooks/pwa/useIsPWA";
 import { useDevice } from "@/hooks/App/useDevice";
-import { usePWAUpdate } from "@/hooks/usePWAUpdate";
+import { usePWAUpdate } from "@/hooks/pwa/usePWAUpdate";
 import { IoReload } from "react-icons/io5";
 
 import { DeviceType } from "@/hooks/App/useDevice";

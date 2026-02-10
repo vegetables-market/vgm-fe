@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/lib/api/services/auth/login";
+import { login } from "@/services/auth/login";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
 
@@ -35,40 +35,41 @@ export function useLogin() {
       const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrUsername);
 
       if (!isEmail) {
-         // ユーザーIDとみなして通常ログインフローへ
-         addLog(`Proceeding to password step for username: ${emailOrUsername}`);
-         setStep("password");
-         return;
+        // ユーザーIDとみなして通常ログインフローへ
+        addLog(`Proceeding to password step for username: ${emailOrUsername}`);
+        setStep("password");
+        return;
       }
 
       setIsLoading(true);
       try {
-          const { initAuthFlow } = await import("@/lib/api/client");
-          const result = await initAuthFlow(emailOrUsername);
+        const { initAuthFlow } = await import("@/lib/api/client");
+        const result = await initAuthFlow(emailOrUsername);
 
-          if (result.flow_id) {
-              addLog("Redirecting to challenge page");
-              // 統一フロー: チャレンジページへ遷移
-              const params = new URLSearchParams();
-              params.set("type", "email");
-              params.set("flow_id", result.flow_id);
-              if (result.expires_at) params.set("expires_at", result.expires_at);
-              if (result.next_resend_at) params.set("next_resend_at", result.next_resend_at);
-              // アクションを指定しても良い (action=login)
-              params.set("action", "login"); 
-              
-              router.push(`/challenge?${params.toString()}`);
-          } else {
-             // flow_idがない場合は通常フロー（パスワード入力）へ進む (後方互換またはフォールバック)
-             addLog("No flow_id, proceeding to password step");
-             setStep("password");
-          }
-      } catch (err) {
-          console.error(err);
-          // エラー時はとりあえずパスワード入力へ進める（フォールバック）
+        if (result.flow_id) {
+          addLog("Redirecting to challenge page");
+          // 統一フロー: チャレンジページへ遷移
+          const params = new URLSearchParams();
+          params.set("type", "email");
+          params.set("flow_id", result.flow_id);
+          if (result.expires_at) params.set("expires_at", result.expires_at);
+          if (result.next_resend_at)
+            params.set("next_resend_at", result.next_resend_at);
+          // アクションを指定しても良い (action=login)
+          params.set("action", "login");
+
+          router.push(`/challenge?${params.toString()}`);
+        } else {
+          // flow_idがない場合は通常フロー（パスワード入力）へ進む (後方互換またはフォールバック)
+          addLog("No flow_id, proceeding to password step");
           setStep("password");
+        }
+      } catch (err) {
+        console.error(err);
+        // エラー時はとりあえずパスワード入力へ進める（フォールバック）
+        setStep("password");
       } finally {
-          setIsLoading(false);
+        setIsLoading(false);
       }
       return;
     }
@@ -87,7 +88,7 @@ export function useLogin() {
 
         if (data.status === "MFA_REQUIRED" && data.mfa_token) {
           addLog("MFA Required. Redirecting to challenge page.");
-          
+
           if (data.masked_email) {
             localStorage.setItem("vgm_masked_email", data.masked_email);
           }

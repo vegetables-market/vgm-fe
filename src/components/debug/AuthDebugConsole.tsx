@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { logout } from "@/lib/api/services/auth/logout";
+import { logout } from "@/services/auth/logout";
 
 export default function AuthDebugConsole() {
   const [logs, setLogs] = useState<string[]>([]);
@@ -56,22 +56,22 @@ export default function AuthDebugConsole() {
   };
 
   return (
-    <div className="fixed bottom-50 right-0 m-4 z-[9999] flex flex-col items-end gap-2">
+    <div className="fixed right-0 bottom-50 z-[9999] m-4 flex flex-col items-end gap-2">
       {/* ログパネル */}
       {isOpen && (
-        <div className="w-80 h-64 bg-black/90 border border-zinc-700 rounded-lg shadow-2xl flex flex-col overflow-hidden backdrop-blur-md">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-800 bg-zinc-900/50">
-            <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+        <div className="flex h-64 w-80 flex-col overflow-hidden rounded-lg border border-zinc-700 bg-black/90 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/50 px-3 py-2">
+            <span className="text-[10px] font-bold tracking-wider text-zinc-400 uppercase">
               Auth Debug Logs
             </span>
             <button
               onClick={() => setLogs([])}
-              className="text-[10px] text-zinc-500 hover:text-white transition-colors"
+              className="text-[10px] text-zinc-500 transition-colors hover:text-white"
             >
               CLEAR
             </button>
           </div>
-          <div className="flex-1 p-2 overflow-y-auto font-mono text-[10px] text-zinc-300 space-y-1">
+          <div className="flex-1 space-y-1 overflow-y-auto p-2 font-mono text-[10px] text-zinc-300">
             {logs.length === 0 ? (
               <div className="text-zinc-600 italic">No logs yet...</div>
             ) : (
@@ -89,13 +89,13 @@ export default function AuthDebugConsole() {
       )}
 
       {/* ステータスバー */}
-      <div className="p-3 bg-black/80 text-white text-xs rounded-lg shadow-lg backdrop-blur-sm border border-white/10 min-w-[200px]">
+      <div className="min-w-[200px] rounded-lg border border-white/10 bg-black/80 p-3 text-xs text-white shadow-lg backdrop-blur-sm">
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between gap-4">
             <span className="font-bold text-gray-400">Auth Status:</span>
             <span
               className={
-                user ? "text-green-400 font-bold" : "text-red-400 font-bold"
+                user ? "font-bold text-green-400" : "font-bold text-red-400"
               }
             >
               {user ? "Logged In" : "Guest"}
@@ -105,23 +105,23 @@ export default function AuthDebugConsole() {
           {user && (
             <div className="flex items-center justify-between gap-4">
               <span className="font-bold text-gray-400">User:</span>
-              <span className="text-blue-300 truncate max-w-[100px]">
+              <span className="max-w-[100px] truncate text-blue-300">
                 {user.displayName}
               </span>
             </div>
           )}
 
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-700">
+          <div className="mt-2 flex items-center gap-2 border-t border-gray-700 pt-2">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex-1 bg-zinc-800 hover:bg-zinc-700 text-white text-[10px] py-1 rounded transition-colors font-bold"
+              className="flex-1 rounded bg-zinc-800 py-1 text-[10px] font-bold text-white transition-colors hover:bg-zinc-700"
             >
               {isOpen ? "HIDE LOGS" : "SHOW LOGS"}
             </button>
             {user && (
               <button
                 onClick={handleLogout}
-                className="bg-red-900/50 hover:bg-red-800 text-red-200 text-[10px] px-2 py-1 rounded transition-colors font-bold border border-red-700/50"
+                className="rounded border border-red-700/50 bg-red-900/50 px-2 py-1 text-[10px] font-bold text-red-200 transition-colors hover:bg-red-800"
               >
                 LOGOUT
               </button>

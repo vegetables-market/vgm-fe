@@ -1,19 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { verifyLogin, AuthMethod } from '@/lib/api/services/auth/verify-login';
-import { getErrorMessage } from '@/lib/api/error-handler';
-import { useAuth } from '@/context/AuthContext';
-import EmailVerificationForm from './EmailVerificationForm';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
+import { getErrorMessage } from "@/lib/api/error-handler";
+import { useAuth } from "@/context/AuthContext";
+import EmailVerificationForm from "./EmailVerificationForm";
 
 interface EmailMfaVerificationProps {
   mfaToken: string;
 }
 
-export default function EmailMfaVerification({ mfaToken }: EmailMfaVerificationProps) {
-  const [code, setCode] = useState('');
-  const [error, setError] = useState('');
+export default function EmailMfaVerification({
+  mfaToken,
+}: EmailMfaVerificationProps) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
   const router = useRouter();
@@ -21,7 +23,7 @@ export default function EmailMfaVerification({ mfaToken }: EmailMfaVerificationP
 
   useEffect(() => {
     // localStorageからmasked_emailを取得（ログインレスポンスで保存されているはず）
-    const storedEmail = localStorage.getItem('vgm_masked_email');
+    const storedEmail = localStorage.getItem("vgm_masked_email");
     if (storedEmail) {
       setMaskedEmail(storedEmail);
     }
@@ -30,30 +32,30 @@ export default function EmailMfaVerification({ mfaToken }: EmailMfaVerificationP
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (code.length !== 6) {
-      setError('認証コードは6桁です。');
+      setError("認証コードは6桁です。");
       return;
     }
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       // MFA認証 (verifyLogin) を使用
       const data = await verifyLogin({
         method: AuthMethod.TOTP,
         identifier: mfaToken,
-        code
+        code,
       });
-      
+
       if (data.user) {
         authLogin(data.user);
-        localStorage.removeItem('vgm_masked_email');
-        router.push('/');
+        localStorage.removeItem("vgm_masked_email");
+        router.push("/");
       } else if (data.require_verification && data.flow_id) {
         // 万が一、MFA後にさらにEmail Verificationが必要な場合
         router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
       } else {
-        setError('ログインに失敗しました。');
+        setError("ログインに失敗しました。");
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
