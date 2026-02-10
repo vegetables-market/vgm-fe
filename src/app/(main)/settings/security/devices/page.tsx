@@ -8,8 +8,10 @@ import {
   FaApple, 
   FaAndroid, 
   FaLinux, 
-  FaDesktop 
+  FaDesktop,
+  FaChevronRight
 } from "react-icons/fa6";
+import Link from "next/link";
 
 interface SessionInfo {
   sessionId: number;
@@ -19,6 +21,7 @@ interface SessionInfo {
   lastActiveAt: string | null;
   expiresAt: string;
   isCurrent: boolean;
+  provider?: string;
 }
 
 export default function DevicesPage() {
@@ -67,26 +70,6 @@ export default function DevicesPage() {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
-
-  const handleRevokeSession = async (sessionId: number) => {
-    if (!confirm("このデバイスをログアウトさせますか？")) return;
-
-    setError("");
-    setIsLoading(true);
-
-    try {
-      await fetchApi<{ success: boolean }>(`/v1/user/sessions/${sessionId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-      setSuccess("デバイスをログアウトさせました");
-      fetchSessions();
-    } catch (err: any) {
-      setError(err.message || "操作に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleRevokeAllOther = async () => {
@@ -162,40 +145,37 @@ export default function DevicesPage() {
               {groupedSessions[os].map((session) => {
                 const device = parseUserAgent(session.deviceInfo);
                 return (
-                  <div
+                  <Link
                     key={session.sessionId}
-                    className={`session-item ${session.isCurrent ? "current" : ""}`}
+                    href={`/settings/security/devices/detail?sessionId=${session.sessionId}`}
+                    className={`session-item ${session.isCurrent ? "current" : ""} block hover:bg-gray-50 transition-colors cursor-pointer group`}
                   >
-                    <div className="session-icon">
-                      {getOsIcon(device.os)}
-                    </div>
-                    <div className="session-info">
-                      <div className="session-header">
-                        <span className="session-device">
-                          {device.browser} {device.deviceType !== "desktop" ? `(${device.deviceType})` : ""}
-                        </span>
-                        {session.isCurrent && (
-                          <span className="badge current">現在のデバイス</span>
-                        )}
+                    <div className="flex items-center gap-4 w-full">
+                      <div className="session-icon">
+                        {getOsIcon(device.os)}
                       </div>
-                      <div className="session-details">
-                        {session.ipAddress && <span>IP: {session.ipAddress}</span>}
-                        <span>ログイン: {formatDate(session.createdAt)}</span>
-                        {!session.isCurrent && session.lastActiveAt && (
-                           <span>最終アクセス: {formatDate(session.lastActiveAt)}</span>
-                        )}
+                      <div className="session-info flex-1">
+                        <div className="session-header">
+                          <span className="session-device">
+                            {device.browser} {device.deviceType !== "desktop" ? `(${device.deviceType})` : ""}
+                          </span>
+                          {session.isCurrent && (
+                            <span className="badge current">現在のデバイス</span>
+                          )}
+                        </div>
+                        <div className="session-details">
+                          {session.ipAddress && <span>IP: {session.ipAddress}</span>}
+                          <span>ログイン: {formatDate(session.createdAt)}</span>
+                          {!session.isCurrent && session.lastActiveAt && (
+                             <span>最終アクセス: {formatDate(session.lastActiveAt)}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <FaChevronRight className="w-4 h-4" />
                       </div>
                     </div>
-                    {!session.isCurrent && (
-                      <button
-                        className="btn-revoke"
-                        onClick={() => handleRevokeSession(session.sessionId)}
-                        disabled={isLoading}
-                      >
-                        ログアウト
-                      </button>
-                    )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>
@@ -272,11 +252,10 @@ export default function DevicesPage() {
         }
 
         .session-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
+          display: block;
           padding: 18px 20px;
           background: #fff;
+          text-decoration: none;
         }
 
         .session-item.current {
@@ -293,6 +272,7 @@ export default function DevicesPage() {
           background: #f5f5f5;
           border-radius: 12px;
           color: #555;
+          flex-shrink: 0;
         }
 
         .session-item.current .session-icon {
@@ -301,7 +281,7 @@ export default function DevicesPage() {
         }
 
         .session-info {
-          flex: 1;
+          min-width: 0; 
         }
 
         .session-header {
@@ -333,28 +313,6 @@ export default function DevicesPage() {
           gap: 2px;
           font-size: 12px;
           color: #666;
-        }
-
-        .btn-revoke {
-          padding: 8px 16px;
-          background: #fff;
-          border: 1px solid #ddd;
-          border-radius: 6px;
-          font-size: 13px;
-          color: #d32f2f;
-          cursor: pointer;
-          transition: all 0.2s;
-          white-space: nowrap;
-        }
-
-        .btn-revoke:hover:not(:disabled) {
-          background: #ffebee;
-          border-color: #ffcdd2;
-        }
-
-        .btn-revoke:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
         }
 
         .bulk-action {
@@ -393,14 +351,7 @@ export default function DevicesPage() {
 
         @media (max-width: 600px) {
           .session-item {
-            flex-wrap: wrap;
             padding: 16px;
-          }
-          
-          .btn-revoke {
-             width: 100%;
-             text-align: center;
-             margin-top: 8px;
           }
         }
       `}</style>

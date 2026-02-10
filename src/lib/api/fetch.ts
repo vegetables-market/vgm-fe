@@ -23,9 +23,6 @@ function handleUnauthorized(): void {
     // AuthContext に通知
     window.dispatchEvent(new Event("auth:unauthorized"));
 
-    // localStorage をクリア
-    localStorage.removeItem("vgm_user");
-
     // 自動リダイレクトを停止（ユーザー要望により）
     // 必要な場合は画面側でこのイベントを検知して制御する
     // window.location.href = '/login';
@@ -139,4 +136,3 @@ export async function fetchApi<T>(
     throw new Error(networkError);
   }
 }
-

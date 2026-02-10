@@ -1,12 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
-import { logout } from "@/services/auth/logout";
-import { UserInfo } from "@/types/auth/user";
+import { useAuth } from "@/context/AuthContext";
 
 import { FaMagnifyingGlass, FaRegHeart, FaUser } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
@@ -14,38 +13,8 @@ import { IoCartOutline } from "react-icons/io5";
 export default function WebHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<UserInfo | null>(null);
   const { totalItems } = useCart();
-
-  useEffect(() => {
-    // localStorageからユーザー情報を取得
-    const storedUser = localStorage.getItem("vgm_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        console.error("Failed to parse user info", e);
-      }
-    }
-
-    // ログイン状態の変更を検知するためのイベントリスナー（簡易的）
-    const handleStorageChange = () => {
-      const updatedUser = localStorage.getItem("vgm_user");
-      if (updatedUser) {
-        setUser(JSON.parse(updatedUser));
-      } else {
-        setUser(null);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    // カスタムイベント（DebugConsoleなどからの更新用）
-    // ※本来はContextで管理すべきだが、今回は簡易実装
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -53,8 +22,6 @@ export default function WebHeader() {
     } catch (e) {
       console.error("Logout failed", e);
     } finally {
-      localStorage.removeItem("vgm_user");
-      setUser(null);
       setIsMenuOpen(false);
       router.push("/login");
     }

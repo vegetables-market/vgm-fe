@@ -45,8 +45,7 @@ export function handleGlobalError(error: unknown, router?: any): void {
         if (error.status === 401) {
             // 認証切れの場合の処理
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('vgm_user');
-                if ((window as any).refreshAuth) (window as any).refreshAuth();
+                window.dispatchEvent(new Event('auth:unauthorized'));
                 if (router) router.push('/login');
             }
         }

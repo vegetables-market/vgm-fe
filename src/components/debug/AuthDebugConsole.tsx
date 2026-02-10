@@ -2,55 +2,38 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { logout } from "@/services/auth/logout";
+import { useAuth } from "@/context/AuthContext";
 
 export default function AuthDebugConsole() {
   const [logs, setLogs] = useState<string[]>([]);
-  const [user, setUser] = useState<any>(null);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { user, logout } = useAuth();
 
   const addLog = useCallback((msg: string) => {
     const timestamp = new Date().toLocaleTimeString();
     setLogs((prev) => [`[${timestamp}] ${msg}`, ...prev.slice(0, 99)]);
   }, []);
 
-  const checkAuth = useCallback(() => {
-    const storedUser = localStorage.getItem("vgm_user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      setUser(null);
-    }
-  }, []);
-
   useEffect(() => {
-    checkAuth();
     addLog(`Navigated to: ${pathname}`);
 
     (window as any).addAuthLog = addLog;
-    (window as any).refreshAuth = checkAuth;
 
     return () => {
       delete (window as any).addAuthLog;
-      delete (window as any).refreshAuth;
     };
-  }, [pathname, addLog, checkAuth]);
+  }, [pathname, addLog]);
 
   const handleLogout = async () => {
     try {
       addLog("Attempting logout...");
       await logout();
-      localStorage.removeItem("vgm_user");
       addLog("Logged out successfully (Cookie cleared)");
-      checkAuth();
       router.push("/login");
     } catch (err: any) {
       addLog(`Logout error: ${err.message}`);
-      // エラーでもローカルの状態はクリアする
-      localStorage.removeItem("vgm_user");
-      checkAuth();
       router.push("/login");
     }
   };
