@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { logout } from "@/services/auth/logout";
-import { UserInfo } from "@/types/auth";
+import { UserInfo } from "@/types/auth/user";
 
 import { FaMagnifyingGlass, FaRegHeart, FaUser } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";

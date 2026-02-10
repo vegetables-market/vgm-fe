@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
 import { verifyAction } from "@/services/auth/verify-action";
 import { resendCode } from "@/services/auth/resend-code";
-import { verifyAuthCode } from "@/lib/api/client";
+import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
 import EmailVerificationForm from "./EmailVerificationForm";

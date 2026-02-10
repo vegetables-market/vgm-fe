@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
 import { compressImage } from "@/lib/utils/imageCompression";
-import { getUploadToken } from "@/services/upload/get-upload-token";
-import { uploadImage } from "@/lib/api/client";
-import { linkImages } from "@/services/item/link-images";
+import { getUploadToken } from "@/services/market/items/get-upload-token";
+import { uploadImage } from "@/lib/api/media";
+import { linkImages } from "@/services/market/items/link-images";
 
 function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -231,4 +231,3 @@ export function useMultiImageUpload(
     ).length,
   };
 }
-

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 // TODO: Implement category API
 import { categoryApi } from "@/lib/api/stubs";
-import type { CategoryResponse } from "@/types";
+import type { CategoryResponse } from "@/types/market/category";
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<CategoryResponse[]>([]);

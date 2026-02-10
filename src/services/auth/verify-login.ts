@@ -1,5 +1,5 @@
-import { fetchApi } from "../../lib/api/client";
-import type { LoginResponse } from "@/types/auth";
+import { fetchApi } from "@/lib/api/fetch";
+import type { LoginResponse } from "@/types/auth/login";
 
 /**
  * 認証方式

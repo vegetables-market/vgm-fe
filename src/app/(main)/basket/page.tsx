@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 // TODO: Implement cart API
 import { cartApi } from "@/lib/api/stubs";
-import type { CartResponse } from "@/types";
+import type { CartResponse } from "@/types/market/cart";
 
 export default function BasketPage() {
   const [cart, setCart] = useState<CartResponse | null>(null);

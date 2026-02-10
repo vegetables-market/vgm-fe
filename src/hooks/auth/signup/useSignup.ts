@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { SignupFormData } from "@/types/auth";
+import { SignupFormData } from "@/types/auth/user";
 
 export function useSignup() {
   const searchParams = useSearchParams();

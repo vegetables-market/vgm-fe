@@ -1,5 +1,5 @@
-import { fetchApi } from "../../lib/api/client";
-import { API_ENDPOINTS } from "../../lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 
 export const updateItemStatus = async (
   itemId: number,

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { loginWithGoogle, loginWithMicrosoft, loginWithGithub } from "@/lib/firebase/auth";
-import { fetchApi, API_ENDPOINTS } from "@/lib/api";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 import { useAuth } from "@/context/AuthContext";
 
 interface LoginResponse {

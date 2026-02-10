@@ -1,4 +1,4 @@
-import { fetchApi } from "../../lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 export const confirmPayment = async (
   orderId: number,

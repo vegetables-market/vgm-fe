@@ -1,5 +1,5 @@
-import { fetchApi } from "../../lib/api/client";
-import type { CreateOrderRequest, CreateOrderResponse } from "../../types";
+import { fetchApi } from "@/lib/api/fetch";
+import type { CreateOrderRequest, CreateOrderResponse } from "@/types/order";
 
 export const createOrder = async (
   orderData: CreateOrderRequest,

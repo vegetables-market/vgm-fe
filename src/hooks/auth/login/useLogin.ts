@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { login } from "@/services/auth/login";
+import { initAuthFlow } from "@/services/auth/init-auth-flow";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
 
@@ -43,7 +44,6 @@ export function useLogin() {
 
       setIsLoading(true);
       try {
-        const { initAuthFlow } = await import("@/lib/api/client");
         const result = await initAuthFlow(emailOrUsername);
 
         if (result.flow_id) {

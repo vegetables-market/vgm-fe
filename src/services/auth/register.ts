@@ -1,6 +1,6 @@
-import { fetchApi } from "../../lib/api/client";
-import { API_ENDPOINTS } from "../../lib/api/client";
-import type { RegisterRequest, RegisterResponse } from "@/types/auth";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
+import type { RegisterRequest, RegisterResponse } from "@/types/auth/register";
 
 /**
  * 新規登録

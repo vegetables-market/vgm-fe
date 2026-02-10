@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 interface ProfileInfo {
   userId: number;

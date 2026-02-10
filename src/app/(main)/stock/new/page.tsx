@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getCategories } from "@/services/category/get-categories";
-import { updateItem } from "@/services/item/update-item";
+import { getCategories } from "@/services/market/categories/get-categories";
+import { updateItem } from "@/services/market/items/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 

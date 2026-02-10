@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 type MfaStatus = {
   isEnabled: boolean;

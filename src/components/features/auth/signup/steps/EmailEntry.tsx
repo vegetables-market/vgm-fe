@@ -3,7 +3,8 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { FaCircleExclamation } from "react-icons/fa6";
 import SocialLoginButtons from "@/components/features/auth/SocialLoginButtons";
-import { SignupFormData } from "@/types/auth";
+import { initAuthFlow } from "@/services/auth/init-auth-flow";
+import { SignupFormData } from "@/types/auth/user";
 import AuthDivider from "@/components/features/auth/ui/AuthDivider";
 
 interface EmailEntryProps {
@@ -35,7 +36,6 @@ export default function EmailEntry({
     
     setIsLoading(true);
     try {
-        const { initAuthFlow } = await import("@/lib/api/client");
         addLog(`Checking email status: ${formData.email}`);
         
         // 認証フロー初期化 (Backendで統一的に処理)

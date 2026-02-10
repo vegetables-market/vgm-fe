@@ -1,6 +1,6 @@
-import { fetchApi } from "../../lib/api/client";
-import { API_ENDPOINTS } from "../../lib/api/client";
-import type { CreateDraftResponse } from "../../types";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
+import type { CreateDraftResponse } from "@/types/market/item";
 
 export const createDraft = async (): Promise<CreateDraftResponse> => {
   return fetchApi<CreateDraftResponse>(`${API_ENDPOINTS.ITEMS}/draft`, {

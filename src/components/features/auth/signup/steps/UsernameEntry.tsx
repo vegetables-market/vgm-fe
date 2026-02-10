@@ -3,8 +3,9 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
-import { checkUsername } from "@/lib/api/client";
-import { SignupFormData } from "@/types/auth";
+import { checkUsername } from "@/services/auth/check-username";
+import { getInitialUsernameSuggestions } from "@/services/auth/get-initial-username-suggestions";
+import { SignupFormData } from "@/types/auth/user";
 
 interface UsernameEntryProps {
   formData: SignupFormData;
@@ -30,10 +31,9 @@ export default function UsernameEntry({ formData, setFormData, onNext }: Usernam
 
     const fetchInitialSuggestions = async () => {
         try {
-            const { getInitialUsernameSuggestions } = await import("@/lib/api/client");
             const result = await getInitialUsernameSuggestions();
             if (result.suggestions && result.suggestions.length > 0) {
-                setSuggestions(result.suggestions);
+              setSuggestions(result.suggestions);
             }
         } catch (error) {
             console.error("Failed to fetch initial suggestions", error);

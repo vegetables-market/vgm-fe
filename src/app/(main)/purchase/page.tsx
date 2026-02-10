@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 // TODO: Create mockData module or replace with real API
 import {
   MOCK_ADDRESSES,

@@ -1,4 +1,4 @@
-import { fetchApi } from "../../lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 export const getOrders = async (buyerId: number): Promise<any[]> => {
   return fetchApi(`/api/orders?buyerId=${buyerId}`, { method: "GET" });

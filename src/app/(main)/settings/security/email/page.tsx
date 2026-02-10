@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 interface EmailInfo {
   emailId: number;

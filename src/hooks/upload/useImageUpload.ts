@@ -3,9 +3,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { uploadImage } from "@/lib/api/client";
-import { getUploadToken } from "@/services/upload/get-upload-token";
-import type { ImageFormat } from "@/lib/api/client";
+import { uploadImage } from "@/lib/api/media";
+import { getUploadToken } from "@/services/market/items/get-upload-token";
+import type { ImageFormat } from "@/lib/api/media";
 import { compressImage } from "@/lib/utils/imageCompression";
 
 type UseImageUploadProps = {

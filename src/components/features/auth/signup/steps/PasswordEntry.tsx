@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FaRegCircle, FaCircleCheck, FaEye, FaEyeSlash } from "react-icons/fa6";
-import { SignupFormData } from "@/types/auth";
+import { SignupFormData } from "@/types/auth/user";
 
 interface PasswordEntryProps {
   formData: SignupFormData;

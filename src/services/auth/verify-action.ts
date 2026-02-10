@@ -1,4 +1,4 @@
-import { fetchApi } from "../../lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 import type { VerifyAuthRequest } from "./verify-login";
 
 /**

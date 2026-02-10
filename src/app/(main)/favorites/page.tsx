@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 // TODO: Implement favorite API
 import { favoriteApi } from "@/lib/api/stubs";
-import type { ItemResponse } from "@/types";
+import type { ItemResponse } from "@/types/market/item";
 
 export default function FavoritesPage() {
   const router = useRouter();

@@ -3,14 +3,30 @@
 import { useEffect, useState } from "react";
 import Btn from "@/components/features/settings/ui/Btn";
 import BtnWrappers from "@/components/features/settings/ui/BtnWrappers";
-import { getSessions } from "@/lib/api/client";
+import { getSessions } from "@/services/user/sessions/get-sessions";
 import { SessionResponse } from "@/types/session";
-import { formatDistanceToNow } from "date-fns";
-import { ja } from "date-fns/locale";
+import { parseUserAgent } from "@/lib/utils/user-agent";
+import { 
+  FaWindows, 
+  FaApple, 
+  FaAndroid, 
+  FaLinux, 
+  FaDesktop 
+} from "react-icons/fa6";
 
 export default function LoggedInDevices() {
   const [sessions, setSessions] = useState<SessionResponse[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // OSごとのセッション数を集計
+  const sessionGroups = sessions.reduce((acc, session) => {
+    const { os } = parseUserAgent(session.deviceInfo);
+    acc[os] = (acc[os] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const osList = Object.entries(sessionGroups);
+  const totalSessions = sessions.length;
 
   useEffect(() => {
     const fetchSessions = async () => {
@@ -27,37 +43,45 @@ export default function LoggedInDevices() {
     fetchSessions();
   }, []);
 
+  const getOsIcon = (os: string) => {
+    switch (os) {
+      case "Windows": return <FaWindows className="text-xl" />;
+      case "macOS": return <FaApple className="text-xl" />;
+      case "iOS": return <FaApple className="text-xl" />; // iOSはAppleアイコン
+      case "Android": return <FaAndroid className="text-xl" />;
+      case "Linux": return <FaLinux className="text-xl" />;
+      default: return <FaDesktop className="text-xl" />;
+    }
+  };
+
   if (loading) {
     return <div className="p-4 text-center text-sm text-gray-500">ロード中...</div>;
   }
 
-  if (sessions.length === 0) {
+  if (totalSessions === 0) {
     return <div className="p-4 text-center text-sm text-gray-500">デバイス情報はありません</div>;
   }
 
   return (
     <BtnWrappers>
-      {sessions.map((session) => (
-        <Btn key={session.sessionId} href="/settings/security/devices">
+      {/* OSごとのグループリンク */}
+      {osList.map(([os, count]) => (
+        <Btn key={os} href={`/settings/security/devices#os-${os}`}>
           <div className="flex w-full items-center justify-between">
-            <div className="flex flex-col items-start">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-500">{getOsIcon(os)}</span>
               <span className="font-medium">
-                {session.deviceInfo || "不明なデバイス"}
-              </span>
-              <span className={`text-sm ${session.isCurrent ? "text-green-600" : "text-gray-500"}`}>
-                {session.isCurrent ? (
-                  "現在使用中"
-                ) : (
-                    <>
-                    最終アクセス: {session.lastActiveAt ? formatDistanceToNow(new Date(session.lastActiveAt), { addSuffix: true, locale: ja }) : '不明'}
-                    </>
-                )}
+                {count} セッション - {os}
               </span>
             </div>
-            <span className="text-xs text-gray-400">詳細</span>
           </div>
         </Btn>
       ))}
+
+      {/* すべてのデバイスを表示 */}
+      <Btn href="/settings/security/devices">
+        <span className="font-medium text-blue-600">すべてのデバイスを表示</span>
+      </Btn>
     </BtnWrappers>
   );
 }

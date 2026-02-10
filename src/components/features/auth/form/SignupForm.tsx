@@ -8,7 +8,7 @@ import PasswordEntry from "@/components/features/auth/signup/steps/PasswordEntry
 import TermsAgreement from "@/components/features/auth/signup/steps/TermsAgreement";
 
 import ProgressBar from "@/components/features/auth/signup/ProgressBar";
-import { SignupFormData } from "@/types/auth";
+import { SignupFormData } from "@/types/auth/user";
 
 interface SignupState {
   step: number;

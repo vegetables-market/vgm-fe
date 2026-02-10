@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
 import AuthButton from "@/components/features/auth/ui/AuthButton";
-import { verifyAuthCode } from "@/lib/api/client";
+import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import OtpInput from 'react-otp-input';
 
 interface CodeVerificationProps {

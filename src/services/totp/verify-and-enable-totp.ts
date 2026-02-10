@@ -1,6 +1,6 @@
-import { fetchApi } from "../../lib/api/client";
-import { API_ENDPOINTS } from "../../lib/api/client";
-import type { VerifyTotpRequest, VerifyTotpResponse } from "@/types/auth";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
+import type { VerifyTotpRequest, VerifyTotpResponse } from "@/types/auth/totp";
 
 /**
  * TOTP検証＆有効化

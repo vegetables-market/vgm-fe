@@ -1,5 +1,5 @@
-import { fetchApi } from "../../lib/api/client";
-import { API_ENDPOINTS } from "../../lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 
 export const updateItem = async (itemId: number, data: any): Promise<void> => {
   return fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {

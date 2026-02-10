@@ -1,4 +1,4 @@
-import { ApiError } from './client';
+import { ApiError } from "./fetch";
 
 /**
  * HTTPステータスコードに応じたデフォルトメッセージ

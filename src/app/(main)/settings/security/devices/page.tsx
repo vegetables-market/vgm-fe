@@ -1,7 +1,15 @@
 ﻿"use client";
 
 import { useState, useEffect } from "react";
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
+import { parseUserAgent } from "@/lib/utils/user-agent";
+import { 
+  FaWindows, 
+  FaApple, 
+  FaAndroid, 
+  FaLinux, 
+  FaDesktop 
+} from "react-icons/fa6";
 
 interface SessionInfo {
   sessionId: number;
@@ -22,6 +30,19 @@ export default function DevicesPage() {
   useEffect(() => {
     fetchSessions();
   }, []);
+
+  // ハッシュリンクの自動スクロール処理
+  useEffect(() => {
+    if (!isLoading && sessions.length > 0) {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+  }, [isLoading, sessions]);
 
   const fetchSessions = async () => {
     try {
@@ -94,29 +115,29 @@ export default function DevicesPage() {
     }
   };
 
-  const parseDeviceInfo = (deviceInfo: string | null) => {
-    if (!deviceInfo) return { browser: "不明", os: "不明" };
-
-    // 簡易的なUser-Agent解析
-    let browser = "不明";
-    let os = "不明";
-
-    if (deviceInfo.includes("Chrome")) browser = "Chrome";
-    else if (deviceInfo.includes("Firefox")) browser = "Firefox";
-    else if (deviceInfo.includes("Safari")) browser = "Safari";
-    else if (deviceInfo.includes("Edge")) browser = "Edge";
-
-    if (deviceInfo.includes("Windows")) os = "Windows";
-    else if (deviceInfo.includes("Mac")) os = "macOS";
-    else if (deviceInfo.includes("Linux")) os = "Linux";
-    else if (deviceInfo.includes("Android")) os = "Android";
-    else if (deviceInfo.includes("iPhone") || deviceInfo.includes("iPad"))
-      os = "iOS";
-
-    return { browser, os };
+  const getOsIcon = (os: string) => {
+    switch (os) {
+      case "Windows": return <FaWindows className="text-xl" />;
+      case "macOS": return <FaApple className="text-xl" />;
+      case "iOS": return <FaApple className="text-xl" />;
+      case "Android": return <FaAndroid className="text-xl" />;
+      case "Linux": return <FaLinux className="text-xl" />;
+      default: return <FaDesktop className="text-xl" />;
+    }
   };
 
   const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length;
+
+  // OSごとにセッションをグルーピング
+  const groupedSessions = sessions.reduce((groups, session) => {
+    const { os } = parseUserAgent(session.deviceInfo);
+    if (!groups[os]) groups[os] = [];
+    groups[os].push(session);
+    return groups;
+  }, {} as Record<string, SessionInfo[]>);
+
+  // OSの表示順序を定義 (必要であれば)
+  const sortedOsKeys = Object.keys(groupedSessions).sort();
 
   return (
     <div className="devices-page">
@@ -128,55 +149,69 @@ export default function DevicesPage() {
       {error && <div className="error-box">{error}</div>}
       {success && <div className="success-box">{success}</div>}
 
-      {/* デバイス一覧 */}
-      <div className="session-list">
-        {sessions.map((session) => {
-          const device = parseDeviceInfo(session.deviceInfo);
-          return (
-            <div
-              key={session.sessionId}
-              className={`session-item ${session.isCurrent ? "current" : ""}`}
-            >
-              <div className="session-icon">
-                {device.os === "Windows"
-                  ? "💻"
-                  : device.os === "macOS"
-                    ? "🖥️"
-                    : device.os === "iOS" || device.os === "Android"
-                      ? "📱"
-                      : "🌐"}
-              </div>
-              <div className="session-info">
-                <div className="session-header">
-                  <span className="session-device">
-                    {device.browser} / {device.os}
-                  </span>
-                  {session.isCurrent && (
-                    <span className="badge current">現在のデバイス</span>
-                  )}
-                </div>
-                <div className="session-details">
-                  {session.ipAddress && <span>IP: {session.ipAddress}</span>}
-                  <span>ログイン: {formatDate(session.createdAt)}</span>
-                </div>
-              </div>
-              {!session.isCurrent && (
-                <button
-                  className="btn-revoke"
-                  onClick={() => handleRevokeSession(session.sessionId)}
-                  disabled={isLoading}
-                >
-                  ログアウト
-                </button>
-              )}
+      {/* デバイス一覧 (OSごとにグループ化) */}
+      <div className="space-y-8">
+        {sortedOsKeys.map((os) => (
+          <div key={os} id={`os-${os}`} className="scroll-mt-24">
+            <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800 border-b pb-2">
+              <span className="text-gray-500">{getOsIcon(os)}</span>
+              {os} デバイス
+            </h2>
+            
+            <div className="session-list">
+              {groupedSessions[os].map((session) => {
+                const device = parseUserAgent(session.deviceInfo);
+                return (
+                  <div
+                    key={session.sessionId}
+                    className={`session-item ${session.isCurrent ? "current" : ""}`}
+                  >
+                    <div className="session-icon">
+                      {getOsIcon(device.os)}
+                    </div>
+                    <div className="session-info">
+                      <div className="session-header">
+                        <span className="session-device">
+                          {device.browser} {device.deviceType !== "desktop" ? `(${device.deviceType})` : ""}
+                        </span>
+                        {session.isCurrent && (
+                          <span className="badge current">現在のデバイス</span>
+                        )}
+                      </div>
+                      <div className="session-details">
+                        {session.ipAddress && <span>IP: {session.ipAddress}</span>}
+                        <span>ログイン: {formatDate(session.createdAt)}</span>
+                        {!session.isCurrent && session.lastActiveAt && (
+                           <span>最終アクセス: {formatDate(session.lastActiveAt)}</span>
+                        )}
+                      </div>
+                    </div>
+                    {!session.isCurrent && (
+                      <button
+                        className="btn-revoke"
+                        onClick={() => handleRevokeSession(session.sessionId)}
+                        disabled={isLoading}
+                      >
+                        ログアウト
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
+
+      {sessions.length === 0 && !isLoading && (
+          <div className="text-center py-8 text-gray-500">
+              ログイン中のデバイスはありません
+          </div>
+      )}
 
       {/* 一括ログアウト */}
       {otherSessionsCount > 0 && (
-        <div className="bulk-action">
+        <div className="bulk-action mt-8">
           <button
             className="btn-revoke-all"
             onClick={handleRevokeAllOther}
@@ -193,6 +228,7 @@ export default function DevicesPage() {
       <style jsx>{`
         .devices-page {
           max-width: 600px;
+          padding-bottom: 40px;
         }
 
         .page-title {
@@ -233,7 +269,6 @@ export default function DevicesPage() {
           background: #eee;
           border-radius: 12px;
           overflow: hidden;
-          margin-bottom: 24px;
         }
 
         .session-item {
@@ -249,7 +284,7 @@ export default function DevicesPage() {
         }
 
         .session-icon {
-          font-size: 28px;
+          font-size: 24px;
           width: 48px;
           height: 48px;
           display: flex;
@@ -257,10 +292,12 @@ export default function DevicesPage() {
           justify-content: center;
           background: #f5f5f5;
           border-radius: 12px;
+          color: #555;
         }
 
         .session-item.current .session-icon {
           background: #e3f2fd;
+          color: #0288d1;
         }
 
         .session-info {
@@ -272,6 +309,7 @@ export default function DevicesPage() {
           align-items: center;
           gap: 8px;
           margin-bottom: 4px;
+          flex-wrap: wrap;
         }
 
         .session-device {
@@ -286,13 +324,15 @@ export default function DevicesPage() {
           background: #1976d2;
           color: #fff;
           border-radius: 4px;
+          white-space: nowrap;
         }
 
         .session-details {
           display: flex;
-          gap: 16px;
+          flex-direction: column;
+          gap: 2px;
           font-size: 12px;
-          color: #888;
+          color: #666;
         }
 
         .btn-revoke {
@@ -304,6 +344,7 @@ export default function DevicesPage() {
           color: #d32f2f;
           cursor: pointer;
           transition: all 0.2s;
+          white-space: nowrap;
         }
 
         .btn-revoke:hover:not(:disabled) {
@@ -350,20 +391,16 @@ export default function DevicesPage() {
           margin: 12px 0 0 0;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
           .session-item {
             flex-wrap: wrap;
-            gap: 12px;
+            padding: 16px;
           }
-
-          .session-details {
-            flex-direction: column;
-            gap: 4px;
-          }
-
+          
           .btn-revoke {
-            width: 100%;
-            margin-top: 8px;
+             width: 100%;
+             text-align: center;
+             margin-top: 8px;
           }
         }
       `}</style>
