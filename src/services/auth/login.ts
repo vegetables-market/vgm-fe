@@ -6,7 +6,7 @@ import type { LoginResponse } from "@/types/auth/login";
  * ログイン
  */
 export const login = async (loginRequest: {
-  email: string;
+  username: string;
   password: string;
 }): Promise<LoginResponse> => {
   return fetchApi<LoginResponse>(API_ENDPOINTS.LOGIN, {

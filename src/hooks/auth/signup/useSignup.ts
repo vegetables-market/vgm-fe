@@ -4,10 +4,13 @@ import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth/user";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import { useAuth } from "@/context/AuthContext";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 
 type SignupInitialParams = {
   email?: string;
   flowId?: string;
+  verified?: boolean;
   redirectTo?: string | null;
 };
 
@@ -16,7 +19,10 @@ export function useSignup(initial?: SignupInitialParams) {
   const initialFlowId = initial?.flowId || "";
   const redirectTo = initial?.redirectTo || null;
 
-  const [step, setStep] = useState(initialFlowId ? 1 : 0); // flow_idがあればVerifyStep(1)から開始
+  // verified=true（チャレンジ画面で認証済み）ならUsernameEntry(2)から開始
+  const [step, setStep] = useState(
+    initial?.verified && initialFlowId ? 2 : initialFlowId ? 1 : 0
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SignupFormData>({
@@ -31,6 +37,8 @@ export function useSignup(initial?: SignupInitialParams) {
     flow_id: initialFlowId || undefined,
   });
   const router = useRouter();
+  const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -76,7 +84,12 @@ export function useSignup(initial?: SignupInitialParams) {
 
       addLog(`Signup successful: ${JSON.stringify(data)}`);
 
-      if (data.require_verification && data.flow_id) {
+      if (data.status === "AUTHENTICATED" && data.user) {
+        // 認証済み: ログイン状態にしてホームへ遷移
+        addLog("Signup completed with auto-login");
+        authLogin(data.user);
+        pushRedirect(redirectTo, "/");
+      } else if (data.require_verification && data.flow_id) {
         if (data.masked_email) {
           localStorage.setItem("vgm_masked_email", data.masked_email);
         }

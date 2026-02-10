@@ -96,7 +96,7 @@ export function useLogin(initial?: LoginInitialParams) {
       setIsLoading(true);
       addLog(`Attempting login with password for: ${emailOrUsername}`);
       try {
-        const data = await login({ email: emailOrUsername, password });
+        const data = await login({ username: emailOrUsername, password });
 
         if (data.status === "MFA_REQUIRED" && data.mfa_token) {
           addLog("MFA Required. Redirecting to challenge page.");

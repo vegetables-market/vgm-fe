@@ -10,9 +10,11 @@ function SignupContainerInner() {
   const initialEmail = searchParams.get("email");
   const initialFlowId = searchParams.get("flow_id");
   const redirectTo = searchParams.get("redirect_to");
+  const verified = searchParams.get("verified") === "true";
   const { state, actions } = useSignup({
     email: initialEmail || undefined,
     flowId: initialFlowId || undefined,
+    verified,
     redirectTo,
   });
 

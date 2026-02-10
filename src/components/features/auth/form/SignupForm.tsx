@@ -67,13 +67,13 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
             />
           )}
           {step === 1 && (
-             <CodeVerification
-               formData={formData}
-               setFormData={setFormData}
-               onNext={handleNext}
-               flowId={formData.flow_id || null}
-               expiresAt={formData.expiresAt}
-             />
+            <CodeVerification
+              formData={formData}
+              setFormData={setFormData}
+              onNext={handleNext}
+              flowId={formData.flow_id || null}
+              expiresAt={formData.expiresAt}
+            />
           )}
           {step === 2 && (
             <UsernameEntry
