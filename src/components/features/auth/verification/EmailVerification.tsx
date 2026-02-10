@@ -8,6 +8,9 @@ import { resendCode } from "@/services/auth/resend-code";
 import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import EmailVerificationForm from "./EmailVerificationForm";
 
 interface EmailVerificationProps {
@@ -43,6 +46,7 @@ export default function EmailVerification({
 
   const router = useRouter();
   const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -134,10 +138,11 @@ export default function EmailVerification({
         addLog(`Action verification successful: ${JSON.stringify(data)}`);
 
         // Action Token Flow
-        if (data.action_token && redirectTo) {
-          const separator = redirectTo.includes("?") ? "&" : "?";
+        const safe = safeRedirectTo(redirectTo);
+        if (data.action_token && safe) {
+          const separator = safe.includes("?") ? "&" : "?";
           router.push(
-            `${redirectTo}${separator}action_token=${data.action_token}`,
+            `${safe}${separator}action_token=${data.action_token}`,
           );
         } else {
           // redirectTo がない場合もエラーにせず、成功として扱う
@@ -156,7 +161,10 @@ export default function EmailVerification({
             // 新規登録フロー: 登録画面へ
             const targetEmail = codeResult.email || "";
             router.push(
-              `/signup?email=${encodeURIComponent(targetEmail)}&flow_id=${flowId}&verified=true`,
+              withRedirectTo(
+                `/signup?email=${encodeURIComponent(targetEmail)}&flow_id=${flowId}&verified=true`,
+                redirectTo,
+              ),
             );
             return;
           }
@@ -177,7 +185,7 @@ export default function EmailVerification({
             // ログインフロー: ログイン完了
             authLogin(data.user);
             localStorage.removeItem("vgm_masked_email");
-            router.push("/");
+            pushRedirect(redirectTo, "/");
           } else {
             setError("ログインに失敗しました。");
           }
@@ -206,7 +214,11 @@ export default function EmailVerification({
 
       // レスポンスに含まれる next_resend_at をURLに反映させることで
       // 上記のuseEffectが発火し、クールダウンがセットされる
-      const newUrl = `/challenge?type=email&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
+      const base = `/challenge?type=email&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
+      const withAction = action
+        ? `${base}&action=${encodeURIComponent(action)}`
+        : base;
+      const newUrl = withRedirectTo(withAction, redirectTo);
       router.replace(newUrl);
     } catch (err: any) {
       // 再送信制限エラーの場合

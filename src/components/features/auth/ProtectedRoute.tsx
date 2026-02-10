@@ -16,7 +16,7 @@ export default function ProtectedRoute({ children, fallback }: ProtectedRoutePro
     useEffect(() => {
         if (!isLoading && !isAuthenticated) {
             // 未ログインの場合、ログインページにリダイレクト
-            router.push('/login');
+            router.push(`/login?redirect_to=${encodeURIComponent(window.location.pathname + window.location.search)}`);
         }
     }, [isLoading, isAuthenticated, router]);
 

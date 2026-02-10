@@ -6,17 +6,20 @@ import SocialLoginButtons from "@/components/features/auth/SocialLoginButtons";
 import { initAuthFlow } from "@/services/auth/init-auth-flow";
 import { SignupFormData } from "@/types/auth/user";
 import AuthDivider from "@/components/features/auth/ui/AuthDivider";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
 interface EmailEntryProps {
   formData: SignupFormData;
   setFormData: React.Dispatch<React.SetStateAction<SignupFormData>>;
   addLog: (msg: string) => void;
+  redirectTo?: string | null;
 }
 
 export default function EmailEntry({
   formData,
   setFormData,
   addLog,
+  redirectTo,
 }: EmailEntryProps) {
   const [showError, setShowError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +52,7 @@ export default function EmailEntry({
             params.set("flow_id", result.flow_id);
             if (result.expires_at) params.set("expires_at", result.expires_at);
             if (result.next_resend_at) params.set("next_resend_at", result.next_resend_at);
+            if (redirectTo) params.set("redirect_to", redirectTo);
             
             router.push(`/challenge?${params.toString()}`);
         } else {
@@ -117,7 +121,7 @@ export default function EmailEntry({
             アカウントをお持ちの方は
           </span>
           <Link
-            href="/login"
+            href={withRedirectTo("/login", redirectTo)}
             className="text-xs text-white underline hover:text-gray-300"
           >
             ここからログイン

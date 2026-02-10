@@ -1,5 +1,9 @@
 import { LoginContainer } from "@/components/features/auth/containers/LoginContainer";
 
-export default function LoginPage() {
-  return <LoginContainer />;
+type PageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
+
+export default function LoginPage({ searchParams }: PageProps) {
+  return <LoginContainer searchParams={searchParams} />;
 }

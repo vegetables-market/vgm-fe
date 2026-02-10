@@ -15,6 +15,7 @@ interface SignupState {
   error: string;
   loading: boolean;
   formData: SignupFormData;
+  redirectTo: string | null;
 }
 
 interface SignupActions {
@@ -32,7 +33,7 @@ interface SignupFormProps {
 }
 
 export default function SignupForm({ state, actions }: SignupFormProps) {
-  const { step, error, loading, formData } = state;
+  const { step, error, loading, formData, redirectTo } = state;
   const { setFormData, handleNext, handlePrev, handleSubmit, addLog } = actions;
 
   return (
@@ -62,6 +63,7 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
               formData={formData}
               setFormData={setFormData}
               addLog={addLog}
+              redirectTo={redirectTo}
             />
           )}
           {step === 1 && (

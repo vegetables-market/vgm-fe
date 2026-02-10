@@ -5,14 +5,18 @@ import { useRouter } from "next/navigation";
 import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import EmailVerificationForm from "./EmailVerificationForm";
 
 interface EmailMfaVerificationProps {
   mfaToken: string;
+  redirectTo?: string;
 }
 
 export default function EmailMfaVerification({
   mfaToken,
+  redirectTo,
 }: EmailMfaVerificationProps) {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
@@ -20,6 +24,7 @@ export default function EmailMfaVerification({
   const [maskedEmail, setMaskedEmail] = useState<string | null>(null);
   const router = useRouter();
   const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
 
   useEffect(() => {
     // localStorageからmasked_emailを取得（ログインレスポンスで保存されているはず）
@@ -50,10 +55,12 @@ export default function EmailMfaVerification({
       if (data.user) {
         authLogin(data.user);
         localStorage.removeItem("vgm_masked_email");
-        router.push("/");
+        pushRedirect(redirectTo, "/");
       } else if (data.require_verification && data.flow_id) {
         // 万が一、MFA後にさらにEmail Verificationが必要な場合
-        router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+        router.push(
+          withRedirectTo(`/challenge?type=email&flow_id=${data.flow_id}`, redirectTo),
+        );
       } else {
         setError("ログインに失敗しました。");
       }

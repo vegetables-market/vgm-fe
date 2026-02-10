@@ -13,6 +13,7 @@ interface LoginState {
   password: string;
   error: string;
   isLoading: boolean;
+  redirectTo: string | null;
 }
 
 interface LoginActions {
@@ -28,7 +29,8 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ state, actions }: LoginFormProps) {
-  const { step, emailOrUsername, password, error, isLoading } = state;
+  const { step, emailOrUsername, password, error, isLoading, redirectTo } =
+    state;
   const { setEmailOrUsername, setPassword, onSubmit, addLog } = actions;
 
   return (
@@ -73,7 +75,7 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
             </AuthButton>
           </form>
         </div>
-        <SignupLink />
+        <SignupLink redirectTo={redirectTo} />
       </div>
     </>
   );

@@ -3,15 +3,18 @@ import { useRouter } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth/user";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
 type SignupInitialParams = {
   email?: string;
   flowId?: string;
+  redirectTo?: string | null;
 };
 
 export function useSignup(initial?: SignupInitialParams) {
   const initialEmail = initial?.email || "";
   const initialFlowId = initial?.flowId || "";
+  const redirectTo = initial?.redirectTo || null;
 
   const [step, setStep] = useState(initialFlowId ? 1 : 0); // flow_idがあればVerifyStep(1)から開始
   const [error, setError] = useState("");
@@ -77,9 +80,9 @@ export function useSignup(initial?: SignupInitialParams) {
         if (data.masked_email) {
           localStorage.setItem("vgm_masked_email", data.masked_email);
         }
-        router.push(`/challenge?flow_id=${data.flow_id}`);
+        router.push(withRedirectTo(`/challenge?flow_id=${data.flow_id}`, redirectTo));
       } else {
-        router.push("/login");
+        router.push(withRedirectTo("/login", redirectTo));
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
@@ -96,6 +99,7 @@ export function useSignup(initial?: SignupInitialParams) {
       error,
       loading,
       formData,
+      redirectTo,
     },
     actions: {
       setStep,

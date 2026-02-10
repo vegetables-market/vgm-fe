@@ -1,13 +1,18 @@
 import Link from "next/link";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
-export default function SignupLink() {
+type Props = {
+  redirectTo?: string | null;
+};
+
+export default function SignupLink({ redirectTo }: Props) {
   return (
     <div className="flex w-full items-center justify-center">
       <span className="mr-1 cursor-default text-xs text-[#b3b3b3]">
         アカウントを
       </span>
       <Link
-        href="/signup"
+        href={withRedirectTo("/signup", redirectTo)}
         className="text-foreground text-xs font-bold underline"
       >
         新規登録する

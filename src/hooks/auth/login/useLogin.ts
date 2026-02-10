@@ -4,8 +4,15 @@ import { login } from "@/services/auth/login";
 import { initAuthFlow } from "@/services/auth/init-auth-flow";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
-export function useLogin() {
+type LoginInitialParams = {
+  redirectTo?: string | null;
+};
+
+export function useLogin(initial?: LoginInitialParams) {
   const [step, setStep] = useState<"email" | "password">("email");
   const [emailOrUsername, setEmailOrUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -13,6 +20,10 @@ export function useLogin() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
+
+  const redirectTo = initial?.redirectTo || null;
+  const safeRedirect = safeRedirectTo(redirectTo);
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -57,6 +68,7 @@ export function useLogin() {
             params.set("next_resend_at", result.next_resend_at);
           // アクションを指定しても良い (action=login)
           params.set("action", "login");
+          if (safeRedirect) params.set("redirect_to", safeRedirect);
 
           router.push(`/challenge?${params.toString()}`);
         } else {
@@ -95,7 +107,10 @@ export function useLogin() {
 
           const mfaType = data.mfa_type?.toLowerCase() || "totp";
           router.push(
-            `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
+            withRedirectTo(
+              `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
+              redirectTo,
+            ),
           );
         } else if (data.require_verification) {
           if (data.flow_id) {
@@ -103,7 +118,12 @@ export function useLogin() {
             if (data.masked_email) {
               localStorage.setItem("vgm_masked_email", data.masked_email);
             }
-            router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+            router.push(
+              withRedirectTo(
+                `/challenge?type=email&flow_id=${data.flow_id}`,
+                redirectTo,
+              ),
+            );
           } else {
             addLog("Login failed: Invalid credentials.");
             setError(
@@ -113,7 +133,7 @@ export function useLogin() {
         } else if (data.user) {
           addLog("Login successful!");
           authLogin(data.user);
-          router.push("/");
+          pushRedirect(redirectTo, "/");
         }
       } catch (err: any) {
         const message = getErrorMessage(err);
@@ -133,6 +153,7 @@ export function useLogin() {
       password,
       error,
       isLoading,
+      redirectTo,
     },
     actions: {
       setEmailOrUsername,

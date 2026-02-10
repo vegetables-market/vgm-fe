@@ -11,10 +11,12 @@ type Props = {
 export function SignupContainer({ searchParams }: Props) {
   const initialEmail = getFirstSearchParam(searchParams?.email);
   const initialFlowId = getFirstSearchParam(searchParams?.flow_id);
+  const redirectTo = getFirstSearchParam(searchParams?.redirect_to);
 
   const { state, actions } = useSignup({
     email: initialEmail || undefined,
     flowId: initialFlowId || undefined,
+    redirectTo,
   });
 
   return <SignupForm state={state} actions={actions} />;

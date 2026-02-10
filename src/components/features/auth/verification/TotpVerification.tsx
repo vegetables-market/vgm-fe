@@ -8,6 +8,9 @@ import { verifyAction } from "@/services/auth/verify-action";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import OtpInput from "@/components/features/auth/OtpInput";
 import { useAuth } from "@/context/AuthContext";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
 interface TotpVerificationProps {
   mfaToken: string;
@@ -25,6 +28,7 @@ export default function TotpVerification({
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -56,10 +60,11 @@ export default function TotpVerification({
         addLog(`Action verification successful: ${JSON.stringify(data)}`);
 
         // Action Token Flow
-        if (data.action_token && redirectTo) {
-          const separator = redirectTo.includes("?") ? "&" : "?";
+        const safe = safeRedirectTo(redirectTo);
+        if (data.action_token && safe) {
+          const separator = safe.includes("?") ? "&" : "?";
           router.push(
-            `${redirectTo}${separator}action_token=${data.action_token}`,
+            `${safe}${separator}action_token=${data.action_token}`,
           );
           return;
         }
@@ -70,10 +75,15 @@ export default function TotpVerification({
         if (data.user) {
           addLog("MFA login successful!");
           authLogin(data.user);
-          router.push("/");
+          pushRedirect(redirectTo, "/");
         } else if (data.require_verification && data.flow_id) {
           // MFA後にさらにメール認証が必要な場合（まれなケース）
-          router.push(`/challenge?type=email&flow_id=${data.flow_id}`);
+          router.push(
+            withRedirectTo(
+              `/challenge?type=email&flow_id=${data.flow_id}`,
+              redirectTo,
+            ),
+          );
         } else {
           setError("ログインに失敗しました。");
         }
