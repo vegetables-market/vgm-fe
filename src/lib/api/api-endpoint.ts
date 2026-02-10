@@ -5,7 +5,9 @@ export const API_ENDPOINTS = {
     TEST: '/test',
     REGISTER: '/v1/auth/signup',
     LOGIN: '/v1/auth/login',
-    VERIFY_EMAIL: '/v1/auth/verify-email',
+    AUTH_GOOGLE: '/v1/auth/google',
+    AUTH_MICROSOFT: '/v1/auth/microsoft',
+    AUTH_GITHUB: '/v1/auth/github',
     USER: '/auth/user',
     TOTP_ENABLE: '/auth/totp/enable',
     TOTP_VERIFY: '/auth/totp/verify-and-enable',
@@ -13,6 +15,7 @@ export const API_ENDPOINTS = {
     LOGIN_TOTP: '/auth/login/totp',
     // 商品関連
     ITEMS: '/v1/market/items',
+    CATEGORIES: '/v1/market/categories',
     // 注文関連
     ORDERS: '/orders',
     // 決済関連

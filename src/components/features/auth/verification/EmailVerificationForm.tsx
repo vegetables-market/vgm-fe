@@ -13,6 +13,8 @@ interface EmailVerificationFormProps {
   onSubmit: (e: React.FormEvent) => void;
   onResend?: () => void;
   isResending?: boolean;
+  timeLeft?: number | null;
+  resendCooldown?: number;
 }
 
 export default function EmailVerificationForm({
@@ -25,7 +27,15 @@ export default function EmailVerificationForm({
   onSubmit,
   onResend,
   isResending = false,
+  timeLeft,
+  resendCooldown = 0,
 }: EmailVerificationFormProps) {
+  const formatTime = (seconds: number) => {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="w-full">
       {error && (
@@ -42,7 +52,7 @@ export default function EmailVerificationForm({
       )}
 
       <div className="mb-5 w-full">
-        <p className="text-[13px] text-gray-300 mb-4 text-center">
+        <p className="text-[13px] text-gray-300 mb-2 text-center">
           {maskedEmail ? (
             <>
               <span className="font-bold text-white">{maskedEmail}</span> 宛に
@@ -53,6 +63,12 @@ export default function EmailVerificationForm({
           )}
           認証コードを送信しました。
         </p>
+        
+        {timeLeft !== undefined && timeLeft !== null && (
+             <p className={`text-center text-xs font-mono mb-4 ${timeLeft < 60 ? 'text-red-500' : 'text-gray-400'}`}>
+                 有効期限: {formatTime(timeLeft)}
+             </p>
+        )}
 
         <form onSubmit={onSubmit}>
           <div className="mb-6">
@@ -77,11 +93,11 @@ export default function EmailVerificationForm({
         {onResend && (
             <button
               onClick={onResend}
-              disabled={isResending}
-              className="flex items-center text-xs text-amber-300 hover:text-amber-200 transition-colors disabled:opacity-50"
+              disabled={isResending || resendCooldown > 0}
+              className="flex items-center text-xs text-amber-300 hover:text-amber-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaRotateRight className={`mr-1 ${isResending ? 'animate-spin' : ''}`} />
-              認証コードを再送信
+              {resendCooldown > 0 ? `再送信まで ${resendCooldown}秒` : '認証コードを再送信'}
             </button>
         )}
       </div>

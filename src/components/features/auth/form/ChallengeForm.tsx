@@ -3,7 +3,6 @@ import { FaCircleExclamation } from "react-icons/fa6";
 import EmailVerification from "@/components/features/auth/verification/EmailVerification";
 import TotpVerification from "@/components/features/auth/verification/TotpVerification";
 import EmailMfaVerification from "@/components/features/auth/verification/EmailMfaVerification";
-import DeleteAccountVerification from "@/components/features/auth/verification/DeleteAccountVerification";
 
 interface ChallengeState {
   error: string;
@@ -11,6 +10,10 @@ interface ChallengeState {
   flowId: string | null;
   mfaToken: string | null;
   action: string | null;
+  maskedEmail: string | null;
+  expiresAt: string | null;
+  nextResendAt: string | null;
+  redirectTo: string | null;
 }
 
 interface ChallengeActions {
@@ -23,25 +26,25 @@ interface ChallengeFormProps {
 }
 
 export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
-  const { error, type, flowId, mfaToken, action } = state;
+  const { error, type, flowId, mfaToken, action, maskedEmail, expiresAt, nextResendAt, redirectTo } = state;
   const { handleReturnToLogin } = actions;
 
   const renderContent = () => {
-    // アカウント削除の確認
-    if (action === "delete_account" && flowId) {
-      return <DeleteAccountVerification flowId={flowId} />;
-    }
     // 1. Email Verification (Signup / Login Unknown Device) -> flow_id
     if (type === "email" && flowId) {
-      return <EmailVerification flowId={flowId} />;
+      return <EmailVerification flowId={flowId} expiresAt={expiresAt || undefined} nextResendAt={nextResendAt || undefined} action={action || undefined} redirectTo={redirectTo || undefined} maskedEmail={maskedEmail || undefined} />;
     }
     // 2. Email MFA (Login Known Device) -> mfa_token
     if (type === "email" && mfaToken) {
       return <EmailMfaVerification mfaToken={mfaToken} />;
     }
     // 3. TOTP MFA -> mfa_token
+    // Note: flowId might actually be an mfaToken if initiateAction returned TOTP type but used flow_id field in response.
+    // Ideally frontend should map response.flow_id to mfaToken prop if type is TOTP.
+    // However, backend initiateAction now returns token in flow_id field but frontend page might pass it as flow_id param??
+    // Let's assume standard mfaToken param for TOTP.
     if (type === "totp" && mfaToken) {
-      return <TotpVerification mfaToken={mfaToken} />;
+      return <TotpVerification mfaToken={mfaToken} action={action || undefined} redirectTo={redirectTo || undefined} />;
     }
 
     // パラメータ不足等の場合
@@ -52,9 +55,6 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
   };
 
   const getTitle = () => {
-    if (action === "delete_account") {
-      return "アカウント削除の確認";
-    }
     return "セキュリティ確認";
   };
 

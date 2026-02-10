@@ -1,38 +1,68 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { FaCircleExclamation } from "react-icons/fa6";
 import SocialLoginButtons from "@/components/features/auth/SocialLoginButtons";
 import { SignupFormData } from "@/types/auth";
+import AuthDivider from "@/components/features/auth/ui/AuthDivider";
 
-interface Step0Props {
+interface EmailEntryProps {
   formData: SignupFormData;
   setFormData: React.Dispatch<React.SetStateAction<SignupFormData>>;
-  onNext: () => void;
   addLog: (msg: string) => void;
 }
 
-export default function Step0Email({
+export default function EmailEntry({
   formData,
   setFormData,
-  onNext,
   addLog,
-}: Step0Props) {
+}: EmailEntryProps) {
   const [showError, setShowError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const isEmailValid = useMemo(() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(formData.email);
   }, [formData.email]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isEmailValid) {
       setShowError(true);
       return;
     }
-    onNext();
+    
+    setIsLoading(true);
+    try {
+        const { initAuthFlow } = await import("@/lib/api/client");
+        addLog(`Checking email status: ${formData.email}`);
+        
+        // 認証フロー初期化 (Backendで統一的に処理)
+        const result = await initAuthFlow(formData.email);
+        addLog(`Auth flow initiated: ${result.flow} / ${result.flow_id}`);
+
+        if (result.flow_id) {
+            // 統一フロー: チャレンジページへ遷移
+            const params = new URLSearchParams();
+            params.set("type", "email");
+            params.set("flow_id", result.flow_id);
+            if (result.expires_at) params.set("expires_at", result.expires_at);
+            if (result.next_resend_at) params.set("next_resend_at", result.next_resend_at);
+            
+            router.push(`/challenge?${params.toString()}`);
+        } else {
+            // 万が一 flow_id がない場合のエラーハンドリング
+            addLog("Error: Missing flow_id for authentication flow");
+            console.error("Error: Missing flow_id for authentication flow");
+        }
+    } catch (error) {
+        addLog("Error checking email status");
+        console.error(error);
+        // エラー表示など
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   return (
@@ -67,21 +97,15 @@ export default function Step0Email({
 
         <button
           type="submit"
-          className="mt-6 h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black transition-colors hover:bg-gray-200"
+          disabled={isLoading}
+          className={`mt-6 h-10 w-full cursor-pointer rounded-full bg-white text-base font-bold text-black transition-colors hover:bg-gray-200 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          次へ
+          {isLoading ? "確認中..." : "次へ"}
         </button>
       </form>
 
       <div className="w-full">
-        <div className="relative my-6 w-full">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-600"></div>
-          </div>
-          <div className="relative flex justify-center text-[13px]">
-            <span className="bg-[#121212] px-2 text-gray-400">または</span>
-          </div>
-        </div>
+        <AuthDivider />
 
         <SocialLoginButtons
           mode="signup"

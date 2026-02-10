@@ -1,1 +1,3 @@
-// 下書き一覧
+export default function DraftsPage() {
+  return <div>Drafts Page</div>;
+}

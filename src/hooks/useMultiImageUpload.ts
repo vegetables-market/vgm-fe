@@ -1,5 +1,4 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-// import { v4 as uuidv4 } from 'uuid'; // Removed: uuid is not installed
 
 function generateId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -26,87 +25,112 @@ export interface UploadFile {
 
 const MAX_CONCURRENCY = 3;
 
-export function useMultiImageUpload(itemId: number | null) {
+interface UseMultiImageUploadOptions {
+  initDraft?: () => Promise<number>;
+}
+
+export function useMultiImageUpload(itemId: number | null, options?: UseMultiImageUploadOptions) {
+  const initDraft = options?.initDraft;
   const [files, setFiles] = useState<UploadFile[]>([]);
-  const uploadQueueRef = useRef<string[]>([]); // アップロード待ちID
-  const activeUploadsRef = useRef<number>(0); // 現在実行中の数
+  const uploadQueueRef = useRef<Map<string, UploadFile>>(new Map());
+  const activeUploadsRef = useRef<number>(0);
+  const itemIdRef = useRef<number | null>(null);
+
+  // itemIdをRefで追跡
+  useEffect(() => {
+    itemIdRef.current = itemId;
+  }, [itemId]);
 
   /**
    * 処理キューを回す
    */
   const processQueue = useCallback(async () => {
-    if (!itemId) return; // Draft IDがないとアップロードできない
+    const currentItemId = itemIdRef.current;
+    if (!currentItemId) return;
     if (activeUploadsRef.current >= MAX_CONCURRENCY) return;
-    if (uploadQueueRef.current.length === 0) return;
+    if (uploadQueueRef.current.size === 0) return;
 
     // 次のタスクを取り出す
-    const nextId = uploadQueueRef.current.shift();
-    if (!nextId) return;
+    const iterator = uploadQueueRef.current.entries().next();
+    if (iterator.done) return;
+
+    const [nextId, targetFile] = iterator.value;
+    uploadQueueRef.current.delete(nextId);
+
+    if (!targetFile || !targetFile.file) {
+      console.error('File not found in queue:', nextId);
+      processQueue();
+      return;
+    }
 
     activeUploadsRef.current++;
 
     // ステータスをUploadingに変更
-    setFiles(prev => prev.map(f => 
+    setFiles(prev => prev.map(f =>
       f.id === nextId ? { ...f, status: 'uploading', progress: 0 } : f
     ));
 
     try {
-      // 対象ファイル特定
-      const target = files.find(f => f.id === nextId);
-      if (!target || !target.file) {
-          // 何らかの理由でファイルがない
-          throw new Error('File not found');
-      }
-
       // 1. Token取得
       const { token, filename } = await getUploadToken();
 
       // 2. Direct Upload (Workers)
-      await uploadImage(target.file, 'jpg', token, filename); // フォーマットは一旦jpg固定
+      await uploadImage(targetFile.file, 'jpg', token, filename);
 
       // 3. Link (Backend)
-      await linkImages(itemId, [filename]);
+      await linkImages(currentItemId, [filename]);
 
       // 完了
-      setFiles(prev => prev.map(f => 
+      setFiles(prev => prev.map(f =>
         f.id === nextId ? { ...f, status: 'completed', serverFilename: filename, progress: 100 } : f
       ));
 
     } catch (err) {
       console.error(`Upload failed for ${nextId}:`, err);
-      setFiles(prev => prev.map(f => 
+      setFiles(prev => prev.map(f =>
         f.id === nextId ? { ...f, status: 'error', error: err instanceof Error ? err.message : 'Upload failed' } : f
       ));
     } finally {
       activeUploadsRef.current--;
-      // 次を処理（再帰的ではなくuseEffect依存でトリガーさせたいが、
-      // ここで直接呼ぶのが確実）
-      processQueue(); 
+      processQueue();
     }
-  }, [files, itemId]);
+  }, []);
 
   /**
-   * itemIdやキューの状態が変わったら処理を試行
+   * itemIdが設定されたらキュー処理を開始
    */
   useEffect(() => {
-    processQueue();
-  }, [itemId, files.length, processQueue]); 
-  // ↑ files.lengthを入れることで、新規追加されたときもトリガーされる
-  // ただし processQueue 内で files を参照していると無限ループのリスクがあるが、
-  // shiftingロジックは Ref で管理しているので大丈夫なはず
+    if (itemId && uploadQueueRef.current.size > 0) {
+      processQueue();
+    }
+  }, [itemId, processQueue]);
 
   /**
-   * ファイル追加
+   * ファイル追加（ドラフトがなければ作成）
    */
   const addFiles = useCallback(async (newFiles: File[]) => {
+    // ドラフトがなければ先に作成（initDraftが提供されている場合のみ）
+    if (!itemIdRef.current) {
+      if (initDraft) {
+        try {
+          const newItemId = await initDraft();
+          itemIdRef.current = newItemId;
+        } catch (err) {
+          console.error('Failed to create draft:', err);
+          return; // ドラフト作成失敗時は画像追加を中止
+        }
+      } else {
+        console.error('No itemId and no initDraft provided');
+        return;
+      }
+    }
+
     const newEntries: UploadFile[] = await Promise.all(newFiles.map(async (f) => {
       const id = generateId();
-      
-      // 圧縮処理（これは並列でやってしまう）
+
       let compressed = f;
-      // プレビュー生成
       const previewUrl = URL.createObjectURL(f);
-      
+
       try {
         const result = await compressImage(f, 'jpeg');
         compressed = result.compressedFile;
@@ -119,7 +143,7 @@ export function useMultiImageUpload(itemId: number | null) {
         originalFile: f,
         file: compressed,
         previewUrl,
-        status: 'pending' as const, // 最初はpending
+        status: 'pending' as const,
         progress: 0
       };
     }));
@@ -127,13 +151,14 @@ export function useMultiImageUpload(itemId: number | null) {
     // State更新
     setFiles(prev => [...prev, ...newEntries]);
 
-    // キューに追加
-    newEntries.forEach(e => {
-      uploadQueueRef.current.push(e.id);
+    // キューに追加（ファイル情報も一緒に保存）
+    newEntries.forEach(entry => {
+      uploadQueueRef.current.set(entry.id, entry);
     });
-    
-    // トリガーはuseEffectが行う
-  }, []);
+
+    // 即座に処理開始を試みる
+    processQueue();
+  }, [processQueue, initDraft]);
 
   /**
    * ファイル削除
@@ -141,10 +166,7 @@ export function useMultiImageUpload(itemId: number | null) {
   const removeFile = useCallback((id: string) => {
     setFiles(prev => prev.filter(f => f.id !== id));
     // キューからも削除
-    uploadQueueRef.current = uploadQueueRef.current.filter(qid => qid !== id);
-    // TODO: サーバーにアップロード済みなら削除APIを呼ぶべきだが、
-    // 今回はDraftなので放置でも良い（Orphan対策は別途バッチでやる方針）
-    // 即時削除したい場合は deleteImage APIが必要
+    uploadQueueRef.current.delete(id);
   }, []);
 
   return {

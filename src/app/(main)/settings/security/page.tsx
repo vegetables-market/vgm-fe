@@ -1,171 +1,61 @@
 "use client";
 
-import Link from "next/link";
+import SettingsTitle from "@/components/features/settings/ui/SettingsTitle";
+import Btn from "@/components/features/settings/ui/Btn";
+import BtnWrappers from "@/components/features/settings/ui/BtnWrappers";
 
-const securityItems = [
-  {
-    href: "/settings/security/email",
-    label: "メールアドレス",
-    description: "登録メールアドレスの確認・変更",
-    icon: "📧",
-  },
-  {
-    href: "/settings/security/password",
-    label: "パスワード",
-    description: "パスワードの変更",
-    icon: "🔑",
-  },
-  {
-    href: "/settings/security/user-name",
-    label: "ユーザー名",
-    description: "ログイン用のユーザー名を変更",
-    icon: "✏️",
-  },
-  {
-    href: "/settings/security/signinoptions",
-    label: "二段階認証",
-    description: "認証アプリ、メール認証の設定",
-    icon: "🔐",
-  },
-  {
-    href: "/settings/security/oauth",
-    label: "外部サービス連携",
-    description: "Google、Appleなどとのアカウント連携",
-    icon: "🔗",
-  },
-  {
-    href: "/settings/security/devices",
-    label: "ログイン中のデバイス",
-    description: "接続中のデバイスを管理",
-    icon: "💻",
-  },
-  {
-    href: "/settings/security/passkeys",
-    label: "パスキー設定",
-    description: "指紋や顔認証でログイン",
-    icon: "👆",
-  },
-];
+import LoggedInDevices from "@/components/features/settings/security/LoggedInDevices";
 
 export default function SecurityPage() {
   return (
-    <div className="security-page">
-      <h1 className="page-title">セキュリティ</h1>
-      <p className="page-subtitle">アカウントのセキュリティ設定を管理します</p>
+    <>
+      <SettingsTitle>セキュリティ</SettingsTitle>
 
-      <div className="security-list">
-        {securityItems.map((item) => (
-          <Link key={item.href} href={item.href} className="security-item">
-            <span className="item-icon">{item.icon}</span>
-            <div className="item-content">
-              <h3 className="item-title">{item.label}</h3>
-              <p className="item-description">{item.description}</p>
+      {/* ログイン履歴 */}
+      <h2 className="mt-6 mb-2 px-1 text-lg font-bold text-gray-900">
+        ログイン履歴
+      </h2>
+      <BtnWrappers>
+        <Btn href="/settings/security/history">
+          <div className="flex w-full items-center justify-between">
+            <div className="flex flex-col items-start gap-1">
+              <span className="font-semibold">新しいログインがありました</span>
+              <span className="text-sm text-gray-500">
+                iPhoneでのログイン • 多要素認証
+              </span>
             </div>
-            <span className="item-arrow">›</span>
-          </Link>
-        ))}
-      </div>
+            <span className="text-sm text-blue-600">履歴を確認</span>
+          </div>
+        </Btn>
+      </BtnWrappers>
 
-      <style jsx>{`
-        .security-page {
-          max-width: 600px;
-        }
+      {/* ログイン方法 */}
+      <h2 className="mt-6 mb-2 px-1 text-lg font-bold text-gray-900">
+        ログイン方法
+      </h2>
+      <BtnWrappers>
+        <Btn href="/settings/security/password">
+          <span className="font-medium">パスワード</span>
+          <span className="text-sm text-gray-500">最終変更: 3ヶ月前</span>
+        </Btn>
+        <Btn href="/settings/security/signinoptions">
+          <span className="font-medium">多要素認証</span>
+          <span className="text-sm text-gray-500">オン</span>
+        </Btn>
+        <Btn href="#">
+          <span className="font-medium">アプリからのメッセージ</span>
+        </Btn>
+        <Btn href="/settings/security/email">
+          <span className="font-medium">再設定用メールアドレス</span>
+          <span className="text-sm text-gray-500">exam***@example.com</span>
+        </Btn>
+      </BtnWrappers>
 
-        .page-title {
-          font-size: 22px;
-          font-weight: 700;
-          color: #333;
-          margin: 0 0 8px 0;
-        }
-
-        .page-subtitle {
-          font-size: 14px;
-          color: #666;
-          margin: 0 0 24px 0;
-        }
-
-        .security-list {
-          display: flex;
-          flex-direction: column;
-          gap: 1px;
-          background: #eee;
-          border-radius: 12px;
-          overflow: hidden;
-        }
-
-        .security-item {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          padding: 18px 20px;
-          background: #fff;
-          text-decoration: none;
-          transition: background 0.2s ease;
-        }
-
-        .security-item:hover {
-          background: #fafafa;
-        }
-
-        .item-icon {
-          font-size: 24px;
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #f5f5f5;
-          border-radius: 10px;
-        }
-
-        .item-content {
-          flex: 1;
-        }
-
-        .item-title {
-          font-size: 15px;
-          font-weight: 600;
-          color: #333;
-          margin: 0 0 4px 0;
-        }
-
-        .item-description {
-          font-size: 13px;
-          color: #888;
-          margin: 0;
-        }
-
-        .item-arrow {
-          font-size: 24px;
-          color: #ccc;
-          font-weight: 300;
-        }
-
-        .security-item:hover .item-arrow {
-          color: #999;
-        }
-
-        @media (max-width: 768px) {
-          .security-item {
-            padding: 14px 16px;
-            gap: 12px;
-          }
-
-          .item-icon {
-            width: 36px;
-            height: 36px;
-            font-size: 20px;
-          }
-
-          .item-title {
-            font-size: 14px;
-          }
-
-          .item-description {
-            font-size: 12px;
-          }
-        }
-      `}</style>
-    </div>
+      {/* ログインしているデバイス */}
+      <h2 className="mt-6 mb-2 px-1 text-lg font-bold text-gray-900">
+        ログインしているデバイス
+      </h2>
+      <LoggedInDevices />
+    </>
   );
 }

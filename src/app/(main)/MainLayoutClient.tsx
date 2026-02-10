@@ -2,13 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useDevice, DeviceType } from "@/hooks/useDevice";
+import { useDevice, DeviceType } from "@/hooks/App/useDevice";
 import { useIsPWA } from "@/hooks/useIsPWA";
 
 const Header = dynamic(() => import("@/components/layouts/WebHeader"));
-const MobileNavigation = dynamic(() => import("@/components/layouts/MobileNavigation"));
-const TabletLeftNavigation = dynamic(() => import("@/components/layouts/TabletLeftNavigation"));
-const InstallPrompt = dynamic(() => import("@/components/layout/InstallPrompt"), { ssr: false });
+const MobileNavigation = dynamic(
+  () => import("@/components/layouts/MobileNavigation"),
+);
+const TabletLeftNavigation = dynamic(
+  () => import("@/components/layouts/TabletLeftNavigation"),
+);
+const InstallPrompt = dynamic(
+  () => import("@/components/layouts/InstallPrompt"),
+  { ssr: false },
+);
 
 export default function MainLayoutClient({
   children,
@@ -48,7 +55,9 @@ export default function MainLayoutClient({
   const showTabletNav = isPWA && deviceType === "tablet";
 
   return (
-    <section className={`flex relative ${deviceType === "tablet" ? "" : "flex-col"} `}>
+    <section
+      className={`relative flex ${deviceType === "tablet" ? "" : "flex-col"} `}
+    >
       {showHeader && <Header />}
       {showMobileNav && <MobileNavigation />}
       {showTabletNav && <TabletLeftNavigation />}

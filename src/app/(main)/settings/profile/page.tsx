@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
-import { fetchApi } from "@/lib/api/api-client";
+import { fetchApi } from "@/lib/api/client";
 
 interface UserProfile {
   username: string;
@@ -23,7 +23,7 @@ export default function ProfileEditPage() {
   const [password, setPassword] = useState("");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -35,7 +35,7 @@ export default function ProfileEditPage() {
   const fetchProfile = async () => {
     try {
       const data = await fetchApi<UserProfile>("/v1/user/profile", {
-        credentials: "include"
+        credentials: "include",
       });
       setProfile(data);
       setDisplayName(data.displayName);
@@ -75,8 +75,8 @@ export default function ProfileEditPage() {
         credentials: "include",
         body: JSON.stringify({
           displayName,
-          password: password || undefined
-        })
+          password: password || undefined,
+        }),
       });
       setSuccess("表示名を更新しました");
       setPassword("");
@@ -97,7 +97,7 @@ export default function ProfileEditPage() {
       await fetchApi("/v1/user/profile/bio", {
         method: "PUT",
         credentials: "include",
-        body: JSON.stringify({ bio })
+        body: JSON.stringify({ bio }),
       });
       setSuccess("自己紹介を更新しました");
       fetchProfile();
@@ -119,8 +119,8 @@ export default function ProfileEditPage() {
         credentials: "include",
         body: JSON.stringify({
           gender,
-          birthDate: birthDate || undefined
-        })
+          birthDate: birthDate || undefined,
+        }),
       });
       setSuccess("ユーザー情報を更新しました");
       fetchProfile();
@@ -145,7 +145,7 @@ export default function ProfileEditPage() {
       const response = await fetch("/v1/user/profile/avatar", {
         method: "POST",
         credentials: "include",
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -183,7 +183,7 @@ export default function ProfileEditPage() {
               <img src={avatarPreview} alt="Avatar" />
             ) : (
               <div className="avatar-placeholder">
-                {profile.displayName.charAt(0).toUpperCase()}
+                {/*{profile.displayName.charAt(0).toUpperCase()}*/}
               </div>
             )}
           </div>
@@ -233,7 +233,7 @@ export default function ProfileEditPage() {
         )}
         <button
           onClick={handleUpdateDisplayName}
-          disabled={isLoading || !displayName.trim()}
+          // disabled={isLoading || !displayName.trim()}
           className="btn-primary"
         >
           表示名を更新

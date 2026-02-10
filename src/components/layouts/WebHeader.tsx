@@ -133,10 +133,10 @@ export default function WebHeader() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-100 transition-all hover:ring-2 hover:ring-amber-500 dark:border-gray-700 dark:bg-gray-800"
             >
-              {user.avatar_url ? (
+              {user.avatarUrl ? (
                 <img
-                  src={user.avatar_url}
-                  alt={user.display_name}
+                  src={user.avatarUrl}
+                  alt={user.displayName}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -159,7 +159,7 @@ export default function WebHeader() {
                   >
                     <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-800">
                       <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
-                        {user.display_name}
+                        {user.displayName}
                       </p>
                       <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                         {user.email}
