@@ -2,6 +2,8 @@
 
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import { getRedirectToFromLocation } from "@/lib/next/getRedirectToFromLocation";
 
 type ProtectedContentProps = {
     children: React.ReactNode;
@@ -15,6 +17,7 @@ export default function ProtectedContent({
     showLoginLink = true
 }: ProtectedContentProps) {
     const { isAuthenticated } = useAuth();
+    const redirectTo = getRedirectToFromLocation();
 
     if (isAuthenticated) {
         return <>{children}</>;
@@ -32,7 +35,7 @@ export default function ProtectedContent({
                 何もありません
             </p>
             {showLoginLink && (
-                <Link href="/login" className="text-blue-500 hover:underline">
+                <Link href={withRedirectTo("/login", redirectTo)} className="text-blue-500 hover:underline">
                     ログイン →
                 </Link>
             )}

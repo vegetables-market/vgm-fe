@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import { getRedirectToFromLocation } from "@/lib/next/getRedirectToFromLocation";
 
 import { FaMagnifyingGlass, FaRegHeart, FaUser } from "react-icons/fa6";
 import { IoCartOutline } from "react-icons/io5";
@@ -15,6 +17,7 @@ export default function WebHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
+  const redirectTo = getRedirectToFromLocation();
 
   const handleLogout = async () => {
     try {
@@ -23,7 +26,7 @@ export default function WebHeader() {
       console.error("Logout failed", e);
     } finally {
       setIsMenuOpen(false);
-      router.push("/login");
+      router.push(withRedirectTo("/login", redirectTo));
     }
   };
 
@@ -164,13 +167,13 @@ export default function WebHeader() {
         ) : (
           <div className="flex gap-2">
             <Link
-              href="/login"
+              href={withRedirectTo("/login", redirectTo)}
               className="rounded-full bg-gray-800 px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 sm:text-sm dark:bg-white dark:text-black"
             >
               ログイン
             </Link>
             <Link
-              href="/signup"
+              href={withRedirectTo("/signup", redirectTo)}
               className="hidden rounded-full border border-gray-300 px-4 py-2 text-xs font-bold text-gray-700 transition hover:bg-gray-50 sm:block sm:text-sm dark:border-gray-700 dark:text-gray-300 dark:hover:bg-zinc-800"
             >
               新規登録

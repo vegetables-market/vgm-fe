@@ -1,18 +1,15 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useSignup } from "@/hooks/auth/signup/useSignup";
 import SignupForm from "@/components/features/auth/form/SignupForm";
-import { getFirstSearchParam } from "@/lib/next/getFirstSearchParam";
 
-type Props = {
-  searchParams?: Record<string, string | string[] | undefined>;
-};
-
-export function SignupContainer({ searchParams }: Props) {
-  const initialEmail = getFirstSearchParam(searchParams?.email);
-  const initialFlowId = getFirstSearchParam(searchParams?.flow_id);
-  const redirectTo = getFirstSearchParam(searchParams?.redirect_to);
-
+function SignupContainerInner() {
+  const searchParams = useSearchParams();
+  const initialEmail = searchParams.get("email");
+  const initialFlowId = searchParams.get("flow_id");
+  const redirectTo = searchParams.get("redirect_to");
   const { state, actions } = useSignup({
     email: initialEmail || undefined,
     flowId: initialFlowId || undefined,
@@ -20,4 +17,12 @@ export function SignupContainer({ searchParams }: Props) {
   });
 
   return <SignupForm state={state} actions={actions} />;
+}
+
+export function SignupContainer() {
+  return (
+    <Suspense fallback={null}>
+      <SignupContainerInner />
+    </Suspense>
+  );
 }

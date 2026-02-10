@@ -1,15 +1,21 @@
 "use client";
 
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { useLogin } from "@/hooks/auth/login/useLogin";
 import LoginForm from "@/components/features/auth/form/LoginForm";
-import { getFirstSearchParam } from "@/lib/next/getFirstSearchParam";
 
-type Props = {
-  searchParams?: Record<string, string | string[] | undefined>;
-};
-
-export function LoginContainer({ searchParams }: Props) {
-  const redirectTo = getFirstSearchParam(searchParams?.redirect_to);
+function LoginContainerInner() {
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect_to");
   const { state, actions } = useLogin({ redirectTo });
   return <LoginForm state={state} actions={actions} />;
+}
+
+export function LoginContainer() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContainerInner />
+    </Suspense>
+  );
 }
