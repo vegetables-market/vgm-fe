@@ -1,13 +1,17 @@
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth/user";
 
-export function useSignup() {
-  const searchParams = useSearchParams();
-  const initialEmail = searchParams.get("email") || "";
-  const initialFlowId = searchParams.get("flow_id") || "";
+type SignupInitialParams = {
+  email?: string;
+  flowId?: string;
+};
+
+export function useSignup(initial?: SignupInitialParams) {
+  const initialEmail = initial?.email || "";
+  const initialFlowId = initial?.flowId || "";
 
   const [step, setStep] = useState(initialFlowId ? 1 : 0); // flow_idがあればVerifyStep(1)から開始
   const [error, setError] = useState("");

@@ -27,7 +27,7 @@ export default function PasswordChangePage() {
 
   const fetchProfileInfo = async () => {
     try {
-      const data = await fetchApi<ProfileInfo>("/v1/user/profile/me", {
+      const data = await fetchApi<ProfileInfo>("/v1/user/account/me", {
         credentials: "include"
       });
       setProfileInfo(data);

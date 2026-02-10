@@ -1,19 +1,16 @@
-"use client";
+import SignupClient from "./signup-client";
 
-import { Suspense } from "react";
-import { useSignup } from "@/hooks/auth/signup/useSignup";
-import SignupForm from "@/components/features/auth/form/SignupForm";
+type PageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
 
-function SignupPageInner() {
-  const { state, actions } = useSignup();
-
-  return <SignupForm state={state} actions={actions} />;
+function getFirst(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
 }
 
-export default function SignupPage() {
-  return (
-    <Suspense fallback={null}>
-      <SignupPageInner />
-    </Suspense>
-  );
+export default function SignupPage({ searchParams }: PageProps) {
+  const email = getFirst(searchParams?.email);
+  const flowId = getFirst(searchParams?.flow_id);
+
+  return <SignupClient initialEmail={email || ""} initialFlowId={flowId || ""} />;
 }

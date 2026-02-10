@@ -28,7 +28,7 @@ export default function UserNameChangePage() {
 
   const fetchProfileInfo = async () => {
     try {
-      const data = await fetchApi<ProfileInfo>("/v1/user/profile/me", {
+      const data = await fetchApi<ProfileInfo>("/v1/user/account/me", {
         credentials: "include"
       });
       setProfileInfo(data);
@@ -63,7 +63,7 @@ export default function UserNameChangePage() {
 
     try {
       const result = await fetchApi<{ success: boolean; message: string; username: string }>(
-        "/v1/user/profile/username",
+        "/v1/user/account/username",
         {
           method: "PUT",
           credentials: "include",
