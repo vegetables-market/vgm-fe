@@ -1,24 +1,9 @@
-"use client";
+import { ChallengeContainer } from "@/components/features/auth/containers/ChallengeContainer";
 
-import { Suspense } from "react";
-import { useChallenge } from "@/hooks/auth/challenge/useChallenge";
-import ChallengeForm from "@/components/features/auth/form/ChallengeForm";
+type PageProps = {
+  searchParams?: Record<string, string | string[] | undefined>;
+};
 
-function ChallengeContent() {
-  const { state, actions } = useChallenge();
-  return <ChallengeForm state={state} actions={actions} />;
-}
-
-export default function ChallengePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen w-screen items-center justify-center bg-black text-white">
-          Loading...
-        </div>
-      }
-    >
-      <ChallengeContent />
-    </Suspense>
-  );
+export default function ChallengePage({ searchParams }: PageProps) {
+  return <ChallengeContainer searchParams={searchParams} />;
 }
