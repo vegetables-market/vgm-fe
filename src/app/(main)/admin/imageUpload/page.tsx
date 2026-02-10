@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import ImageUploader from '@/components/ImageUploader';
-import { getAdminUploadToken, getMediaUrl } from '@/lib/api';
+import { getAdminUploadToken, getMediaUrl } from '@/lib/api/client';
 
 export default function AdminImageUploadPage() {
   const [targetFilename, setTargetFilename] = useState('');

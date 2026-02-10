@@ -1,7 +1,7 @@
 'use client';
 
 import ImageUploader from '@/components/ImageUploader';
-import { getMediaUrl } from '@/lib/api';
+import { getMediaUrl } from '@/lib/api/client';
 import { useState } from 'react';
 
 export default function TestImageUploadPage() {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchApi } from '@/lib/api';
+import { fetchApi } from '@/lib/api/client';
 
 interface NotificationSettings {
   emailNotifications: boolean;

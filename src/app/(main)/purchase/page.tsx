@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import { fetchApi } from "@/lib/api/client";
+// TODO: Create mockData module or replace with real API
 import {
   MOCK_ADDRESSES,
   MOCK_PAYMENT_METHODS,

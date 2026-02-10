@@ -8,7 +8,9 @@ function generateId() {
 }
 
 import { compressImage } from '@/lib/utils/imageCompression';
-import { getUploadToken, uploadImage, linkImages } from '@/lib/api';
+import { getUploadToken } from '@/lib/api/services/upload/get-upload-token';
+import { uploadImage } from '@/lib/api/client';
+import { linkImages } from '@/lib/api/services/item/link-images';
 
 export type UploadFileStatus = 'pending' | 'compressing' | 'uploading' | 'completed' | 'error';
 

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCategories, updateItem } from '@/lib/api';
+import { getCategories } from '@/lib/api/services/category/get-categories';
+import { updateItem } from '@/lib/api/services/item/update-item';
 import { useItemDraft } from '@/hooks/useItemDraft';
 import { useMultiImageUpload } from '@/hooks/useMultiImageUpload';
 

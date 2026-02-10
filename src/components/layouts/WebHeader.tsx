@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
-import { logout } from "@/lib/api/services/auth";
+import { logout } from "@/lib/api/services/auth/logout";
 import { UserInfo } from "@/types/auth";
 
 import { FaMagnifyingGlass, FaRegHeart, FaUser } from "react-icons/fa6";

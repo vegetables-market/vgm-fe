@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { categoryApi } from '@/lib/api/services';
+// TODO: Implement category API
+import { categoryApi } from '@/lib/api/stubs';
 import type { CategoryResponse } from '@/lib/api/types';
 
 export default function CategoriesPage() {

@@ -2,7 +2,7 @@
  * アップロード結果表示コンポーネント
  */
 
-import { getMediaUrl } from '@/lib/api';
+import { getMediaUrl } from '@/lib/api/client';
 
 type Props = {
   fileName: string;

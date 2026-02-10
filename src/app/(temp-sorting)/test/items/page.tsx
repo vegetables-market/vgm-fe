@@ -7,6 +7,7 @@ import { Suspense, useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/layouts/Footer';
 import { useCart } from '@/context/CartContext';
+// TODO: Create data module or replace with real API
 import { ITEMS_DATA } from '@/lib/data';
 
 // ==========================================

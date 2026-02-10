@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { verifyLogin, AuthMethod } from '@/lib/api/services/auth';
+import { verifyLogin, AuthMethod } from '@/lib/api/services/auth/verify-login';
 import { getErrorMessage } from '@/lib/api/error-handler';
 import { useAuth } from '@/context/AuthContext';
 import EmailVerificationForm from './EmailVerificationForm';

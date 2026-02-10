@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getMyItems, deleteItem, updateItemStatus } from '@/lib/api';
+import { getMyItems } from '@/lib/api/services/item/get-my-items';
+import { deleteItem } from '@/lib/api/services/item/delete-item';
+import { updateItemStatus } from '@/lib/api/services/item/update-item-status';
 
 interface Item {
   id: number;

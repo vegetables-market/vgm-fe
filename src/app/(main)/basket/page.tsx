@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { cartApi } from "@/lib/api/services";
+// TODO: Implement cart API
+import { cartApi } from "@/lib/api/stubs";
 import type { CartResponse } from "@/lib/api/types";
 
 export default function BasketPage() {
@@ -30,7 +31,7 @@ export default function BasketPage() {
     if (newQuantity < 1) return;
     setIsUpdating(true);
     try {
-      await cartApi.updateCartItemQuantity(cartItemId, { quantity: newQuantity });
+      await cartApi.updateCartItemQuantity(cartItemId, newQuantity);
       await fetchCart(); // Refresh cart
     } catch (error) {
       alert("数量の変更に失敗しました");

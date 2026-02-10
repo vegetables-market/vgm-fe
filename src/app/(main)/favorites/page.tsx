@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { favoriteApi } from "@/lib/api/services";
+// TODO: Implement favorite API
+import { favoriteApi } from "@/lib/api/stubs";
 import type { ItemResponse } from "@/lib/api/types";
 
 export default function FavoritesPage() {

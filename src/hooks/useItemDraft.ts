@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { createDraft } from '@/lib/api';
+import { createDraft } from '@/lib/api/services/item/create-draft';
 
 export function useItemDraft() {
   const [itemId, setItemId] = useState<number | null>(null);

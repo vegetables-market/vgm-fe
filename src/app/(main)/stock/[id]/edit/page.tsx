@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { getCategories, updateItem, fetchApi } from '@/lib/api';
+import { getCategories } from '@/lib/api/services/category/get-categories';
+import { updateItem } from '@/lib/api/services/item/update-item';
+import { fetchApi } from '@/lib/api/client';
 import { useMultiImageUpload } from '@/hooks/useMultiImageUpload';
 
 interface ItemDetail {

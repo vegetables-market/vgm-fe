@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { register } from "@/lib/api/services/auth";
+import { register } from "@/lib/api/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth";
 
