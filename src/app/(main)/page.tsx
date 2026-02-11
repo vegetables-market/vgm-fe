@@ -27,7 +27,7 @@ export default function MainPage() {
           Test Pages
         </Link>
         <Link
-          href="/products"
+          href="/stocks"
           className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
         >
           購入する

@@ -77,7 +77,7 @@ export default function BasketPage() {
         <h1 className="mb-8 text-2xl font-bold">カート</h1>
         <p className="mb-8 text-gray-500">カートに商品が入っていません</p>
         <Link
-          href="/products"
+          href="/stocks"
           className="inline-block rounded-lg bg-red-500 px-6 py-3 font-bold text-white transition-colors hover:bg-red-600"
         >
           商品一覧へ
@@ -113,7 +113,7 @@ export default function BasketPage() {
             {/* Info */}
             <div className="flex-1">
               <Link
-                href={`/products/${item.itemId}`}
+                href={`/stocks/${item.itemId}`}
                 className="text-lg font-bold text-gray-800 hover:text-red-500"
               >
                 {item.name}
@@ -181,7 +181,7 @@ export default function BasketPage() {
             購入手続きへ進む
           </Link>
           <Link
-            href="/products"
+            href="/stocks"
             className="block w-full rounded-lg border border-gray-300 py-3 text-center text-gray-600 transition-colors hover:bg-gray-50"
           >
             買い物を続ける
