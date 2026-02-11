@@ -6,7 +6,7 @@ import { fetchApi } from "@/lib/api/fetch";
 
 interface StockDetail {
   item: {
-    itemId: number;
+    itemId: string;
     title: string;
     description: string | null;
     price: number;
@@ -37,7 +37,7 @@ interface StockDetail {
     updatedAt: string;
   };
   relatedItems: Array<{
-    itemId: number;
+    itemId: string;
     title: string;
     price: number;
     thumbnailUrl: string | null;

@@ -8,7 +8,7 @@
  */
 export interface CartItemResponse {
   cartItemId: number;
-  itemId: number;
+  itemId: string;
   name: string;
   price: number;
   quantity: number;
@@ -30,7 +30,7 @@ export interface CartResponse {
  * Backend: AddCartRequest.kt
  */
 export interface AddCartRequest {
-  itemId: number;
+  itemId: string;
   quantity: number;
 }
 

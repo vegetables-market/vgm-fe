@@ -5,7 +5,7 @@ import StocksDetailClient from "./StocksDetailClient";
 export const dynamicParams = false;
 
 type SearchResponse = {
-  items?: Array<{ itemId: number }>;
+  items?: Array<{ itemId: string }>;
 };
 
 export async function generateStaticParams() {

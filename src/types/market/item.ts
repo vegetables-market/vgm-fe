@@ -5,7 +5,7 @@ import type { ItemStatus } from "./item-status";
  * 商品情報 (簡易版)
  */
 export interface Item {
-  id: number;
+  id: string; // changed
   name: string | null;
   price: number | null;
   status: ItemStatus;
@@ -29,7 +29,7 @@ export interface SellerInfo {
  * Backend: ItemResponse.kt
  */
 export interface ItemResponse {
-  itemId: number;
+  itemId: string; // changed
   title: string;
   description: string | null;
   price: number;
@@ -58,7 +58,7 @@ export interface ItemImageResponse {
  * Backend: ItemDetailResponse.kt
  */
 export interface ItemDetailResponse {
-  itemId: number;
+  itemId: string; // changed
   title: string;
   description: string | null;
   price: number;
@@ -78,7 +78,7 @@ export interface ItemDetailResponse {
  * Backend: SimpleItemResponse.kt
  */
 export interface SimpleItemResponse {
-  itemId: number;
+  itemId: string; // changed
   name: string;
   price: number;
   thumbnailUrl: string | null;
@@ -97,7 +97,7 @@ export type FavoritesResponse = PaginatedResponse<ItemResponse>;
  * Backend: CreateDraftResponse.kt
  */
 export interface CreateDraftResponse {
-  itemId: number;
+  itemId: string;
   message: string;
 }
 
