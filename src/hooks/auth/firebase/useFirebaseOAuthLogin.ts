@@ -3,15 +3,17 @@ import { loginWithGoogle, loginWithMicrosoft, loginWithGithub } from "@/lib/fire
 import { fetchApi, API_ENDPOINTS } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 
+interface LoginResponseUser {
+  username: string;
+  display_name: string;
+  email: string;
+  avatar_url: string | null;
+  is_email_verified: boolean;
+}
+
 interface LoginResponse {
   status: string;
-  user: {
-    username: string;
-    displayName: string;
-    email: string;
-    avatarUrl: string | null;
-    isEmailVerified: boolean;
-  } | null;
+  user: LoginResponseUser | null;
   flow_id?: string;
   message?: string;
 }
@@ -53,10 +55,10 @@ export function useFirebaseOAuthLogin() {
         // Save user info to AuthContext (which also saves to localStorage)
         login({
           username: response.user.username,
-          displayName: response.user.displayName,
+          displayName: response.user.display_name,
           email: response.user.email,
-          avatarUrl: response.user.avatarUrl,
-          isEmailVerified: response.user.isEmailVerified,
+          avatarUrl: response.user.avatar_url,
+          isEmailVerified: response.user.is_email_verified,
         });
         
         // Settings/OAuthページからの連携フローの場合、そこに戻る
