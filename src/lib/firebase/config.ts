@@ -1,6 +1,6 @@
-// Firebase Configuration
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+// Firebase Configuration (lazy initialization)
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,8 +11,21 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
+let _app: FirebaseApp | undefined;
+let _auth: Auth | undefined;
 
-export { app, auth };
+function getFirebaseApp(): FirebaseApp {
+  if (!_app) {
+    _app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  }
+  return _app;
+}
+
+function getFirebaseAuth(): Auth {
+  if (!_auth) {
+    _auth = getAuth(getFirebaseApp());
+  }
+  return _auth;
+}
+
+export { getFirebaseApp, getFirebaseAuth };

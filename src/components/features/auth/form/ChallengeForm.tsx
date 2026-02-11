@@ -36,7 +36,7 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
     }
     // 2. Email MFA (Login Known Device) -> mfa_token
     if (type === "email" && mfaToken) {
-      return <EmailMfaVerification mfaToken={mfaToken} />;
+      return <EmailMfaVerification mfaToken={mfaToken} redirectTo={redirectTo || undefined} />;
     }
     // 3. TOTP MFA -> mfa_token
     // Note: flowId might actually be an mfaToken if initiateAction returned TOTP type but used flow_id field in response.

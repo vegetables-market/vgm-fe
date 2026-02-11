@@ -121,8 +121,6 @@ export async function fetchApi<T>(
             if (response.status === 401) {
                 addLog('[API Error] 401 Unauthorized - Auto logout');
                 handleUnauthorized();
-                addLog('[API Error] 401 Unauthorized - Auto logout');
-                handleUnauthorized();
                 throw new ApiError(401, 'Unauthorized', 'UNAUTHORIZED');
             }
 
