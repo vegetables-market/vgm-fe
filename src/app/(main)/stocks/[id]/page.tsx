@@ -133,14 +133,6 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
     return type === 0 ? "送料込み（出品者負担）" : "着払い（購入者負担）";
   };
 
-  const getMediaUrl = (url: string | null) => {
-    if (!url) return null;
-    if (url.startsWith("http")) return url;
-    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
-    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
-    return `${baseUrl}/${url}`;
-  };
-
   if (isLoading) {
     return <div className="loading">読み込み中...</div>;
   }
@@ -166,7 +158,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
           <div className="main-image">
             {item.images.length > 0 ? (
               <img
-                src={getMediaUrl(item.images[selectedImage].imageUrl) || ""}
+                src={item.images[selectedImage].imageUrl}
                 alt={item.title}
               />
             ) : (
@@ -181,7 +173,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
                   className={`thumbnail ${index === selectedImage ? "active" : ""}`}
                   onClick={() => setSelectedImage(index)}
                 >
-                  <img src={getMediaUrl(image.imageUrl) || ""} alt={`${item.title} ${index + 1}`} />
+                  <img src={image.imageUrl} alt={`${item.title} ${index + 1}`} />
                 </div>
               ))}
             </div>
@@ -277,7 +269,7 @@ export default function ProductDetailPage({ params }: { params: { id: string } }
               >
                 <div className="related-image">
                   {related.thumbnailUrl ? (
-                    <img src={getMediaUrl(related.thumbnailUrl) || ""} alt={related.title} />
+                    <img src={related.thumbnailUrl} alt={related.title} />
                   ) : (
                     <div className="no-image">画像なし</div>
                   )}

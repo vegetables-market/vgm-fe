@@ -105,14 +105,6 @@ export default function ProductsPage() {
     router.push(`/stocks?${params.toString()}`);
   };
 
-  const getMediaUrl = (url: string | null) => {
-    if (!url) return null;
-    if (url.startsWith("http")) return url;
-    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
-    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
-    return `${baseUrl}/${url}`;
-  };
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP", {
       style: "currency",
@@ -203,7 +195,7 @@ export default function ProductsPage() {
               >
                 <div className="product-image">
                   {product.thumbnailUrl ? (
-                    <img src={getMediaUrl(product.thumbnailUrl) || ""} alt={product.title} />
+                    <img src={product.thumbnailUrl} alt={product.title} />
                   ) : (
                     <div className="no-image">画像なし</div>
                   )}

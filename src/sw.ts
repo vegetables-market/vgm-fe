@@ -23,10 +23,8 @@ const serwist = new Serwist({
   // 有効化されたらすぐにページをコントロール下に置く
   clientsClaim: true,
 
-  // ナビゲーションプリロードを無効化
-  // Next.js の SPA クライアントサイドルーティングと競合し、
-  // preloadResponse が settle する前にナビゲーションがキャンセルされる問題を回避
-  navigationPreload: false,
+  // ナビゲーションプリロードを有効化 (パフォーマンス向上)
+  navigationPreload: true,
 
   // 3. ランタイムキャッシュ設定
   // defaultCache は Next.js の画像、JS、CSS、Google Fonts などを適切にキャッシュする設定セットです
