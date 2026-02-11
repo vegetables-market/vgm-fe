@@ -25,7 +25,7 @@ import { PaymentMethodSelectModal } from "@/components/purchase/PaymentMethodSel
 import { AddressSelectModal } from "@/components/purchase/AddressSelectModal";
 import { DeliveryPlaceSelectModal } from "@/components/purchase/DeliveryPlaceSelectModal";
 import { AddAddressModal } from "@/components/purchase/AddAddressModal";
-import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
+import ProtectedRoute from "@/components/features3/auth/ProtectedRoute";
 
 interface StockDetail {
   item: {
@@ -112,10 +112,9 @@ function PurchaseContent() {
       setError("");
 
       try {
-        const data = await fetchApi<StockDetail>(
-          `/v1/market/items/${itemId}`,
-          { credentials: "include" }
-        );
+        const data = await fetchApi<StockDetail>(`/v1/market/items/${itemId}`, {
+          credentials: "include",
+        });
 
         // 出品中(status=2)でない場合はエラー
         if (data.item.status !== 2) {
@@ -138,7 +137,8 @@ function PurchaseContent() {
   const getMediaUrl = (url: string | null) => {
     if (!url) return "/images/no-image.png";
     if (url.startsWith("http")) return url;
-    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const mediaUrl =
+      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
     const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
     return `${baseUrl}/${url}`;
   };
@@ -159,11 +159,11 @@ function PurchaseContent() {
         orderId: number;
         totalAmount: number;
         status: number;
-      }>('/v1/market/orders', {
-        method: 'POST',
-        credentials: 'include',
+      }>("/v1/market/orders", {
+        method: "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           itemId: stock.item.itemId,
@@ -174,19 +174,25 @@ function PurchaseContent() {
           shippingCity: selectedAddress.city,
           shippingAddressLine1: selectedAddress.address1,
           shippingAddressLine2: selectedAddress.address2 || null,
-          paymentMethod: selectedPayment.type === 'credit_card' ? 'card' : selectedPayment.type,
+          paymentMethod:
+            selectedPayment.type === "credit_card"
+              ? "card"
+              : selectedPayment.type,
         }),
       });
 
       // 2. 決済を処理
       await fetchApi(`/v1/market/orders/${orderResponse.orderId}/pay`, {
-        method: 'POST',
-        credentials: 'include',
+        method: "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          paymentMethod: selectedPayment.type === 'credit_card' ? 'card' : selectedPayment.type,
+          paymentMethod:
+            selectedPayment.type === "credit_card"
+              ? "card"
+              : selectedPayment.type,
         }),
       });
 
@@ -287,7 +293,10 @@ function PurchaseContent() {
   }
 
   const item = stock.item;
-  const thumbnailUrl = item.images.length > 0 ? getMediaUrl(item.images[0].imageUrl) : "/images/no-image.png";
+  const thumbnailUrl =
+    item.images.length > 0
+      ? getMediaUrl(item.images[0].imageUrl)
+      : "/images/no-image.png";
   const shippingText = item.shippingPayerType === 0 ? "送料込み" : "着払い";
 
   return (

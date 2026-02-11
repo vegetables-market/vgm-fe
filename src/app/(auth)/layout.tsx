@@ -1,5 +1,5 @@
 // app/(auth)/layout.tsx
-import AuthBaseLayout from "@/components/features/auth/AuthBaseLayout";
+import AuthBaseLayout from "@/components/features3/auth/AuthBaseLayout";
 
 export default function AuthLayout({
   children,
