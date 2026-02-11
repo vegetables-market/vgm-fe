@@ -32,15 +32,15 @@ export function useItemDraft() {
     setError(null);
     try {
       const response = await createDraft();
-      console.log('Draft created:', response.itemId);
-      createdIdRef.current = response.itemId;
-      setItemId(response.itemId);
+      console.log('Draft created:', response.item_id);
+      createdIdRef.current = response.item_id;
+      setItemId(response.item_id);
 
       // 待機中の呼び出しに結果を通知
-      waitingResolversRef.current.forEach(resolve => resolve(response.itemId));
+      waitingResolversRef.current.forEach(resolve => resolve(response.item_id));
       waitingResolversRef.current = [];
 
-      return response.itemId;
+      return response.item_id;
     } catch (err) {
       console.error('Failed to create draft:', err);
       const errorObj = err instanceof Error ? err : new Error('Failed to create draft');
