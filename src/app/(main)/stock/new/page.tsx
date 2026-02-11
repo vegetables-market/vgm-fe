@@ -113,17 +113,14 @@ export default function StockNewPage() {
       const payload = {
         name,
         description,
-        categoryId: Number(categoryId),
+        category_id: Number(categoryId),
         price: Number(price),
         quantity: Number(quantity),
-        shippingPayerType: shippingPayerType,
-        shippingOriginArea: prefectureId,
-        shippingDaysId: shippingDaysId,
-        shippingMethodId: shippingMethodId,
-        itemCondition: itemCondition,
-        // image_urls is handled by backend link-images api, so we don't strictly need to send it here.
-        // But if the backend expects it or we want to re-order, we might need to send it.
-        // For now, based on plan, updateItem (PUT) updates the item details and sets status to ON_SALE.
+        shipping_payer_type: shippingPayerType,
+        shipping_origin_area: prefectureId,
+        shipping_days_id: shippingDaysId,
+        shipping_method_id: shippingMethodId,
+        item_condition: itemCondition,
       };
 
       await updateItem(itemId, payload);

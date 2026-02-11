@@ -122,7 +122,7 @@ export interface Item {
 }
 
 export interface CreateDraftResponse {
-    itemId: number;
+    item_id: number;
 }
 
 export interface LinkImagesRequest {
