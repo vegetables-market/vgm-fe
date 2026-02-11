@@ -269,7 +269,7 @@ export default function ProfilePage() {
                             </span>
                         </h2>
                         <Link
-                            href="/listing"
+                            href="/stock/new"
                             className="text-sm text-emerald-600 font-medium hover:underline"
                         >
                             + 新規出品
@@ -294,7 +294,7 @@ export default function ProfilePage() {
                         <div className="bg-white rounded-lg p-8 text-center">
                             <p className="text-stone-500 mb-4">出品中の商品はありません</p>
                             <Link
-                                href="/listing"
+                                href="/stock/new"
                                 className="inline-block bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-emerald-600 transition"
                             >
                                 出品する

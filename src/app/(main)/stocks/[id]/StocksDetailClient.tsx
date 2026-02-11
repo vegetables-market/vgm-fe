@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
 
-interface ProductDetail {
+interface StockDetail {
   item: {
     itemId: number;
     title: string;
@@ -46,26 +46,27 @@ interface ProductDetail {
 
 export default function StocksDetailClient({ id }: { id: string }) {
   const router = useRouter();
-  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [stock, setStock] = useState<StockDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedImage, setSelectedImage] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    fetchProductDetail();
+    fetchStockDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const fetchProductDetail = async () => {
+  const fetchStockDetail = async () => {
     setIsLoading(true);
     setError("");
 
     try {
-      const data = await fetchApi<ProductDetail>(`/v1/market/items/${id}`, {
+      const data = await fetchApi<StockDetail>(`/v1/market/items/${id}`, {
         credentials: "include",
       });
-      setProduct(data);
+      setStock(data);
       setIsLiked(data.item.isLiked);
     } catch (err: any) {
       setError(err.message || "在庫の取得に失敗しました");
@@ -82,12 +83,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
           credentials: "include",
         });
         setIsLiked(false);
-        if (product) {
-          setProduct({
-            ...product,
+        if (stock) {
+          setStock({
+            ...stock,
             item: {
-              ...product.item,
-              likesCount: product.item.likesCount - 1,
+              ...stock.item,
+              likesCount: stock.item.likesCount - 1,
             },
           });
         }
@@ -97,12 +98,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
           credentials: "include",
         });
         setIsLiked(true);
-        if (product) {
-          setProduct({
-            ...product,
+        if (stock) {
+          setStock({
+            ...stock,
             item: {
-              ...product.item,
-              likesCount: product.item.likesCount + 1,
+              ...stock.item,
+              likesCount: stock.item.likesCount + 1,
             },
           });
         }
@@ -110,6 +111,30 @@ export default function StocksDetailClient({ id }: { id: string }) {
     } catch (err: any) {
       alert(err.message || "お気に入りの操作に失敗しました");
     }
+  };
+
+  const handleAddToCart = async () => {
+    if (!stock) return;
+    setIsProcessing(true);
+    try {
+      await fetchApi("/v1/market/cart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ itemId: stock.item.itemId, quantity: 1 }),
+        credentials: "include",
+      });
+      if (confirm("カートに追加しました。カートへ移動しますか？")) {
+        router.push("/basket");
+      }
+    } catch (err: any) {
+      alert(err.message || "カートへの追加に失敗しました");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePurchase = () => {
+    router.push(`/purchase?itemId=${id}`);
   };
 
   const formatPrice = (price: number) => {
@@ -139,7 +164,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
     return <div className="loading">読み込み中...</div>;
   }
 
-  if (error || !product) {
+  if (error || !stock) {
     return (
       <div className="error-page">
         <p>{error || "在庫が見つかりませんでした"}</p>
@@ -150,11 +175,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
     );
   }
 
-  const { item, relatedItems } = product;
+  const { item, relatedItems } = stock;
 
   return (
-    <div className="product-detail-page">
-      <div className="product-container">
+    <div className="stock-detail-page">
+      <div className="stock-container">
         {/* 画像ギャラリー */}
         <div className="image-gallery">
           <div className="main-image">
@@ -182,15 +207,33 @@ export default function StocksDetailClient({ id }: { id: string }) {
         </div>
 
         {/* 商品情報 */}
-        <div className="product-info">
-          <h1 className="product-title">{item.title}</h1>
-          <p className="product-price">{formatPrice(item.price)}</p>
+        <div className="stock-info">
+          <h1 className="stock-title">{item.title}</h1>
+          <p className="stock-price">{formatPrice(item.price)}</p>
 
-          <div className="product-meta">
+          <div className="stock-meta">
             <span className="likes-count">♥ {item.likesCount}</span>
             {item.categoryName && (
               <span className="category">{item.categoryName}</span>
             )}
+          </div>
+
+          <div className="actions">
+            <button
+              onClick={handlePurchase}
+              className={`purchase-button ${item.quantity <= 0 ? "sold-out" : ""}`}
+              disabled={item.quantity <= 0}
+            >
+              {item.quantity <= 0 ? "売り切れ" : "購入する"}
+            </button>
+
+            <button
+              onClick={handleAddToCart}
+              className="cart-button"
+              disabled={item.quantity <= 0 || isProcessing}
+            >
+              {isProcessing ? "処理中..." : "カートに追加"}
+            </button>
           </div>
 
           <button
@@ -200,12 +243,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
             {isLiked ? "♥ お気に入り解除" : "♡ お気に入り"}
           </button>
 
-          <div className="product-description">
+          <div className="stock-description">
             <h2>商品説明</h2>
             <p>{item.description || "説明はありません"}</p>
           </div>
 
-          <div className="product-details">
+          <div className="stock-details">
             <h2>商品情報</h2>
             <dl>
               <dt>カテゴリ</dt>
@@ -259,20 +302,20 @@ export default function StocksDetailClient({ id }: { id: string }) {
       </div>
 
       <style jsx>{`
-        .product-detail-page {
+        .stock-detail-page {
           max-width: 1200px;
           margin: 0 auto;
           padding: 24px;
         }
 
-        .product-container {
+        .stock-container {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 48px;
         }
 
         @media (max-width: 768px) {
-          .product-container {
+          .stock-container {
             grid-template-columns: 1fr;
             gap: 24px;
           }
@@ -336,30 +379,74 @@ export default function StocksDetailClient({ id }: { id: string }) {
           object-fit: cover;
         }
 
-        .product-info {
+        .stock-info {
           background: #fff;
           border-radius: 12px;
           padding: 24px;
         }
 
-        .product-title {
+        .stock-title {
           font-size: 24px;
           font-weight: 700;
           color: #333;
           margin: 0 0 16px 0;
         }
 
-        .product-price {
+        .stock-price {
           font-size: 32px;
           font-weight: 700;
           color: #333;
           margin-bottom: 16px;
         }
 
-        .product-meta {
+        .stock-meta {
           display: flex;
           gap: 12px;
           margin-bottom: 24px;
+        }
+
+        .actions {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+          margin-bottom: 16px;
+        }
+
+        .purchase-button,
+        .cart-button {
+          border: none;
+          border-radius: 8px;
+          padding: 12px 16px;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: opacity 0.2s;
+        }
+
+        .purchase-button {
+          background: #111827;
+          color: #fff;
+        }
+
+        .purchase-button.sold-out {
+          background: #9ca3af;
+          cursor: not-allowed;
+        }
+
+        .cart-button {
+          background: #f3f4f6;
+          color: #111827;
+        }
+
+        .cart-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+          .actions {
+            grid-template-columns: 1fr;
+          }
         }
 
         .likes-count {
@@ -398,13 +485,13 @@ export default function StocksDetailClient({ id }: { id: string }) {
           opacity: 0.8;
         }
 
-        .product-description,
-        .product-details {
+        .stock-description,
+        .stock-details {
           margin-bottom: 32px;
         }
 
-        .product-description h2,
-        .product-details h2,
+        .stock-description h2,
+        .stock-details h2,
         .related-section h2 {
           font-size: 18px;
           font-weight: 600;
@@ -412,25 +499,25 @@ export default function StocksDetailClient({ id }: { id: string }) {
           margin: 0 0 16px 0;
         }
 
-        .product-description p {
+        .stock-description p {
           color: #666;
           line-height: 1.6;
           white-space: pre-wrap;
         }
 
-        .product-details dl {
+        .stock-details dl {
           display: grid;
           grid-template-columns: 120px 1fr;
           gap: 12px;
           margin: 0;
         }
 
-        .product-details dt {
+        .stock-details dt {
           font-weight: 600;
           color: #666;
         }
 
-        .product-details dd {
+        .stock-details dd {
           margin: 0;
           color: #333;
         }

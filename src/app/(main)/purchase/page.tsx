@@ -27,7 +27,7 @@ import { DeliveryPlaceSelectModal } from "@/components/purchase/DeliveryPlaceSel
 import { AddAddressModal } from "@/components/purchase/AddAddressModal";
 import ProtectedRoute from "@/components/features/auth/ProtectedRoute";
 
-interface ProductDetail {
+interface StockDetail {
   item: {
     itemId: number;
     title: string;
@@ -72,7 +72,7 @@ function PurchaseContent() {
   const itemId = searchParams.get("itemId");
 
   // 商品データ
-  const [product, setProduct] = useState<ProductDetail | null>(null);
+  const [stock, setStock] = useState<StockDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -107,12 +107,12 @@ function PurchaseContent() {
       return;
     }
 
-    const fetchProduct = async () => {
+    const fetchStock = async () => {
       setIsLoading(true);
       setError("");
 
       try {
-        const data = await fetchApi<ProductDetail>(
+        const data = await fetchApi<StockDetail>(
           `/v1/market/items/${itemId}`,
           { credentials: "include" }
         );
@@ -120,9 +120,9 @@ function PurchaseContent() {
         // 出品中(status=2)でない場合はエラー
         if (data.item.status !== 2) {
           setError("この商品は現在購入できません");
-          setProduct(null);
+          setStock(null);
         } else {
-          setProduct(data);
+          setStock(data);
         }
       } catch (err: any) {
         setError(err.message || "商品の取得に失敗しました");
@@ -131,7 +131,7 @@ function PurchaseContent() {
       }
     };
 
-    fetchProduct();
+    fetchStock();
   }, [itemId]);
 
   // 画像URLを構築
@@ -150,7 +150,7 @@ function PurchaseContent() {
   };
 
   const handlePurchase = async () => {
-    if (!product) return;
+    if (!stock) return;
 
     setIsProcessing(true);
     try {
@@ -166,7 +166,7 @@ function PurchaseContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          itemId: product.item.itemId,
+          itemId: stock.item.itemId,
           quantity: 1,
           shippingName: selectedAddress.name,
           shippingZipCode: selectedAddress.postalCode,
@@ -211,7 +211,7 @@ function PurchaseContent() {
   }
 
   // エラー時
-  if (error || !product) {
+  if (error || !stock) {
     return (
       <div className="bg-background flex min-h-screen items-center justify-center p-4">
         <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-xl dark:border-gray-700 dark:bg-gray-800">
@@ -237,7 +237,7 @@ function PurchaseContent() {
             商品ページに戻って再度お試しください。
           </p>
           <Link
-            href="/products"
+            href="/stocks"
             className="inline-block rounded-lg bg-red-500 px-8 py-3 font-bold text-white transition-colors hover:bg-red-600"
           >
             商品一覧に戻る
@@ -286,7 +286,7 @@ function PurchaseContent() {
     );
   }
 
-  const item = product.item;
+  const item = stock.item;
   const thumbnailUrl = item.images.length > 0 ? getMediaUrl(item.images[0].imageUrl) : "/images/no-image.png";
   const shippingText = item.shippingPayerType === 0 ? "送料込み" : "着払い";
 
@@ -296,7 +296,7 @@ function PurchaseContent() {
       <header className="border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
         <div className="mx-auto flex max-w-6xl items-center">
           <Link
-            href={`/products/${itemId}`}
+            href={`/stocks/${itemId}`}
             className="flex items-center gap-2 text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
           >
             <svg

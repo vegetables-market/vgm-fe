@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
 
-interface Product {
+interface StockItem {
   itemId: number;
   title: string;
   description: string | null;
@@ -25,7 +25,7 @@ interface Product {
 }
 
 interface PaginatedResponse {
-  items: Product[];
+  items: StockItem[];
   pagination: {
     page: number;
     limit: number;
@@ -34,11 +34,11 @@ interface PaginatedResponse {
   };
 }
 
-export default function ProductsPage() {
+export default function StocksPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  const [products, setProducts] = useState<Product[]>([]);
+  const [stocks, setStocks] = useState<StockItem[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -56,10 +56,10 @@ export default function ProductsPage() {
   const [sort, setSort] = useState(searchParams.get("sort") || "newest");
 
   useEffect(() => {
-    searchProducts();
+    searchStocks();
   }, [searchParams]);
 
-  const searchProducts = async () => {
+  const searchStocks = async () => {
     setIsLoading(true);
     setError("");
 
@@ -78,7 +78,7 @@ export default function ProductsPage() {
         { credentials: "include" }
       );
 
-      setProducts(data.items);
+      setStocks(data.items);
       setPagination(data.pagination);
     } catch (err: any) {
       setError(err.message || "在庫の取得に失敗しました");
@@ -113,7 +113,7 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="products-page">
+    <div className="stocks-page">
       <div className="page-header">
         <h1 className="page-title">在庫検索</h1>
       </div>
@@ -186,31 +186,31 @@ export default function ProductsPage() {
       {/* 商品一覧 */}
       {!isLoading && (
         <>
-          <div className="products-grid">
-            {products.map((product) => (
+          <div className="stocks-grid">
+            {stocks.map((stock) => (
               <div
-                key={product.itemId}
-                className="product-card"
-                onClick={() => router.push(`/stocks/${product.itemId}`)}
+                key={stock.itemId}
+                className="stock-card"
+                onClick={() => router.push(`/stocks/${stock.itemId}`)}
               >
-                <div className="product-image">
-                  {product.thumbnailUrl ? (
-                    <img src={product.thumbnailUrl} alt={product.title} />
+                <div className="stock-image">
+                  {stock.thumbnailUrl ? (
+                    <img src={stock.thumbnailUrl} alt={stock.title} />
                   ) : (
                     <div className="no-image">画像なし</div>
                   )}
                 </div>
-                <div className="product-info">
-                  <h3 className="product-title">{product.title}</h3>
-                  <p className="product-price">{formatPrice(product.price)}</p>
-                  <div className="product-meta">
-                    <span className="likes-count">♥ {product.likesCount}</span>
-                    {product.categoryName && (
-                      <span className="category">{product.categoryName}</span>
+                <div className="stock-info">
+                  <h3 className="stock-title">{stock.title}</h3>
+                  <p className="stock-price">{formatPrice(stock.price)}</p>
+                  <div className="stock-meta">
+                    <span className="likes-count">♥ {stock.likesCount}</span>
+                    {stock.categoryName && (
+                      <span className="category">{stock.categoryName}</span>
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{product.seller.displayName}</span>
+                    <span className="seller-name">{stock.seller.displayName}</span>
                   </div>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function ProductsPage() {
             </div>
           )}
 
-          {products.length === 0 && !isLoading && (
+          {stocks.length === 0 && !isLoading && (
             <div className="no-results">
               <p>在庫が見つかりませんでした</p>
             </div>
@@ -249,7 +249,7 @@ export default function ProductsPage() {
       )}
 
       <style jsx>{`
-        .products-page {
+        .stocks-page {
           max-width: 1200px;
           margin: 0 auto;
           padding: 24px;
@@ -374,14 +374,14 @@ export default function ProductsPage() {
           color: #999;
         }
 
-        .products-grid {
+        .stocks-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
           gap: 20px;
           margin-bottom: 32px;
         }
 
-        .product-card {
+        .stock-card {
           background: #fff;
           border-radius: 12px;
           overflow: hidden;
@@ -390,12 +390,12 @@ export default function ProductsPage() {
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .product-card:hover {
+        .stock-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .product-image {
+        .stock-image {
           width: 100%;
           height: 200px;
           background: #f5f5f5;
@@ -404,7 +404,7 @@ export default function ProductsPage() {
           justify-content: center;
         }
 
-        .product-image img {
+        .stock-image img {
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -415,11 +415,11 @@ export default function ProductsPage() {
           font-size: 14px;
         }
 
-        .product-info {
+        .stock-info {
           padding: 16px;
         }
 
-        .product-title {
+        .stock-title {
           font-size: 16px;
           font-weight: 600;
           color: #333;
@@ -429,14 +429,14 @@ export default function ProductsPage() {
           white-space: nowrap;
         }
 
-        .product-price {
+        .stock-price {
           font-size: 20px;
           font-weight: 700;
           color: #333;
           margin: 0 0 12px 0;
         }
 
-        .product-meta {
+        .stock-meta {
           display: flex;
           gap: 12px;
           align-items: center;
