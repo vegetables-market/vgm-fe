@@ -1,32 +1,11 @@
-import React from "react";
-import { FaCircleExclamation } from "react-icons/fa6";
 import SocialLoginButtons from "@/components/features3/auth/SocialLoginButtons";
-import OrDivider from "@/components/ui/auth/OrDivider";
-import AuthInput from "@/components/features3/auth/ui/AuthInput";
-import AuthButton from "@/components/features3/auth/ui/AuthButton";
-import AuthTitle from "@/components/ui/auth/AuthTitle";
+import AuthInput from "@/components/ui/auth/AuthInput";
+import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
+import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
-
-interface LoginState {
-  step: "email" | "password";
-  emailOrUsername: string;
-  password: string;
-  error: string;
-  isLoading: boolean;
-  redirectTo: string | null;
-}
-
-interface LoginActions {
-  setEmailOrUsername: (value: string) => void;
-  setPassword: (value: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  addLog: (msg: string) => void;
-}
-
-interface LoginFormProps {
-  state: LoginState;
-  actions: LoginActions;
-}
+import AuthTitle from "@/components/ui/auth/AuthTitle";
+import OrDivider from "@/components/ui/auth/OrDivider";
+import type { LoginFormProps } from "./types";
 
 export default function LoginForm({ state, actions }: LoginFormProps) {
   const { step, emailOrUsername, password, error, isLoading, redirectTo } =
@@ -35,24 +14,17 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
 
   return (
     <div className="flex w-75 flex-col items-center">
-      {/* title */}
       <AuthTitle>ログイン</AuthTitle>
 
-      {/* oAuthProvider */}
       <SocialLoginButtons
         mode="login"
         onProviderClick={(id) => addLog(`Social login clicked: ${id}`)}
       />
 
-      {/* またはの棒 */}
       <OrDivider />
 
-      {error && (
-        <p className="mb-2 flex h-8 w-full items-center justify-center rounded-xs bg-red-600 text-center text-[11px]">
-          <FaCircleExclamation className="mr-1" />
-          {error}
-        </p>
-      )}
+      {error && <AuthStatusMessage message={error} variant="error" />}
+
       <div className="mb-3">
         <form onSubmit={onSubmit}>
           <AuthInput
@@ -74,11 +46,12 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
             />
           )}
 
-          <AuthButton type="submit" isLoading={isLoading}>
+          <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
             {step === "email" ? "次へ" : "ログイン"}
-          </AuthButton>
+          </AuthSubmitButton>
         </form>
       </div>
+
       <AuthSwitchLink
         promptText="アカウントを"
         linkText="新規登録する"

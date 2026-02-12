@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FaCircleExclamation } from "react-icons/fa6";
+import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 
 type ChallengeLayoutProps = {
   title: string;
@@ -22,12 +22,7 @@ export default function ChallengeLayout({
         {title}
       </h2>
 
-      {error && (
-        <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-red-600/90 p-2 text-center text-[11px] text-white">
-          <FaCircleExclamation className="mr-1 flex-shrink-0" />
-          {error}
-        </p>
-      )}
+      {error && <AuthStatusMessage message={error} variant="error" className="mb-4" />}
 
       {children}
 

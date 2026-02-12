@@ -1,6 +1,7 @@
 import React from "react";
-import { FaCircleExclamation, FaCircleChevronLeft } from "react-icons/fa6";
+import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
+import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import EmailEntry from "./EmailEntry";
 import CodeVerification from "./CodeVerification";
 import UsernameEntry from "./UsernameEntry";
@@ -48,14 +49,9 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
         </div>
       )}
       <div className="flex w-75 flex-col items-center">
-        <AuthTitle>新規登録</AuthTitle>
+        <AuthTitle>{"\u65b0\u898f\u767b\u9332"}</AuthTitle>
 
-        {error && (
-          <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-red-600/90 p-2 text-center text-[11px] text-white">
-            <FaCircleExclamation className="mr-1 flex-shrink-0" />
-            {error}
-          </p>
-        )}
+        {error && <AuthStatusMessage message={error} variant="error" className="mb-4" />}
 
         <div className="mb-5 w-full">
           {step === 0 && (

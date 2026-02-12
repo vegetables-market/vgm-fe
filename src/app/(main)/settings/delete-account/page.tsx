@@ -4,7 +4,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
 import { FaCircleExclamation } from "react-icons/fa6";
-import AuthButton from "@/components/features3/auth/ui/AuthButton";
 import { useAuth } from "@/context/AuthContext";
 
 export default function DeleteAccountPage() {
@@ -180,14 +179,13 @@ export default function DeleteAccountPage() {
           )}
 
           <div className="flex flex-col gap-4">
-            <AuthButton
+            <button
               type="submit"
-              isLoading={isLoading}
-              disabled={!agreed}
-              className="w-full !border-none !bg-red-600 py-3 text-white transition-colors hover:!bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={isLoading || !agreed}
+              className="w-full rounded-full border-none bg-red-600 py-3 text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              アカウントを削除する
-            </AuthButton>
+              {isLoading ? "処理中..." : "アカウントを削除する"}
+            </button>
 
             <button
               type="button"
