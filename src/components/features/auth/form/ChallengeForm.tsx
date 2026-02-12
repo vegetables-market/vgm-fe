@@ -1,7 +1,6 @@
-import { FaCircleExclamation } from "react-icons/fa6";
-import EmailVerification from "@/components/features3/auth/verification/EmailVerification";
-import TotpVerification from "@/components/features3/auth/verification/TotpVerification";
-import EmailMfaVerification from "@/components/features3/auth/verification/EmailMfaVerification";
+import ChallengeLayout from "@/components/features/auth/step/ChallengeLayout";
+import VerificationContainer from "@/components/features/auth/verification/VerificationContainer";
+import { VerificationMode } from "@/hooks/auth/verification/useVerificationFlow";
 
 interface ChallengeState {
   error: string;
@@ -39,48 +38,40 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
   const { handleReturnToLogin } = actions;
 
   const renderContent = () => {
+    let mode: VerificationMode | null = null;
+    let effectiveFlowId = flowId;
+    let effectiveMfaToken = mfaToken;
+
     // 1. Email Verification (Signup / Login Unknown Device) -> flow_id
     if (type === "email" && flowId) {
-      return (
-        <EmailVerification
-          flowId={flowId}
-          expiresAt={expiresAt || undefined}
-          nextResendAt={nextResendAt || undefined}
-          action={action || undefined}
-          redirectTo={redirectTo || undefined}
-          maskedEmail={maskedEmail || undefined}
-        />
-      );
+      mode = "email";
     }
     // 2. Email MFA (Login Known Device) -> mfa_token
-    if (type === "email" && mfaToken) {
-      return (
-        <EmailMfaVerification
-          mfaToken={mfaToken}
-          redirectTo={redirectTo || undefined}
-        />
-      );
+    else if (type === "email" && mfaToken) {
+      mode = "email_mfa";
     }
     // 3. TOTP MFA -> mfa_token
-    // Note: flowId might actually be an mfaToken if initiateAction returned TOTP type but used flow_id field in response.
-    // Ideally frontend should map response.flow_id to mfaToken prop if type is TOTP.
-    // However, backend initiateAction now returns token in flow_id field but frontend page might pass it as flow_id param??
-    // Let's assume standard mfaToken param for TOTP.
-    if (type === "totp" && mfaToken) {
-      return (
-        <TotpVerification
-          mfaToken={mfaToken}
-          action={action || undefined}
-          redirectTo={redirectTo || undefined}
-        />
-      );
+    else if (type === "totp" && mfaToken) {
+      mode = "totp";
     }
 
-    // パラメータ不足等の場合
-    if (!error) {
+    if (!mode) {
+      // パラメータ不足等の場合
       return null;
     }
-    return null;
+
+    return (
+      <VerificationContainer
+        mode={mode}
+        flowId={effectiveFlowId}
+        mfaToken={effectiveMfaToken}
+        action={action || null}
+        redirectTo={redirectTo || null}
+        maskedEmail={maskedEmail || null}
+        expiresAt={expiresAt || null}
+        nextResendAt={nextResendAt || null}
+      />
+    );
   };
 
   const getTitle = () => {
@@ -88,28 +79,19 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
   };
 
   return (
-    <div className="flex w-75 flex-col items-center">
-      <h2 className="mb-6 w-fit cursor-default text-center text-3xl font-bold text-white">
-        {getTitle()}
-      </h2>
-
-      {error && (
-        <p className="mb-4 flex h-auto min-h-8 w-full items-center justify-center rounded-xs bg-red-600/90 p-2 text-center text-[11px] text-white">
-          <FaCircleExclamation className="mr-1 flex-shrink-0" />
-          {error}
-        </p>
-      )}
-
-      {renderContent()}
-
-      <div className="mt-6 flex w-full flex-col items-center justify-center gap-4">
+    <ChallengeLayout
+      title={getTitle()}
+      error={error}
+      footer={
         <button
           onClick={handleReturnToLogin}
           className="cursor-pointer border-none bg-transparent text-xs text-zinc-500 underline transition-colors hover:text-zinc-300"
         >
           {action === "delete_account" ? "設定に戻る" : "ログイン画面に戻る"}
         </button>
-      </div>
-    </div>
+      }
+    >
+      {renderContent()}
+    </ChallengeLayout>
   );
 }

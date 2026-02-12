@@ -1,13 +1,13 @@
 import React from "react";
 import { FaCircleExclamation, FaCircleChevronLeft } from "react-icons/fa6";
 import AuthTitle from "@/components/features3/auth/ui/AuthTitle";
-import EmailEntry from "@/components/features3/auth/signup/steps/EmailEntry";
+import EmailEntry from "@/components/features/auth/step/EmailEntry";
 import CodeVerification from "@/components/features3/auth/signup/steps/CodeVerification";
-import UsernameEntry from "@/components/features3/auth/signup/steps/UsernameEntry";
-import PasswordEntry from "@/components/features3/auth/signup/steps/PasswordEntry";
+import UsernameEntry from "@/components/features/auth/step/UsernameEntry";
+import PasswordEntry from "@/components/features/auth/step/PasswordEntry";
 import TermsAgreement from "@/components/features/auth/step/TermsAgreement";
 
-import ProgressBar from "@/components/features3/auth/signup/ProgressBar";
+import ProgressBar from "@/components/features/auth/ProgressBar";
 import { SignupFormData } from "@/types/auth/user";
 
 interface SignupState {

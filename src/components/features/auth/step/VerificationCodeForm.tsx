@@ -16,6 +16,7 @@ type VerificationCodeFormProps = {
   isResending?: boolean;
   timeLeft?: number | null;
   resendCooldown?: number;
+  description?: React.ReactNode;
 };
 
 export default function VerificationCodeForm({
@@ -30,6 +31,7 @@ export default function VerificationCodeForm({
   isResending = false,
   timeLeft,
   resendCooldown = 0,
+  description,
 }: VerificationCodeFormProps) {
   const formatTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -53,20 +55,24 @@ export default function VerificationCodeForm({
       )}
 
       <div className="mb-5 w-full">
-        <p className="mb-2 text-center text-[13px] text-gray-300">
-          {emailDisplay ? (
-            <>
-              <span className="font-bold text-white">{emailDisplay}</span> 宛に
-              <br />
-            </>
-          ) : (
-            <>
-              登録されたメールアドレス宛に
-              <br />
-            </>
-          )}
-          認証コードを送信しました。
-        </p>
+        <div className="mb-4 text-center text-[13px] text-gray-300">
+            {description ? (
+                description
+            ) : (
+                <p>
+                  {emailDisplay ? (
+                    <>
+                      <span className="font-bold text-white">{emailDisplay}</span> 宛に
+                    </>
+                  ) : (
+                    <>
+                      登録されたメールアドレス宛に
+                    </>
+                  )}
+                  認証コードを送信しました。
+                </p>
+            )}
+        </div>
 
         {timeLeft !== undefined && timeLeft !== null && (
           <p
@@ -95,13 +101,13 @@ export default function VerificationCodeForm({
         {onResend && (
           <button
             onClick={onResend}
-            disabled={isResending || resendCooldown > 0}
+            disabled={isResending || (resendCooldown !== undefined && resendCooldown > 0)}
             className="flex items-center text-xs text-amber-300 transition-colors hover:text-amber-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <FaRotateRight
               className={`mr-1 ${isResending ? "animate-spin" : ""}`}
             />
-            {resendCooldown > 0
+            {(resendCooldown !== undefined && resendCooldown > 0)
               ? `再送まで ${resendCooldown}秒`
               : "認証コードを再送"}
           </button>
@@ -110,4 +116,3 @@ export default function VerificationCodeForm({
     </div>
   );
 }
-
