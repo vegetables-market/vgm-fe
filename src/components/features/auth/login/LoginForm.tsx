@@ -1,4 +1,4 @@
-import SocialLoginButtons from "@/components/features3/auth/SocialLoginButtons";
+import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
@@ -16,7 +16,7 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
     <div className="flex w-75 flex-col items-center">
       <AuthTitle>ログイン</AuthTitle>
 
-      <SocialLoginButtons
+      <AuthSocialButtons
         mode="login"
         onProviderClick={(id) => addLog(`Social login clicked: ${id}`)}
       />

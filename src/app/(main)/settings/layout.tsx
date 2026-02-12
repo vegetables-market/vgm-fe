@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import ProtectedContent from "@/components/features3/auth/ProtectedContent";
+import AuthGuard from "@/components/features/auth/AuthGuard";
 import SettingsNavigation from "@/components/features3/settings/SettingsNavigation";
 import SettingsMainLayout from "@/components/features3/settings/SettingsMainLayout";
 
@@ -11,7 +11,7 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
-    <ProtectedContent>
+    <AuthGuard mode="content">
       <div
         className="relative flex w-full overflow-hidden"
         style={{ height: "calc(100vh - 4rem)" }}
@@ -24,6 +24,6 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         {/* 中央コンテンツエリア */}
         <SettingsMainLayout>{children}</SettingsMainLayout>
       </div>
-    </ProtectedContent>
+    </AuthGuard>
   );
 }

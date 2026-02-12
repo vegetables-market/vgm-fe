@@ -1,4 +1,4 @@
-import SocialLoginButtons from "@/components/features3/auth/SocialLoginButtons";
+import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
@@ -56,7 +56,7 @@ export default function EmailEntry({
 
       <OrDivider />
 
-      <SocialLoginButtons
+      <AuthSocialButtons
         mode="signup"
         onProviderClick={(id) => addLog(`Social signup: ${id}`)}
       />

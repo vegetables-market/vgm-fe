@@ -25,7 +25,7 @@ import { PaymentMethodSelectModal } from "@/components/purchase/PaymentMethodSel
 import { AddressSelectModal } from "@/components/purchase/AddressSelectModal";
 import { DeliveryPlaceSelectModal } from "@/components/purchase/DeliveryPlaceSelectModal";
 import { AddAddressModal } from "@/components/purchase/AddAddressModal";
-import ProtectedRoute from "@/components/features3/auth/ProtectedRoute";
+import AuthGuard from "@/components/features/auth/AuthGuard";
 
 interface StockDetail {
   item: {
@@ -527,7 +527,7 @@ function PurchaseContent() {
 
 export default function PurchasePage() {
   return (
-    <ProtectedRoute>
+    <AuthGuard mode="redirect">
       <Suspense
         fallback={
           <div className="bg-background flex min-h-screen items-center justify-center text-gray-900 dark:text-white">
@@ -537,6 +537,6 @@ export default function PurchasePage() {
       >
         <PurchaseContent />
       </Suspense>
-    </ProtectedRoute>
+    </AuthGuard>
   );
 }

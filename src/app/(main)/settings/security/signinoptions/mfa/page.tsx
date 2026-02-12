@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import ProtectedRoute from "@/components/features3/auth/ProtectedRoute";
+import AuthGuard from "@/components/features/auth/AuthGuard";
 import { fetchApi } from "@/lib/api/fetch";
 
 type MfaStatus = {
@@ -129,7 +129,7 @@ export default function MfaPage() {
   }, []);
 
   return (
-    <ProtectedRoute>
+    <AuthGuard mode="redirect">
       <div className="min-h-screen bg-stone-50 p-8">
         <div className="mx-auto max-w-2xl rounded-lg bg-white p-6 shadow">
           <h1 className="mb-6 text-2xl font-bold">多要素認証（MFA）</h1>
@@ -291,6 +291,6 @@ export default function MfaPage() {
           )}
         </div>
       </div>
-    </ProtectedRoute>
+    </AuthGuard>
   );
 }

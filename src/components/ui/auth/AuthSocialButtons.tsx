@@ -44,7 +44,7 @@ interface SocialLoginButtonsProps {
   onProviderClick?: (providerId: string) => void;
 }
 
-export default function SocialLoginButtons({
+export default function AuthSocialButtons({
   mode,
   onProviderClick,
 }: SocialLoginButtonsProps) {
