@@ -16,7 +16,7 @@ export default function AuthSwitchLink({
 }: Props) {
   return (
     <div className="flex w-full items-center justify-center">
-      <span className="mr-1 cursor-default text-xs text-[#b3b3b3]">
+      <span className="text--muted-foreground mr-1 cursor-default text-xs">
         {promptText}
       </span>
       <Link

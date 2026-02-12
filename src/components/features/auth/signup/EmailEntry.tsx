@@ -1,12 +1,12 @@
 import { useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
-import Link from "next/link";
 import { FaCircleExclamation } from "react-icons/fa6";
 import SocialLoginButtons from "@/components/features3/auth/SocialLoginButtons";
 import { initAuthFlow } from "@/services/auth/init-auth-flow";
 import { SignupFormData } from "@/components/features/auth/types";
 import OrDivider from "@/components/ui/auth/OrDivider";
-import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
+import Divider from "@/components/ui/auth/Divider";
 
 interface EmailEntryProps {
   formData: SignupFormData;
@@ -109,26 +109,20 @@ export default function EmailEntry({
         </button>
       </form>
 
-      <div className="w-full">
-        <OrDivider />
+      <OrDivider />
 
-        <SocialLoginButtons
-          mode="signup"
-          onProviderClick={(id) => addLog(`Social signup: ${id}`)}
-        />
+      <SocialLoginButtons
+        mode="signup"
+        onProviderClick={(id) => addLog(`Social signup: ${id}`)}
+      />
+      <Divider />
 
-        <div className="mt-8 flex w-full items-center justify-center border-t border-gray-800 pt-6">
-          <span className="mr-1 text-xs text-[#b3b3b3]">
-            アカウントをお持ちの方は
-          </span>
-          <Link
-            href={withRedirectTo("/login", redirectTo)}
-            className="text-xs text-white underline hover:text-gray-300"
-          >
-            ここからログイン
-          </Link>
-        </div>
-      </div>
+      <AuthSwitchLink
+        promptText="アカウントをお持ちの方は"
+        linkText="ここからログイン"
+        href="/login"
+        redirectTo={redirectTo}
+      />
     </>
   );
 }

@@ -5,31 +5,39 @@
 
 /* カラーモード設定 */
 :root {
-  --background: #f9f8f4;
-  --foreground: #171717;
-  --primary: #098758;
-  --primary-foreground: #f0fdf4;
-  --border: #1e2939;
-  --muted: #ffffff;
-  --muted-foreground: #f0fdf4;
-  --action: #098758;
+  --background: #f6f7f4;
+  --foreground: #131816;
+  --surface: #ffffff;
+  --surface-foreground: #131816;
+  --primary: #0f7a59;
+  --primary-foreground: #ecfdf5;
+  --border: #d9e0d8;
+  --muted: #eef2ed;
+  --muted-foreground: #5c6b63;
+  --action: #0f7a59;
   --action-foreground: #ffffff;
-  --disabled: #d1d5db;
-  --disabled-foreground: #9ca3af;
+  --disabled: #d9dfdb;
+  --disabled-foreground: #8a968f;
+  --input: #ffffff;
+  --ring: #2f9b76;
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --primary: #098758;
-  --primary-foreground: #f0fdf4;
-  --border: #364153;             /* border-gray-700 */
-  --muted: #1f1f1f;
-  --muted-foreground: #2c2c2c;
-  --action: #10b981;
-  --action-foreground: #ffffff;
-  --disabled: #374151;
-  --disabled-foreground: #6b7280;
+  --background: #0f1412;
+  --foreground: #edf2ee;
+  --surface: #151c19;
+  --surface-foreground: #edf2ee;
+  --primary: #34c38f;
+  --primary-foreground: #052e20;
+  --border: #2a3430;
+  --muted: #1b2421;
+  --muted-foreground: #9aa7a0;
+  --action: #2fb980;
+  --action-foreground: #062419;
+  --disabled: #25302b;
+  --disabled-foreground: #74827b;
+  --input: #151c19;
+  --ring: #5dd5a5;
 }
 
 
@@ -40,6 +48,8 @@
   /* 色もここで定義する（Tailwindのクラスとして使えるようになる） */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-foreground: var(--surface-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-border: var(--border);
@@ -86,17 +96,17 @@ body {
 
 /* フォーム要素のスタイル（ダークモードでも見やすく） */
 input, textarea, select {
-  color: #171717 !important;
-  background-color: #ffffff !important;
+  color: var(--foreground);
+  background-color: var(--input);
+  border-color: var(--border);
 }
 
 select option {
-  color: #171717 !important;
-  background-color: #ffffff !important;
+  color: var(--foreground);
+  background-color: var(--input);
 }
 
 /* GSAPアニメーションに必要な基本設定 */
-:root { --font-primary: "PP Neue Montreal", sans-serif; }
 
 /* アニメーションエリアの必須スタイル */
 .fixed-section { height: 1100vh; position: relative; }
