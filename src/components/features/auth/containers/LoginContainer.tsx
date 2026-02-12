@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLogin } from "@/hooks/auth/login/useLogin";
-import LoginForm from "@/components/features3/auth/form/LoginForm";
+import LoginForm from "@/components/features/auth/form/LoginForm";
 
 function LoginContainerInner() {
   const searchParams = useSearchParams();

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeToggle } from "@/components/debug/ThemeToggle";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { useState } from "react";
 
@@ -50,7 +50,9 @@ export default function MainPage() {
         title="メニュー"
       >
         <div className="space-y-4">
-          <p className="text-sm text-gray-500">ここにメニューコンテンツが表示されます。</p>
+          <p className="text-sm text-gray-500">
+            ここにメニューコンテンツが表示されます。
+          </p>
           <div className="grid grid-cols-2 gap-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
@@ -62,8 +64,11 @@ export default function MainPage() {
             ))}
           </div>
           <div className="pt-4">
-            <Link href="/menu" className="block w-full rounded-lg bg-gray-900 py-3 text-center text-white dark:bg-gray-700">
-                Menuページへ移動
+            <Link
+              href="/menu"
+              className="block w-full rounded-lg bg-gray-900 py-3 text-center text-white dark:bg-gray-700"
+            >
+              Menuページへ移動
             </Link>
           </div>
         </div>

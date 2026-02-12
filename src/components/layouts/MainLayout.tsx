@@ -5,19 +5,21 @@ import dynamic from "next/dynamic";
 import { useDevice, DeviceType } from "@/hooks/app/useDevice";
 import { useIsPWA } from "@/hooks/pwa/useIsPWA";
 
-const Header = dynamic(() => import("@/components/layouts/WebHeader"));
+const Header = dynamic(
+  () => import("@/components/layouts/MainGroup/WebHeader"),
+);
 const MobileNavigation = dynamic(
-  () => import("@/components/layouts/MobileNavigation"),
+  () => import("@/components/layouts/MainGroup/MobileNavigation"),
 );
 const TabletLeftNavigation = dynamic(
-  () => import("@/components/layouts/TabletLeftNavigation"),
+  () => import("@/components/layouts/MainGroup/TabletLeftNavigation"),
 );
 const InstallPrompt = dynamic(
   () => import("@/components/layouts/InstallPrompt"),
   { ssr: false },
 );
 
-export default function MainLayoutClient({
+export default function MainLayout({
   children,
   initialDeviceType,
   initialIsPWA,

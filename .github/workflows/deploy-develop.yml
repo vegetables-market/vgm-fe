@@ -53,7 +53,7 @@ jobs:
             const body = `### 🚀 Deploy Success! (Develop/Preview)\n\nPreview URL: **[${url}](${url})**`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
-              owner: context.repo.owner,
+              owner: context.repo.owner,halnagoyap@ssw0rd
               repo: context.repo.repo,
               body: body
             })

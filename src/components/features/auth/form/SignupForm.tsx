@@ -5,7 +5,7 @@ import EmailEntry from "@/components/features3/auth/signup/steps/EmailEntry";
 import CodeVerification from "@/components/features3/auth/signup/steps/CodeVerification";
 import UsernameEntry from "@/components/features3/auth/signup/steps/UsernameEntry";
 import PasswordEntry from "@/components/features3/auth/signup/steps/PasswordEntry";
-import TermsAgreement from "@/components/features3/auth/signup/steps/TermsAgreement";
+import TermsAgreement from "@/components/features/auth/step/TermsAgreement";
 
 import ProgressBar from "@/components/features3/auth/signup/ProgressBar";
 import { SignupFormData } from "@/types/auth/user";

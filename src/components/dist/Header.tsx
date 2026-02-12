@@ -31,27 +31,27 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-100 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+    <header className="sticky top-0 z-50 border-b border-stone-100 bg-white/90 shadow-sm backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* 1. ロゴ & ナビゲーション */}
         <div className="flex items-center gap-8">
           <Link
-            href="/"
-            className="font-serif text-2xl font-bold text-green-800 tracking-tight flex items-center gap-2"
+            href="/vgm-fe/public"
+            className="flex items-center gap-2 font-serif text-2xl font-bold tracking-tight text-green-800"
           >
             Harvest
           </Link>
-          <nav className="hidden md:flex gap-6 text-sm font-bold text-stone-500">
+          <nav className="hidden gap-6 text-sm font-bold text-stone-500 md:flex">
             <Link
-              href="/"
-              className="hover:text-green-700 transition flex items-center gap-1"
+              href="/vgm-fe/public"
+              className="flex items-center gap-1 transition hover:text-green-700"
             >
               <HiOutlineHome className="text-lg" />
               ホーム
             </Link>
             <Link
               href="/menu"
-              className="hover:text-green-700 transition flex items-center gap-1"
+              className="flex items-center gap-1 transition hover:text-green-700"
             >
               <IoGridOutline className="text-lg" />
               メニュー
@@ -64,32 +64,32 @@ export default function Header() {
           {/* お気に入り */}
           <Link
             href="/favorites"
-            className="relative p-2 text-stone-400 hover:text-green-700 transition"
+            className="relative p-2 text-stone-400 transition hover:text-green-700"
           >
-            <FaRegHeart className="w-6 h-6" />
+            <FaRegHeart className="h-6 w-6" />
           </Link>
 
           {/* アイコン「ショッピングカート」 */}
           <Link
             href="/basket"
-            className="relative p-2 text-stone-400 hover:text-green-700 transition"
+            className="relative p-2 text-stone-400 transition hover:text-green-700"
           >
-            <IoCartOutline className="w-6 h-6" />
+            <IoCartOutline className="h-6 w-6" />
             {/* カートに商品が入っていたらバッジを表示 */}
             {totalItems > 0 && (
-              <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
                 {totalItems}
               </span>
             )}
           </Link>
 
           {/* 検索バー */}
-          <div className="hidden md:flex items-center bg-stone-100 rounded-full px-4 py-2 w-48 lg:w-64 focus-within:ring-2 focus-within:ring-green-200 transition">
-            <FaMagnifyingGlass className="w-4 h-4 text-stone-400 mr-2" />
+          <div className="hidden w-48 items-center rounded-full bg-stone-100 px-4 py-2 transition focus-within:ring-2 focus-within:ring-green-200 md:flex lg:w-64">
+            <FaMagnifyingGlass className="mr-2 h-4 w-4 text-stone-400" />
             <input
               type="text"
               placeholder="検索..."
-              className="bg-transparent border-none outline-none text-sm w-full placeholder-stone-400 text-stone-700"
+              className="w-full border-none bg-transparent text-sm text-stone-700 placeholder-stone-400 outline-none"
             />
           </div>
 
@@ -98,9 +98,9 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
-                className="flex items-center gap-2 hover:opacity-80 transition"
+                className="flex items-center gap-2 transition hover:opacity-80"
               >
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-bold text-sm border border-green-200">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-green-200 bg-green-100 text-sm font-bold text-green-700">
                   G
                 </div>
               </button>
@@ -115,26 +115,26 @@ export default function Header() {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0 }}
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-stone-100 py-1 z-20 overflow-hidden"
+                      className="absolute right-0 z-20 mt-2 w-48 overflow-hidden rounded-xl border border-stone-100 bg-white py-1 shadow-xl"
                     >
                       <Link
                         href="/profile"
-                        className="block px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 font-bold"
+                        className="block px-4 py-3 text-sm font-bold text-stone-700 hover:bg-stone-50"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         マイページ
                       </Link>
                       <Link
                         href="/basket"
-                        className="block px-4 py-3 text-sm text-stone-700 hover:bg-stone-50 font-bold"
+                        className="block px-4 py-3 text-sm font-bold text-stone-700 hover:bg-stone-50"
                         onClick={() => setIsMenuOpen(false)}
                       >
                         カートを見る
                       </Link>
-                      <div className="h-px bg-stone-100 my-1 mx-4"></div>
+                      <div className="mx-4 my-1 h-px bg-stone-100"></div>
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-3 text-sm text-red-500 hover:bg-red-50 font-bold"
+                        className="w-full px-4 py-3 text-left text-sm font-bold text-red-500 hover:bg-red-50"
                       >
                         ログアウト
                       </button>
@@ -147,7 +147,7 @@ export default function Header() {
           ) : (
             <Link
               href="/login"
-              className="text-sm font-bold bg-stone-800 text-white px-5 py-2 rounded-full hover:bg-stone-700 transition"
+              className="rounded-full bg-stone-800 px-5 py-2 text-sm font-bold text-white transition hover:bg-stone-700"
             >
               ログイン
             </Link>
