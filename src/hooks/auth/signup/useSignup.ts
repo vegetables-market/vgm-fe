@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { SignupFormData } from "@/types/auth/user";
+import { SignupFormData } from "@/components/features/auth/types";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";

@@ -8,7 +8,7 @@ import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 
 interface ItemDetail {
-  itemId: number;
+  itemId: string;
   name: string;
   description: string;
   categoryId: number;
@@ -28,7 +28,7 @@ interface ItemDetail {
 
 export default function StockEditClient({ id }: { id: string }) {
   const router = useRouter();
-  const itemId = Number(id);
+  const itemId = id;
 
   const { files, addFiles, removeFile, hasError, pendingCount } =
     useMultiImageUpload(itemId);

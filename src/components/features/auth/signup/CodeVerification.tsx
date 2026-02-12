@@ -1,8 +1,8 @@
 "use client";
 
-import VerificationCodeForm from "@/components/features/auth/step/VerificationCodeForm";
+import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
 import { useSignupCodeVerification } from "@/hooks/auth/verification/useSignupCodeVerification";
-import { SignupFormData } from "@/types/auth/user";
+import { SignupFormData } from "@/components/features/auth/types";
 
 interface CodeVerificationProps {
   formData: SignupFormData;
@@ -27,7 +27,7 @@ export default function CodeVerification({
     });
 
   return (
-    <VerificationCodeForm
+    <VerificationInputForm
       code={code}
       setCode={setCode}
       emailDisplay={formData.email}

@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useChallenge } from "@/hooks/auth/challenge/useChallenge";
-import ChallengeForm from "@/components/features/auth/form/ChallengeForm";
+import ChallengeForm from "./ChallengeForm";
 
 function ChallengeContainerInner() {
   const searchParams = useSearchParams();

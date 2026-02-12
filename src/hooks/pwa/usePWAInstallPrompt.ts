@@ -109,21 +109,9 @@ export function usePWAInstallPrompt(options?: PWAInstallPromptOptions) {
     );
     window.addEventListener("appinstalled", onAppInstalled);
 
-    type LegacyMediaQueryList = MediaQueryList & {
-      addListener?: (listener: (e: MediaQueryListEvent) => void) => void;
-      removeListener?: (listener: (e: MediaQueryListEvent) => void) => void;
-    };
-
-    const mql = window.matchMedia(
-      "(display-mode: standalone)",
-    ) as LegacyMediaQueryList;
+    const mql = window.matchMedia("(display-mode: standalone)");
     const onDisplayModeChange = () => setIsStandalone(getIsStandalone());
-    if ("addEventListener" in mql) {
-      mql.addEventListener("change", onDisplayModeChange);
-    } else {
-      // Safari < 14
-      mql.addListener?.(onDisplayModeChange);
-    }
+    mql.addEventListener("change", onDisplayModeChange);
 
     return () => {
       window.removeEventListener(
@@ -131,11 +119,7 @@ export function usePWAInstallPrompt(options?: PWAInstallPromptOptions) {
         onBeforeInstallPrompt as EventListener,
       );
       window.removeEventListener("appinstalled", onAppInstalled);
-      if ("removeEventListener" in mql) {
-        mql.removeEventListener("change", onDisplayModeChange);
-      } else {
-        mql.removeListener?.(onDisplayModeChange);
-      }
+      mql.removeEventListener("change", onDisplayModeChange);
     };
   }, [resolved.storageKey]);
 

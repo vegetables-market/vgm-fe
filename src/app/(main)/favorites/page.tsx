@@ -38,7 +38,7 @@ export default function FavoritesPage() {
   };
 
   const handleRemoveFavorite = async (
-    itemId: number,
+    itemId: string,
     event: React.MouseEvent,
   ) => {
     event.stopPropagation();
@@ -57,7 +57,7 @@ export default function FavoritesPage() {
     }
   };
 
-  const handleStockClick = (itemId: number) => {
+  const handleStockClick = (itemId: string) => {
     router.push(`/stocks/${itemId}`);
   };
 

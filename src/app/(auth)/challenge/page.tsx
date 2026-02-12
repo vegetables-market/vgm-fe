@@ -1,4 +1,4 @@
-import { ChallengeContainer } from "@/components/features/auth/containers/ChallengeContainer";
+import { ChallengeContainer } from "@/components/features/auth/challenge/ChallengeContainer";
 
 export default function ChallengePage() {
   return <ChallengeContainer />;

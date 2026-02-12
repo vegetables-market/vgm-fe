@@ -1,6 +1,6 @@
-import ChallengeLayout from "@/components/features/auth/step/ChallengeLayout";
-import VerificationContainer from "@/components/features/auth/verification/VerificationContainer";
-import { VerificationMode } from "@/hooks/auth/verification/useVerificationFlow";
+import ChallengeLayout from "./ChallengeLayout";
+import ChallengeFlow from "@/components/features/auth/challenge/ChallengeFlow";
+import { VerificationMode } from "@/components/features/auth/types";
 
 interface ChallengeState {
   error: string;
@@ -61,7 +61,7 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
     }
 
     return (
-      <VerificationContainer
+      <ChallengeFlow
         mode={mode}
         flowId={effectiveFlowId}
         mfaToken={effectiveMfaToken}

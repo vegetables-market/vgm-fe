@@ -5,7 +5,7 @@ import { FaCircleExclamation } from "react-icons/fa6";
 import { useDebouncedCallback } from "use-debounce";
 import { checkUsername } from "@/services/auth/check-username";
 import { getInitialUsernameSuggestions } from "@/services/auth/get-initial-username-suggestions";
-import { SignupFormData } from "@/types/auth/user";
+import { SignupFormData } from "@/components/features/auth/types";
 
 interface UsernameEntryProps {
   formData: SignupFormData;

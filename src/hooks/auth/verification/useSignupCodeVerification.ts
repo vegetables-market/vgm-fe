@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react"; // Unused
 import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
+import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 
 type UseSignupCodeVerificationParams = {
   flowId: string | null;
@@ -15,9 +16,8 @@ export function useSignupCodeVerification({
   expiresAt,
   onVerified,
 }: UseSignupCodeVerificationParams) {
-  const [code, setCode] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { code, setCode, error, setError, isLoading, setIsLoading } =
+    useOtpInput();
   const { timeLeft } = useVerificationCountdown(expiresAt);
 
   const onSubmit = async (e?: React.FormEvent) => {

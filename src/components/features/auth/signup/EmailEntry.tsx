@@ -4,8 +4,8 @@ import Link from "next/link";
 import { FaCircleExclamation } from "react-icons/fa6";
 import SocialLoginButtons from "@/components/features3/auth/SocialLoginButtons";
 import { initAuthFlow } from "@/services/auth/init-auth-flow";
-import { SignupFormData } from "@/types/auth/user";
-import AuthDivider from "@/components/features3/auth/ui/AuthDivider";
+import { SignupFormData } from "@/components/features/auth/types";
+import OrDivider from "@/components/ui/auth/OrDivider";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
 interface EmailEntryProps {
@@ -110,7 +110,7 @@ export default function EmailEntry({
       </form>
 
       <div className="w-full">
-        <AuthDivider />
+        <OrDivider />
 
         <SocialLoginButtons
           mode="signup"

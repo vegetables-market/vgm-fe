@@ -2,27 +2,27 @@ import { useState, useCallback, useRef } from "react";
 import { createDraft } from "@/services/market/items/create-draft";
 
 export function useItemDraft() {
-  const [itemId, setItemId] = useState<number | null>(null);
+  const [itemId, setItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   // 重複呼び出し防止用のRef
   const isCreatingRef = useRef(false);
-  const createdIdRef = useRef<number | null>(null);
+  const createdIdRef = useRef<string | null>(null);
   // 待機中のPromise resolver を保持
-  const waitingResolversRef = useRef<Array<(id: number) => void>>([]);
+  const waitingResolversRef = useRef<Array<(id: string) => void>>([]);
 
   /**
    * Draft Itemを作成または既存のIDを返却
    * 既にitemIdがある場合はAPIコールせずそのIDを返す
    */
-  const initDraft = useCallback(async (): Promise<number> => {
+  const initDraft = useCallback(async (): Promise<string> => {
     // 既に作成済みの場合は即座に返す
     if (createdIdRef.current) return createdIdRef.current;
 
     // 作成中の場合は完了を待機（重複防止）
     if (isCreatingRef.current) {
-      return new Promise<number>((resolve) => {
+      return new Promise<string>((resolve) => {
         waitingResolversRef.current.push(resolve);
       });
     }

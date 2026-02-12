@@ -1,4 +1,4 @@
-export default function AuthDivider() {
+export default function OrDivider() {
   return (
     <div className="mb-4 flex w-full items-center">
       <div className="w-full border-t border-gray-400 dark:border-gray-600"></div>

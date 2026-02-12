@@ -33,11 +33,11 @@ export interface UploadFile {
 const MAX_CONCURRENCY = 3;
 
 interface UseMultiImageUploadOptions {
-  initDraft?: () => Promise<number>;
+  initDraft?: () => Promise<string>;
 }
 
 export function useMultiImageUpload(
-  itemId: number | null,
+  itemId: string | null,
   options?: UseMultiImageUploadOptions,
 ) {
   const initDraft = options?.initDraft;
@@ -45,7 +45,7 @@ export function useMultiImageUpload(
   const filesRef = useRef<UploadFile[]>([]);
   const uploadQueueRef = useRef<Map<string, UploadFile>>(new Map());
   const activeUploadsRef = useRef<number>(0);
-  const itemIdRef = useRef<number | null>(null);
+  const itemIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     filesRef.current = files;

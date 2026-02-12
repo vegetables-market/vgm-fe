@@ -7,7 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { UserInfo } from "@/types/auth/user";
+import { UserInfo } from "@/components/features/auth/types";
 import { logout as logoutApi } from "@/services/auth/logout";
 
 type AuthContextType = {

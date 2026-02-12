@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FaCircleExclamation } from "react-icons/fa6";
-import { SignupFormData } from "@/types/auth/user";
+import { SignupFormData } from "@/components/features/auth/types";
 
 const GENDER_OPTIONS = [
   { value: "male", label: "男性" },
