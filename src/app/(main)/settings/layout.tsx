@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import ProtectedContent from "@/components/features/auth/ProtectedContent";
-import SettingsNavigation from "@/components/features/settings/SettingsNavigation";
-import SettingsMainLayout from "@/components/features/settings/SettingsMainLayout";
+import ProtectedContent from "@/components/features3/auth/ProtectedContent";
+import SettingsNavigation from "@/components/features3/settings/SettingsNavigation";
+import SettingsMainLayout from "@/components/features3/settings/SettingsMainLayout";
 
 interface SettingsLayoutProps {
   children: React.ReactNode;

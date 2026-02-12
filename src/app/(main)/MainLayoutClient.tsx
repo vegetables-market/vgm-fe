@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import { useDevice, DeviceType } from "@/hooks/App/useDevice";
-import { useIsPWA } from "@/hooks/useIsPWA";
+import { useDevice, DeviceType } from "@/hooks/app/useDevice";
+import { useIsPWA } from "@/hooks/pwa/useIsPWA";
 
 const Header = dynamic(() => import("@/components/layouts/WebHeader"));
 const MobileNavigation = dynamic(

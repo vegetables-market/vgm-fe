@@ -1,15 +1,28 @@
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { register } from "@/services/authService";
+import { useRouter } from "next/navigation";
+import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { SignupFormData } from "@/types/auth";
+import { SignupFormData } from "@/types/auth/user";
+import { withRedirectTo } from "@/lib/next/withRedirectTo";
+import { useAuth } from "@/context/AuthContext";
+import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 
-export function useSignup() {
-  const searchParams = useSearchParams();
-  const initialEmail = searchParams.get("email") || "";
-  const initialFlowId = searchParams.get("flow_id") || "";
-  
-  const [step, setStep] = useState(initialFlowId ? 1 : 0); // flow_idがあればVerifyStep(1)から開始
+type SignupInitialParams = {
+  email?: string;
+  flowId?: string;
+  verified?: boolean;
+  redirectTo?: string | null;
+};
+
+export function useSignup(initial?: SignupInitialParams) {
+  const initialEmail = initial?.email || "";
+  const initialFlowId = initial?.flowId || "";
+  const redirectTo = initial?.redirectTo || null;
+
+  // verified=true（チャレンジ画面で認証済み）ならUsernameEntry(2)から開始
+  const [step, setStep] = useState(
+    initial?.verified && initialFlowId ? 2 : initialFlowId ? 1 : 0
+  );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<SignupFormData>({
@@ -24,6 +37,8 @@ export function useSignup() {
     flow_id: initialFlowId || undefined,
   });
   const router = useRouter();
+  const { login: authLogin } = useAuth();
+  const { pushRedirect } = useSafeRedirect();
 
   const addLog = (msg: string) => {
     if (typeof window !== "undefined" && (window as any).addAuthLog) {
@@ -69,13 +84,18 @@ export function useSignup() {
 
       addLog(`Signup successful: ${JSON.stringify(data)}`);
 
-      if (data.require_verification && data.flow_id) {
+      if (data.status === "AUTHENTICATED" && data.user) {
+        // 認証済み: ログイン状態にしてホームへ遷移
+        addLog("Signup completed with auto-login");
+        authLogin(data.user);
+        pushRedirect(redirectTo, "/");
+      } else if (data.require_verification && data.flow_id) {
         if (data.masked_email) {
           localStorage.setItem("vgm_masked_email", data.masked_email);
         }
-        router.push(`/challenge?flow_id=${data.flow_id}`);
+        router.push(withRedirectTo(`/challenge?flow_id=${data.flow_id}`, redirectTo));
       } else {
-        router.push("/login");
+        router.push(withRedirectTo("/login", redirectTo));
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
@@ -92,6 +112,7 @@ export function useSignup() {
       error,
       loading,
       formData,
+      redirectTo,
     },
     actions: {
       setStep,

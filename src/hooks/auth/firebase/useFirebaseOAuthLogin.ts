@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { loginWithGoogle, loginWithMicrosoft, loginWithGithub } from "@/lib/firebase/auth";
-import { fetchApi, API_ENDPOINTS } from "@/lib/api";
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 import { useAuth } from "@/context/AuthContext";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
 interface LoginResponse {
   status: string;
@@ -61,8 +63,9 @@ export function useFirebaseOAuthLogin() {
         
         // Settings/OAuthページからの連携フローの場合、そこに戻る
         const urlParams = new URLSearchParams(window.location.search);
-        const redirectUrl = urlParams.get('redirect') || '/';
-        window.location.href = redirectUrl;
+        const rawRedirect =
+          urlParams.get("redirect_to") || urlParams.get("redirect");
+        window.location.href = safeRedirectTo(rawRedirect) || "/";
         
       } else {
         throw new Error(response.message || "ログインに失敗しました");

@@ -1,9 +1,5 @@
-"use client";
-
-import { useLogin } from "@/hooks/auth/login/useLogin";
-import LoginForm from "@/components/features/auth/form/LoginForm";
+import { LoginContainer } from "@/components/features3/auth/containers/LoginContainer";
 
 export default function LoginPage() {
-  const { state, actions } = useLogin();
-  return <LoginForm state={state} actions={actions} />;
+  return <LoginContainer />;
 }

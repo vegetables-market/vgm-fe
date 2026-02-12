@@ -258,7 +258,7 @@ export default function Home() {
       <header className="fixed top-0 right-0 p-6 z-[60] flex items-center gap-4">
         
         {/* カートアイコン */}
-        <Link href="/cart" className="relative p-2 text-white hover:text-green-400 transition-colors">
+        <Link href="/basket" className="relative p-2 text-white hover:text-green-400 transition-colors">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
           </svg>
@@ -360,7 +360,7 @@ export default function Home() {
           <div className="overflow-y-auto flex-1 p-6 md:p-10 bg-[#faf9f6]" data-lenis-prevent>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-10">
               {modalItems.map((item) => (
-                <div key={item.id} className="group flex flex-col cursor-pointer" onClick={() => router.push(`/items/detail?id=${item.id}`)}>
+                <div key={item.id} className="group flex flex-col cursor-pointer" onClick={() => router.push(`/stocks/${item.id}`)}>
                   <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-gray-200 shadow-sm mb-4">
                     <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   </div>

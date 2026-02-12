@@ -6,6 +6,7 @@ export interface SessionResponse {
   lastActiveAt?: string;
   expiresAt: string;
   isCurrent: boolean;
+  provider?: string;
 }
 
 export interface RevokeSessionResponse {

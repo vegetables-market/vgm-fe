@@ -5,7 +5,7 @@
 'use client';
 
 import ImagePreview from './ImagePreview';
-import { useImageUpload } from '@/hooks/useImageUpload';
+import { useImageUpload } from '@/hooks/upload/useImageUpload';
 import UploadResult from './UploadResult';
 import { formatFileSize } from '@/lib/utils/imageCompression';
 

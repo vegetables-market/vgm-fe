@@ -1,10 +1,10 @@
 "use client";
 
-import SettingsTitle from "@/components/features/settings/ui/SettingsTitle";
-import Btn from "@/components/features/settings/ui/Btn";
-import BtnWrappers from "@/components/features/settings/ui/BtnWrappers";
+import SettingsTitle from "@/components/features3/settings/ui/SettingsTitle";
+import Btn from "@/components/features3/settings/ui/Btn";
+import BtnWrappers from "@/components/features3/settings/ui/BtnWrappers";
 
-import LoggedInDevices from "@/components/features/settings/security/LoggedInDevices";
+import LoggedInDevices from "@/components/features3/settings/security/LoggedInDevices";
 
 export default function SecurityPage() {
   return (
