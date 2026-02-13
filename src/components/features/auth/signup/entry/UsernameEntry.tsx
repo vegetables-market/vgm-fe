@@ -92,7 +92,7 @@ export default function UsernameEntry({
                 key={suggestion}
                 type="button"
                 onClick={() => applySuggestion(suggestion)}
-                className="rounded-full border border-zinc-700 bg-zinc-800 px-3 py-1 text-[11px] text-white transition-colors hover:bg-zinc-700"
+                className="border-border cursor-pointer rounded-full border px-3 py-1 text-[11px] transition-colors hover:opacity-70"
               >
                 {suggestion}
               </button>

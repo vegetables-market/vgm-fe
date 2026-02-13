@@ -2,12 +2,12 @@ import React from "react";
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import EmailEntry from "@/components/features/auth/signup/entry/EmailEntry";
-import EmailVerification from "@/components/features/auth/challenge/EmailVerification";
+import SignupEmailVerification from "@/components/features/auth/signup/SignupEmailVerification";
 import UsernameEntry from "@/components/features/auth/signup/entry/UsernameEntry";
 import PasswordEntry from "@/components/features/auth/signup/entry/PasswordEntry";
 import TermsAgreement from "@/components/features/auth/signup/entry/TermsAgreement";
 
-import ProgressBar from "@/components/features/auth/ProgressBar";
+import ProgressBar from "@/components/ui/auth/ProgressBar";
 import { SignupFormData } from "@/types/auth/core";
 import { SignupStepProvider } from "@/context/auth/SignupStepContext";
 
@@ -16,7 +16,7 @@ const SIGNUP_STEPS = [
   {
     key: "verification",
     title: "認証コードを入力",
-    component: EmailVerification,
+    component: SignupEmailVerification,
   },
   { key: "username", title: "ユーザーIDを設定", component: UsernameEntry },
   { key: "password", title: "パスワードを設定", component: PasswordEntry },
@@ -59,10 +59,13 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
     <>
       {step > 0 && (
         <div className="w-full">
-          <FaCircleChevronLeft
-            className="absolute top-8 left-8 cursor-pointer text-3xl transition-colors hover:text-gray-300"
-            onClick={handlePrev}
-          />
+          {step > 2 && (
+            <FaCircleChevronLeft
+              className="absolute top-8 left-8 cursor-pointer text-3xl transition-colors hover:text-gray-300"
+              onClick={handlePrev}
+            />
+          )}
+
           {showStepNumber && (
             <ProgressBar
               currentStep={displayStep + 1}
@@ -90,7 +93,7 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
             />
           )}
           {step === 1 && (
-            <EmailVerification
+            <SignupEmailVerification
               flowId={formData.flow_id || null}
               maskedEmail={formData.email}
               expiresAt={formData.expiresAt}

@@ -22,7 +22,7 @@ export default function AuthInput({
     ? "border-red-400 focus:border-red-400"
     : isSuccess
       ? "border-green-500 focus:border-green-500"
-      : "border-white/70 focus:border-white";
+      : "border-border focus:border-muted-foreground";
 
   return (
     <div className={`mb-3 w-full ${className}`}>
@@ -31,7 +31,7 @@ export default function AuthInput({
       </div>
       <div className="relative">
         <input
-          className={`h-9 w-full rounded-lg border-2 pl-3 text-sm transition-colors duration-300 outline-none ${borderClass} ${
+          className={`border-border h-9 w-full rounded-lg border-2 pl-3 text-sm transition-colors duration-300 outline-none ${borderClass} ${
             onTogglePasswordVisibility ? "pr-10" : ""
           }`}
           {...props}

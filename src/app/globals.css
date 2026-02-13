@@ -94,17 +94,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* フォーム要素のスタイル（ダークモードでも見やすく） */
-input, textarea, select {
-  color: var(--foreground);
-  background-color: var(--input);
-  border-color: var(--border);
-}
 
-select option {
-  color: var(--foreground);
-  background-color: var(--input);
-}
+
+/* select option { */
+/*   color: var(--foreground); */
+/*   background-color: var(--input); */
+/* } */
 
 /* GSAPアニメーションに必要な基本設定 */
 

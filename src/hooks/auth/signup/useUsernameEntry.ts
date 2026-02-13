@@ -5,11 +5,7 @@ import { checkUsername } from "@/services/auth/check-username";
 import { getInitialUsernameSuggestions } from "@/services/auth/get-initial-username-suggestions";
 import { isValidUsernameFormat } from "@/services/auth/username-validation";
 
-type UsernameCheckResult = {
-  available: boolean;
-  message?: string;
-  suggestions?: string[];
-};
+import type { CheckUsernameResult } from "@/types/auth/service";
 
 type UseUsernameEntryParams = {
   username: string;
@@ -30,7 +26,7 @@ export function useUsernameEntry({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
-  const checkCache = useRef<Map<string, UsernameCheckResult>>(new Map());
+  const checkCache = useRef<Map<string, CheckUsernameResult>>(new Map());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const isFormatValid = useMemo(() => isValidUsernameFormat(username), [username]);
@@ -129,12 +125,8 @@ export function useUsernameEntry({
     if (isValidUsernameFormat(value)) {
       setChecking(true);
       debouncedCheck(value);
-    } else {
-      // Clear checking state and results if format is invalid
+      // Clear checking state but keep previous results
       setChecking(false);
-      setUsernameError("");
-      setSuggestions([]);
-      setIsAvailable(null);
     }
   };
 
