@@ -8,3 +8,25 @@ export interface EmailEntryProps {
   redirectTo?: string | null;
 }
 
+export interface PasswordEntryProps {
+  formData: SignupFormData;
+  setFormData: Dispatch<SetStateAction<SignupFormData>>;
+  onNext: () => void;
+}
+
+export interface UsernameEntryProps {
+  formData: SignupFormData;
+  setFormData: Dispatch<SetStateAction<SignupFormData>>;
+  onNext: () => void;
+}
+
+export interface ProfileEntryProps {
+  formData: SignupFormData;
+  setFormData: Dispatch<SetStateAction<SignupFormData>>;
+  onNext: () => void;
+}
+
+export interface TermsAgreementProps {
+  onSubmit: () => void;
+  loading: boolean;
+}
