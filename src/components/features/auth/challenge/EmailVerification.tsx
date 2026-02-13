@@ -9,6 +9,7 @@ type EmailVerificationProps = {
   redirectTo?: string | null;
   expiresAt?: string | null;
   nextResendAt?: string | null;
+  onVerifiedAction?: (data?: any) => void;
 };
 
 export default function EmailVerification({
@@ -17,6 +18,7 @@ export default function EmailVerification({
   redirectTo,
   expiresAt,
   nextResendAt,
+  onVerifiedAction,
 }: EmailVerificationProps) {
   const {
     code,
@@ -34,6 +36,7 @@ export default function EmailVerification({
     redirectTo,
     expiresAt,
     nextResendAt,
+    onVerifiedAction,
   });
 
   return (

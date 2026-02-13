@@ -18,6 +18,7 @@ type UseEmailChallengeParams = {
   redirectTo?: string | null;
   expiresAt?: string | null;
   nextResendAt?: string | null;
+  onVerifiedAction?: (data?: any) => void;
 };
 
 export function useEmailChallenge({
@@ -25,6 +26,7 @@ export function useEmailChallenge({
   redirectTo,
   expiresAt,
   nextResendAt,
+  onVerifiedAction,
 }: UseEmailChallengeParams) {
   const { 
     code, setCode, 
@@ -98,15 +100,19 @@ export function useEmailChallenge({
         addLog(`Code verification successful: ${JSON.stringify(codeResult)}`);
 
         if (codeResult.verified) {
-          const targetEmail = codeResult.email || "";
-          router.push(
-            withRedirectTo(
-              `/signup?email=${encodeURIComponent(
-                targetEmail,
-              )}&flow_id=${flowId}&verified=true`,
-              redirectTo,
-            ),
-          );
+          if (onVerifiedAction) {
+            onVerifiedAction(codeResult);
+          } else {
+            const targetEmail = codeResult.email || "";
+            router.push(
+              withRedirectTo(
+                `/signup?email=${encodeURIComponent(
+                  targetEmail,
+                )}&flow_id=${flowId}&verified=true`,
+                redirectTo,
+              ),
+            );
+          }
           return;
         }
       } catch (codeErr: any) {

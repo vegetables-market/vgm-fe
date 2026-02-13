@@ -1,4 +1,4 @@
-import ChallengeLayout from "./ChallengeLayout";
+import ChallengeLayout from "../ChallengeLayout";
 import ChallengeFlow from "@/components/features/auth/challenge/ChallengeFlow";
 import { VerificationMode } from "@/types/auth/core";
 

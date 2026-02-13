@@ -13,14 +13,22 @@ type UseActionVerifyParams = {
   redirectTo?: string | null;
 };
 
-export function useActionVerify({ mode, identifier, action, redirectTo }: UseActionVerifyParams) {
-  const { 
-    code, setCode, 
-    error, setError, 
-    isLoading, setIsLoading,
-    successMsg 
+export function useActionVerify({
+  mode,
+  identifier,
+  action,
+  redirectTo,
+}: UseActionVerifyParams) {
+  const {
+    code,
+    setCode,
+    error,
+    setError,
+    isLoading,
+    setIsLoading,
+    successMsg,
   } = useOtpInput();
-  
+
   const router = useRouter();
 
   const addLog = (msg: string) => {
@@ -32,13 +40,13 @@ export function useActionVerify({ mode, identifier, action, redirectTo }: UseAct
   const onSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (code.length !== 6) {
-      setError("隱崎ｨｼ繧ｳ繝ｼ繝峨・6譯√〒縺吶・);
+      setError("認証コードは6桁です。");
       return;
     }
 
     if (!identifier) {
-       setError("隴伜挨蟄舌′隕九▽縺九ｊ縺ｾ縺帙ｓ縲・);
-       return;
+      setError("識別子が見つかりません。");
+      return;
     }
 
     setIsLoading(true);
@@ -47,7 +55,7 @@ export function useActionVerify({ mode, identifier, action, redirectTo }: UseAct
 
     try {
       const method = mode === "totp" ? AuthMethod.TOTP : AuthMethod.EMAIL;
-      
+
       const data = await verifyAction({
         method,
         identifier,

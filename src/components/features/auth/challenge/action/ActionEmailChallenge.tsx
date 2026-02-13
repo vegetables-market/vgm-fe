@@ -11,7 +11,7 @@ type ActionChallengeProps = {
   redirectTo?: string | null;
 };
 
-export default function ActionChallenge({
+export default function ActionEmailChallenge({
   mode,
   identifier,
   action,

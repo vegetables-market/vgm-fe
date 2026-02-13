@@ -3,7 +3,7 @@ import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import EmailEntry from "./EmailEntry";
-import CodeVerification from "./CodeVerification";
+import EmailVerification from "@/components/features/auth/challenge/EmailVerification";
 import UsernameEntry from "./UsernameEntry";
 import PasswordEntry from "./PasswordEntry";
 import TermsAgreement from "./TermsAgreement";
@@ -63,12 +63,12 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
             />
           )}
           {step === 1 && (
-            <CodeVerification
-              formData={formData}
-              setFormData={setFormData}
-              onNext={handleNext}
+            <EmailVerification
               flowId={formData.flow_id || null}
+              maskedEmail={formData.email}
               expiresAt={formData.expiresAt}
+              onVerifiedAction={handleNext}
+              redirectTo={redirectTo}
             />
           )}
           {step === 2 && (

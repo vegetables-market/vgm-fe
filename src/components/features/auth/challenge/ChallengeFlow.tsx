@@ -2,9 +2,9 @@
 
 import { VerificationMode } from "@/types/auth/core";
 import EmailVerification from "./EmailVerification";
-import ActionChallenge from "./ActionChallenge";
-import MfaEmailForm from "./MfaEmailForm";
-import MfaTotpForm from "./MfaTotpForm";
+import ActionEmailChallenge from "./action/ActionEmailChallenge";
+import MfaEmailForm from "./mfa/MfaEmailForm";
+import MfaTotpForm from "./mfa/MfaTotpForm";
 
 type ChallengeFlowProps = {
   mode: VerificationMode;
@@ -31,7 +31,7 @@ export default function ChallengeFlow({
   if (action) {
     const identifier = mode === "totp" ? mfaToken : flowId;
     return (
-      <ActionChallenge
+      <ActionEmailChallenge
         mode={mode}
         identifier={identifier || null}
         action={action}
@@ -68,12 +68,7 @@ export default function ChallengeFlow({
 
   // 4. MFA Verification (TOTP)
   if (mode === "totp") {
-    return (
-      <MfaTotpForm
-        mfaToken={mfaToken || null}
-        redirectTo={redirectTo}
-      />
-    );
+    return <MfaTotpForm mfaToken={mfaToken || null} redirectTo={redirectTo} />;
   }
 
   return (
