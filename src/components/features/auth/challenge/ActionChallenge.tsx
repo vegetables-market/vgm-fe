@@ -2,7 +2,7 @@
 
 import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
 import { useActionVerify } from "@/hooks/auth/challenge/useActionVerify";
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 
 type ActionChallengeProps = {
   mode: VerificationMode;
@@ -17,19 +17,13 @@ export default function ActionChallenge({
   action,
   redirectTo,
 }: ActionChallengeProps) {
-  const {
-    code,
-    setCode,
-    error,
-    successMsg,
-    isLoading,
-    onSubmit,
-  } = useActionVerify({
-    mode,
-    identifier,
-    action,
-    redirectTo,
-  });
+  const { code, setCode, error, successMsg, isLoading, onSubmit } =
+    useActionVerify({
+      mode,
+      identifier,
+      action,
+      redirectTo,
+    });
 
   return (
     <VerificationInputForm

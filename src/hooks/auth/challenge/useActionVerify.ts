@@ -4,7 +4,7 @@ import { AuthMethod } from "@/services/auth/verify-login";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 
 type UseActionVerifyParams = {
   mode: VerificationMode;
@@ -32,12 +32,12 @@ export function useActionVerify({ mode, identifier, action, redirectTo }: UseAct
   const onSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (code.length !== 6) {
-      setError("認証コードは6桁です。");
+      setError("隱崎ｨｼ繧ｳ繝ｼ繝峨・6譯√〒縺吶・);
       return;
     }
 
     if (!identifier) {
-       setError("識別子が見つかりません。");
+       setError("隴伜挨蟄舌′隕九▽縺九ｊ縺ｾ縺帙ｓ縲・);
        return;
     }
 

@@ -3,12 +3,12 @@
 import { FaCircleExclamation } from "react-icons/fa6";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import { useProfileEntry } from "@/hooks/auth/signup/useProfileEntry";
-import type { ProfileEntryProps } from "./types";
+import type { ProfileEntryProps } from "@/types/auth/signup-components";
 
 const GENDER_OPTIONS = [
-  { value: "male", label: "男性" },
-  { value: "female", label: "女性" },
-  { value: "other", label: "その他" },
+  { value: "male", label: "逕ｷ諤ｧ" },
+  { value: "female", label: "螂ｳ諤ｧ" },
+  { value: "other", label: "縺昴・莉・ },
 ];
 
 export default function ProfileEntry({
@@ -24,15 +24,15 @@ export default function ProfileEntry({
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-7">
-        <p className="mb-1 text-base text-[#b3b3b3]">ステップ 2 / 4</p>
-        <p className="text-base font-bold text-white">プロフィールの入力</p>
+        <p className="mb-1 text-base text-[#b3b3b3]">繧ｹ繝・ャ繝・2 / 4</p>
+        <p className="text-base font-bold text-white">繝励Ο繝輔ぅ繝ｼ繝ｫ縺ｮ蜈･蜉・/p>
       </div>
 
       <section className="space-y-4">
         <div>
           <div className="mb-2 w-full">
-            <span className="text-[13px] font-bold text-white">表示名</span>
-            <span className="ml-2 text-[11px] text-[#b3b3b3]">プロフィールに表示されます</span>
+            <span className="text-[13px] font-bold text-white">陦ｨ遉ｺ蜷・/span>
+            <span className="ml-2 text-[11px] text-[#b3b3b3]">繝励Ο繝輔ぅ繝ｼ繝ｫ縺ｫ陦ｨ遉ｺ縺輔ｌ縺ｾ縺・/span>
           </div>
           <input
             type="text"
@@ -51,14 +51,14 @@ export default function ProfileEntry({
           {showError && !validations.isNameValid && (
             <div className="mt-1 flex items-center text-xs text-red-400">
               <FaCircleExclamation className="mr-1" />
-              <p>表示名を入力してください。</p>
+              <p>陦ｨ遉ｺ蜷阪ｒ蜈･蜉帙＠縺ｦ縺上□縺輔＞縲・/p>
             </div>
           )}
         </div>
 
         <div>
           <div className="mb-2 w-full">
-            <span className="text-[13px] font-bold text-white">生年月日</span>
+            <span className="text-[13px] font-bold text-white">逕溷ｹｴ譛域律</span>
           </div>
           <div className="flex gap-2">
             <input
@@ -92,11 +92,10 @@ export default function ProfileEntry({
                   : "!border-white/70 focus:!border-white"
               }`}
             >
-              <option value="">月</option>
+              <option value="">譛・/option>
               {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                 <option key={month} value={month}>
-                  {month}月
-                </option>
+                  {month}譛・                </option>
               ))}
             </select>
             <input
@@ -120,14 +119,14 @@ export default function ProfileEntry({
           {showError && !validations.isBirthDateValid && (
             <div className="mt-1 flex items-center text-xs text-red-400">
               <FaCircleExclamation className="mr-1" />
-              <p>生年月日を正しく入力してください。</p>
+              <p>逕溷ｹｴ譛域律繧呈ｭ｣縺励￥蜈･蜉帙＠縺ｦ縺上□縺輔＞縲・/p>
             </div>
           )}
         </div>
 
         <div>
           <div className="mb-2 w-full">
-            <span className="text-[13px] font-bold text-white">性別</span>
+            <span className="text-[13px] font-bold text-white">諤ｧ蛻･</span>
           </div>
           <div className="flex gap-4">
             {GENDER_OPTIONS.map((option) => (
@@ -151,13 +150,13 @@ export default function ProfileEntry({
           {showError && !validations.isGenderValid && (
             <div className="mt-1 flex items-center text-xs text-red-400">
               <FaCircleExclamation className="mr-1" />
-              <p>性別を選択してください。</p>
+              <p>諤ｧ蛻･繧帝∈謚槭＠縺ｦ縺上□縺輔＞縲・/p>
             </div>
           )}
         </div>
       </section>
 
-      <AuthSubmitButton>次へ</AuthSubmitButton>
+      <AuthSubmitButton>谺｡縺ｸ</AuthSubmitButton>
     </form>
   );
 }

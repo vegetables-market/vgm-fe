@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { SignupFormData } from "@/components/features/auth/types";
+import type { SignupFormData } from "@/types/auth/core";
 
 export interface EmailEntryProps {
   formData: SignupFormData;
@@ -30,3 +30,4 @@ export interface TermsAgreementProps {
   onSubmit: () => void;
   loading: boolean;
 }
+

@@ -6,7 +6,7 @@ import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
 import Divider from "@/components/ui/auth/Divider";
 import OrDivider from "@/components/ui/auth/OrDivider";
 import { useEmailEntry } from "@/hooks/auth/signup/useEmailEntry";
-import type { EmailEntryProps } from "./types";
+import type { EmailEntryProps } from "@/types/auth/signup-components";
 
 export default function EmailEntry({
   formData,
@@ -27,7 +27,7 @@ export default function EmailEntry({
       <form onSubmit={onSubmit}>
         <section>
           <AuthInput
-            label="メールアドレス"
+            label="繝｡繝ｼ繝ｫ繧｢繝峨Ξ繧ｹ"
             type="email"
             value={formData.email}
             onChange={(e) => {
@@ -43,14 +43,14 @@ export default function EmailEntry({
 
           {hasEmailError && (
             <AuthStatusMessage
-              message="有効なメールアドレスを入力してください。"
+              message="譛牙柑縺ｪ繝｡繝ｼ繝ｫ繧｢繝峨Ξ繧ｹ繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・
               variant="error"
             />
           )}
         </section>
 
-        <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
-          次へ
+        <AuthSubmitButton isLoading={isLoading} loadingText="遒ｺ隱堺ｸｭ...">
+          谺｡縺ｸ
         </AuthSubmitButton>
       </form>
 
@@ -63,8 +63,8 @@ export default function EmailEntry({
       <Divider />
 
       <AuthSwitchLink
-        promptText="アカウントをお持ちの方は"
-        linkText="ここからログイン"
+        promptText="繧｢繧ｫ繧ｦ繝ｳ繝医ｒ縺頑戟縺｡縺ｮ譁ｹ縺ｯ"
+        linkText="縺薙％縺九ｉ繝ｭ繧ｰ繧､繝ｳ"
         href="/login"
         redirectTo={redirectTo}
       />

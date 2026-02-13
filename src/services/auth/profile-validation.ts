@@ -1,4 +1,4 @@
-import type { SignupFormData } from "@/components/features/auth/types";
+import type { SignupFormData } from "@/types/auth/core";
 
 export type ProfileValidationResult = {
   isNameValid: boolean;

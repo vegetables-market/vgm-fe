@@ -3,7 +3,7 @@
 import { FaRegCircle, FaCircleCheck, FaEye, FaEyeSlash } from "react-icons/fa6";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import { usePasswordEntry } from "@/hooks/auth/signup/usePasswordEntry";
-import type { PasswordEntryProps } from "./types";
+import type { PasswordEntryProps } from "@/types/auth/signup-components";
 
 export default function PasswordEntry({
   formData,
@@ -25,8 +25,8 @@ export default function PasswordEntry({
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-7">
-        <p className="mb-1 text-base text-[#b3b3b3]">ステップ 3 / 4</p>
-        <p className="text-base font-bold text-white">パスワードを設定</p>
+        <p className="mb-1 text-base text-[#b3b3b3]">繧ｹ繝・ャ繝・3 / 4</p>
+        <p className="text-base font-bold text-white">繝代せ繝ｯ繝ｼ繝峨ｒ險ｭ螳・/p>
       </div>
 
       <section>
@@ -40,7 +40,7 @@ export default function PasswordEntry({
         />
 
         <div className="mb-2 w-full">
-          <span className="text-[13px] font-bold text-white">パスワード</span>
+          <span className="text-[13px] font-bold text-white">繝代せ繝ｯ繝ｼ繝・/span>
         </div>
         <div className="relative mb-4">
           <input
@@ -69,8 +69,7 @@ export default function PasswordEntry({
         </div>
 
         <h3 className="mb-3 text-[13px] font-bold text-white">
-          以下の条件を満たす必要があります
-        </h3>
+          莉･荳九・譚｡莉ｶ繧呈ｺ縺溘☆蠢・ｦ√′縺ゅｊ縺ｾ縺・        </h3>
         <div className="mb-2 flex flex-col space-y-2">
           <div className="flex items-center text-[13px]">
             {validations.hasLetter ? (
@@ -79,7 +78,7 @@ export default function PasswordEntry({
               <FaRegCircle className="mr-1 text-white" />
             )}
             <p className={showError && !validations.hasLetter ? "text-red-400" : "text-white"}>
-              英字を1文字以上含む
+              闍ｱ蟄励ｒ1譁・ｭ嶺ｻ･荳雁性繧
             </p>
           </div>
           <div className="flex items-center text-[13px]">
@@ -89,7 +88,7 @@ export default function PasswordEntry({
               <FaRegCircle className="mr-1 text-white" />
             )}
             <p className={showError && !validations.hasNumberOrSpecialChar ? "text-red-400" : "text-white"}>
-              数字または記号を1つ以上含む
+              謨ｰ蟄励∪縺溘・險伜捷繧・縺､莉･荳雁性繧
             </p>
           </div>
           <div className="flex items-center text-[13px]">
@@ -99,13 +98,12 @@ export default function PasswordEntry({
               <FaRegCircle className="mr-1 text-white" />
             )}
             <p className={showError && !validations.isLengthValid ? "text-red-400" : "text-white"}>
-              10文字以上
-            </p>
+              10譁・ｭ嶺ｻ･荳・            </p>
           </div>
         </div>
       </section>
 
-      <AuthSubmitButton>次へ</AuthSubmitButton>
+      <AuthSubmitButton>谺｡縺ｸ</AuthSubmitButton>
     </form>
   );
 }

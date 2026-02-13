@@ -2,7 +2,7 @@
 
 import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
 import { useSignupCodeVerification } from "@/hooks/auth/verification/useSignupCodeVerification";
-import { SignupFormData } from "@/components/features/auth/types";
+import { SignupFormData } from "@/types/auth/core";
 
 interface CodeVerificationProps {
   formData: SignupFormData;

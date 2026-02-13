@@ -2,7 +2,7 @@
 
 import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
 import { useMfaChallenge } from "@/hooks/auth/challenge/useMfaChallenge";
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 
 type MfaChallengeProps = {
   mode: VerificationMode;

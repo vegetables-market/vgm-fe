@@ -1,6 +1,6 @@
 import ChallengeLayout from "./ChallengeLayout";
 import ChallengeFlow from "@/components/features/auth/challenge/ChallengeFlow";
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 
 interface ChallengeState {
   error: string;
@@ -56,7 +56,7 @@ export default function ChallengeForm({ state, actions }: ChallengeFormProps) {
     }
 
     if (!mode) {
-      // パラメータ不足等の場合
+      // 繝代Λ繝｡繝ｼ繧ｿ荳崎ｶｳ遲峨・蝣ｴ蜷・
       return null;
     }
 

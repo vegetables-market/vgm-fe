@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import type { SignupFormData } from "@/components/features/auth/types";
+import type { SignupFormData } from "@/types/auth/core";
 import { validateProfile } from "@/services/auth/profile-validation";
 
 type UseProfileEntryParams = {

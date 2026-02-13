@@ -1,6 +1,6 @@
 "use client";
 
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 import EmailChallenge from "./EmailChallenge";
 import MfaChallenge from "./MfaChallenge";
 import ActionChallenge from "./ActionChallenge";
@@ -68,7 +68,7 @@ export default function ChallengeFlow({
 
   return (
     <div className="text-center text-red-400">
-      不正なリクエストです。(Unknown Mode)
+      荳肴ｭ｣縺ｪ繝ｪ繧ｯ繧ｨ繧ｹ繝医〒縺吶・Unknown Mode)
     </div>
   );
 }

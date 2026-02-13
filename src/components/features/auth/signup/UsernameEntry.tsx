@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 
 import { FaCircleExclamation } from "react-icons/fa6";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import { useUsernameEntry } from "@/hooks/auth/signup/useUsernameEntry";
-import type { UsernameEntryProps } from "./types";
+import type { UsernameEntryProps } from "@/types/auth/signup-components";
 
 export default function UsernameEntry({
   formData,

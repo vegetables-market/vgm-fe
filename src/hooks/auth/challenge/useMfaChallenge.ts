@@ -11,7 +11,7 @@ import {
   useVerificationCountdown,
   useResendCooldown,
 } from "@/hooks/auth/verification/useVerificationCountdown";
-import { VerificationMode } from "@/components/features/auth/types";
+import { VerificationMode } from "@/types/auth/core";
 
 type UseMfaChallengeParams = {
   mode: VerificationMode; // email_mfa or totp
@@ -65,7 +65,7 @@ export function useMfaChallenge({
           ),
         );
     } else {
-      setError("ログインに失敗しました。");
+      setError("繝ｭ繧ｰ繧､繝ｳ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲・);
     }
   };
 
@@ -81,7 +81,7 @@ export function useMfaChallenge({
     try {
       const data = await resendCode({ flow_id: flowId });
       addLog(`Resend successful (MFA). New flow_id: ${data.flow_id}`);
-      setSuccessMsg("認証コードを再送しました。");
+      setSuccessMsg("隱崎ｨｼ繧ｳ繝ｼ繝峨ｒ蜀埼√＠縺ｾ縺励◆縲・);
 
       // Reload page (MFA usually keeps same mfa_token? Or maybe flow_id changes and needs to be updated in URL?)
       // If result has flow_id, update URL parameter
@@ -99,12 +99,12 @@ export function useMfaChallenge({
   const onSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (code.length !== 6) {
-      setError("認証コードは6桁です。");
+      setError("隱崎ｨｼ繧ｳ繝ｼ繝峨・6譯√〒縺吶・);
       return;
     }
 
     if (!mfaToken) {
-       setError("MFAトークンが見つかりません。");
+       setError("MFA繝医・繧ｯ繝ｳ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縲・);
        return;
     }
 

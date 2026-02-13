@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { SignupFormData } from "@/components/features/auth/types";
+import { SignupFormData } from "@/types/auth/core";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
@@ -19,7 +19,7 @@ export function useSignup(initial?: SignupInitialParams) {
   const initialFlowId = initial?.flowId || "";
   const redirectTo = initial?.redirectTo || null;
 
-  // verified=true（チャレンジ画面で認証済み）ならUsernameEntry(2)から開始
+  // verified=true・医メ繝｣繝ｬ繝ｳ繧ｸ逕ｻ髱｢縺ｧ隱崎ｨｼ貂医∩・峨↑繧蔚sernameEntry(2)縺九ｉ髢句ｧ・
   const [step, setStep] = useState(
     initial?.verified && initialFlowId ? 2 : initialFlowId ? 1 : 0
   );
@@ -77,15 +77,15 @@ export function useSignup(initial?: SignupInitialParams) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        display_name: formData.username, // display_nameをusernameで初期化
+        display_name: formData.username, // display_name繧置sername縺ｧ蛻晄悄蛹・
         flow_id: formData.flow_id,
-        // プロフィール関連は省略（バックエンドがNullableまたはデフォルト値を持つ前提）
+        // 繝励Ο繝輔ぅ繝ｼ繝ｫ髢｢騾｣縺ｯ逵∫払・医ヰ繝・け繧ｨ繝ｳ繝峨′Nullable縺ｾ縺溘・繝・ヵ繧ｩ繝ｫ繝亥､繧呈戟縺､蜑肴署・・
       });
 
       addLog(`Signup successful: ${JSON.stringify(data)}`);
 
       if (data.status === "AUTHENTICATED" && data.user) {
-        // 認証済み: ログイン状態にしてホームへ遷移
+        // 隱崎ｨｼ貂医∩: 繝ｭ繧ｰ繧､繝ｳ迥ｶ諷九↓縺励※繝帙・繝縺ｸ驕ｷ遘ｻ
         addLog("Signup completed with auto-login");
         authLogin(data.user);
         pushRedirect(redirectTo, "/");
