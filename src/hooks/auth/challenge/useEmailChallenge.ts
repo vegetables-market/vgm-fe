@@ -1,7 +1,7 @@
-import { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
-import { resendCode } from "@/services/auth/resend-code";
+
 import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
@@ -10,8 +10,8 @@ import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import {
   useVerificationCountdown,
-  useResendCooldown,
 } from "@/hooks/auth/verification/useVerificationCountdown";
+import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 
 type UseEmailChallengeParams = {
   flowId: string | null;
@@ -33,11 +33,18 @@ export function useEmailChallenge({
     successMsg, setSuccessMsg 
   } = useOtpInput();
   
-  const [isResending, setIsResending] = useState(false);
-  
-  const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
-  const { resendCooldown } = useResendCooldown(nextResendAt || undefined);
+  /* New Hook Usage */
+  const { isResending, resendCooldown, onResend } = useChallengeResend({
+    flowId,
+    nextResendAt,
+    redirectTo,
+    setError,
+    setSuccessMsg: setSuccessMsg as (msg: string) => void,
+    verificationType: "email",
+  });
 
+  const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
+  
   const router = useRouter();
   const { login: authLogin } = useAuth();
   const { pushRedirect } = useSafeRedirect();
@@ -66,42 +73,7 @@ export function useEmailChallenge({
     }
   };
 
-  const onResend = async () => {
-    if (isResending || (resendCooldown && resendCooldown > 0)) return;
-    if (!flowId) return;
 
-    setIsResending(true);
-    setError("");
-    setSuccessMsg("");
-
-    try {
-      const data = await resendCode({ flow_id: flowId });
-      addLog(`Resend successful. New flow_id: ${data.flow_id}`);
-      setSuccessMsg("認証コードを再送しました。");
-
-      // Reload page with new params (flow_id changed)
-      const base = `/challenge?type=email&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
-      const newUrl = withRedirectTo(base, redirectTo);
-      router.replace(newUrl);
-    } catch (err: any) {
-       if (
-        err.info?.error === "RESEND_LIMIT_EXCEEDED" ||
-        err.message?.includes("再送回数の上限")
-      ) {
-        setError(
-          "再送回数の上限に達しました。ログイン画面に戻ります。",
-        );
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
-        return;
-      }
-      const message = getErrorMessage(err);
-      setError(message);
-    } finally {
-      setIsResending(false);
-    }
-  };
 
   const onSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();

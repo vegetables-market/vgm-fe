@@ -1,9 +1,10 @@
 "use client";
 
 import { VerificationMode } from "@/types/auth/core";
-import EmailChallenge from "./EmailChallenge";
-import MfaChallenge from "./MfaChallenge";
+import EmailVerification from "./EmailVerification";
 import ActionChallenge from "./ActionChallenge";
+import MfaEmailForm from "./MfaEmailForm";
+import MfaTotpForm from "./MfaTotpForm";
 
 type ChallengeFlowProps = {
   mode: VerificationMode;
@@ -42,7 +43,7 @@ export default function ChallengeFlow({
   // 2. Email Verification (Signup / Login Unknown)
   if (mode === "email") {
     return (
-      <EmailChallenge
+      <EmailVerification
         flowId={flowId || null}
         maskedEmail={maskedEmail}
         redirectTo={redirectTo}
@@ -52,16 +53,25 @@ export default function ChallengeFlow({
     );
   }
 
-  // 3. MFA Verification (Email MFA or TOTP)
-  if (mode === "email_mfa" || mode === "totp") {
+  // 3. MFA Verification (Email MFA)
+  if (mode === "email_mfa") {
     return (
-      <MfaChallenge
-        mode={mode}
+      <MfaEmailForm
         mfaToken={mfaToken || null}
-        flowId={flowId || null} // Needed for email_mfa resend
+        flowId={flowId || null}
         redirectTo={redirectTo}
         expiresAt={expiresAt}
         nextResendAt={nextResendAt}
+      />
+    );
+  }
+
+  // 4. MFA Verification (TOTP)
+  if (mode === "totp") {
+    return (
+      <MfaTotpForm
+        mfaToken={mfaToken || null}
+        redirectTo={redirectTo}
       />
     );
   }

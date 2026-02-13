@@ -1,23 +1,23 @@
 "use client";
 
 import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
-import { useEmailChallenge } from "@/hooks/auth/challenge/useEmailChallenge";
+import { useMfaEmail } from "@/hooks/auth/challenge/useMfaEmail";
 
-type EmailChallengeProps = {
-  flowId: string | null;
-  maskedEmail?: string | null;
+type MfaEmailFormProps = {
+  mfaToken: string | null;
+  flowId?: string | null;
   redirectTo?: string | null;
   expiresAt?: string | null;
   nextResendAt?: string | null;
 };
 
-export default function EmailChallenge({
+export default function MfaEmailForm({
+  mfaToken,
   flowId,
-  maskedEmail,
   redirectTo,
   expiresAt,
   nextResendAt,
-}: EmailChallengeProps) {
+}: MfaEmailFormProps) {
   const {
     code,
     setCode,
@@ -29,7 +29,8 @@ export default function EmailChallenge({
     resendCooldown,
     onResend,
     onSubmit,
-  } = useEmailChallenge({
+  } = useMfaEmail({
+    mfaToken,
     flowId,
     redirectTo,
     expiresAt,
@@ -40,10 +41,9 @@ export default function EmailChallenge({
     <VerificationInputForm
       code={code}
       setCode={setCode}
-      emailDisplay={maskedEmail || undefined}
       description={
         <div className="text-center text-sm text-gray-300">
-          登録したメールアドレスに送信された
+          メールアドレスに送信された
           <br />
           6桁の認証コードを入力してください。
         </div>

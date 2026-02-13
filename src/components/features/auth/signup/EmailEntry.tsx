@@ -27,7 +27,7 @@ export default function EmailEntry({
       <form onSubmit={onSubmit}>
         <section>
           <AuthInput
-            label="繝｡繝ｼ繝ｫ繧｢繝峨Ξ繧ｹ"
+            label="メールアドレス"
             type="email"
             value={formData.email}
             onChange={(e) => {
@@ -43,14 +43,14 @@ export default function EmailEntry({
 
           {hasEmailError && (
             <AuthStatusMessage
-              message="譛牙柑縺ｪ繝｡繝ｼ繝ｫ繧｢繝峨Ξ繧ｹ繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・
+              message="有効なメールアドレスを入力してください。"
               variant="error"
             />
           )}
         </section>
 
-        <AuthSubmitButton isLoading={isLoading} loadingText="遒ｺ隱堺ｸｭ...">
-          谺｡縺ｸ
+        <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
+          次へ
         </AuthSubmitButton>
       </form>
 
@@ -63,8 +63,8 @@ export default function EmailEntry({
       <Divider />
 
       <AuthSwitchLink
-        promptText="繧｢繧ｫ繧ｦ繝ｳ繝医ｒ縺頑戟縺｡縺ｮ譁ｹ縺ｯ"
-        linkText="縺薙％縺九ｉ繝ｭ繧ｰ繧､繝ｳ"
+        promptText="アカウントをお持ちの方は"
+        linkText="ここからログイン"
         href="/login"
         redirectTo={redirectTo}
       />

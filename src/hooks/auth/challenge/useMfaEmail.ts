@@ -1,7 +1,5 @@
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
-import { resendCode } from "@/services/auth/resend-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
@@ -9,38 +7,43 @@ import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import {
   useVerificationCountdown,
-  useResendCooldown,
 } from "@/hooks/auth/verification/useVerificationCountdown";
-import { VerificationMode } from "@/types/auth/core";
+import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 
-type UseMfaChallengeParams = {
-  mode: VerificationMode; // email_mfa or totp
+type UseMfaEmailParams = {
   mfaToken: string | null;
-  flowId?: string | null; // Needed for resend if email_mfa
+  flowId?: string | null;
   redirectTo?: string | null;
   expiresAt?: string | null;
   nextResendAt?: string | null;
 };
 
-export function useMfaChallenge({ 
-  mode, 
-  mfaToken, 
+export function useMfaEmail({
+  mfaToken,
   flowId,
   redirectTo,
   expiresAt,
   nextResendAt
-}: UseMfaChallengeParams) {
-  const { 
-    code, setCode, 
-    error, setError, 
+}: UseMfaEmailParams) {
+  const {
+    code, setCode,
+    error, setError,
     isLoading, setIsLoading,
     successMsg, setSuccessMsg
   } = useOtpInput();
-  
-  const [isResending, setIsResending] = useState(false);
+
+  const { isResending, resendCooldown, onResend } = useChallengeResend({
+    flowId,
+    nextResendAt,
+    redirectTo,
+    setError,
+    setSuccessMsg: setSuccessMsg as (msg: string) => void,
+    verificationType: "email_mfa",
+    token: mfaToken,
+  });
+
   const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
-  const { resendCooldown } = useResendCooldown(nextResendAt || undefined);
-  
+
   const router = useRouter();
   const { login: authLogin } = useAuth();
   const { pushRedirect } = useSafeRedirect();
@@ -65,56 +68,29 @@ export function useMfaChallenge({
           ),
         );
     } else {
-      setError("繝ｭ繧ｰ繧､繝ｳ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲・);
-    }
-  };
-
-  const onResend = async () => {
-    if (mode === "totp") return;
-    if (isResending || (resendCooldown && resendCooldown > 0)) return;
-    if (!flowId) return;
-
-    setIsResending(true);
-    setError("");
-    setSuccessMsg("");
-
-    try {
-      const data = await resendCode({ flow_id: flowId });
-      addLog(`Resend successful (MFA). New flow_id: ${data.flow_id}`);
-      setSuccessMsg("隱崎ｨｼ繧ｳ繝ｼ繝峨ｒ蜀埼√＠縺ｾ縺励◆縲・);
-
-      // Reload page (MFA usually keeps same mfa_token? Or maybe flow_id changes and needs to be updated in URL?)
-      // If result has flow_id, update URL parameter
-      const base = `/challenge?type=email_mfa&token=${encodeURIComponent(mfaToken || "")}&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
-      const newUrl = withRedirectTo(base, redirectTo);
-      router.replace(newUrl);
-    } catch (err: any) {
-      const message = getErrorMessage(err);
-      setError(message);
-    } finally {
-      setIsResending(false);
+      setError("ログインに失敗しました。");
     }
   };
 
   const onSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (code.length !== 6) {
-      setError("隱崎ｨｼ繧ｳ繝ｼ繝峨・6譯√〒縺吶・);
+      setError("認証コードは6桁です。");
       return;
     }
 
     if (!mfaToken) {
-       setError("MFA繝医・繧ｯ繝ｳ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縲・);
+       setError("MFAトークンが見つかりません。");
        return;
     }
 
     setIsLoading(true);
     setError("");
-    addLog(`Submitting MFA verification: ${mode}`);
+    addLog(`Submitting MFA verification: email_mfa`);
 
     try {
       const data = await verifyLogin({
-        method: AuthMethod.TOTP,
+        method: AuthMethod.TOTP, // Backend uses TOTP method even for Email MFA currently
         identifier: mfaToken,
         code,
       });
@@ -136,7 +112,7 @@ export function useMfaChallenge({
     isResending,
     timeLeft,
     resendCooldown,
-    onResend: mode === "totp" ? undefined : onResend,
+    onResend,
     onSubmit,
   };
 }

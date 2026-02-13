@@ -20,11 +20,7 @@ export interface UsernameEntryProps {
   onNext: () => void;
 }
 
-export interface ProfileEntryProps {
-  formData: SignupFormData;
-  setFormData: Dispatch<SetStateAction<SignupFormData>>;
-  onNext: () => void;
-}
+
 
 export interface TermsAgreementProps {
   onSubmit: () => void;
