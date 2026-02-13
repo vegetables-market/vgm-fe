@@ -7,6 +7,7 @@ type UseTermsAgreementParams = {
 
 export function useTermsAgreement({ onSubmit }: UseTermsAgreementParams) {
   const [agreed, setAgreed] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -17,6 +18,8 @@ export function useTermsAgreement({ onSubmit }: UseTermsAgreementParams) {
   return {
     agreed,
     setAgreed,
+    subscribed,
+    setSubscribed,
     handleSubmit,
   };
 }

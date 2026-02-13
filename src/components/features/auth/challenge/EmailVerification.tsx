@@ -2,6 +2,7 @@
 
 import VerificationInputForm from "@/components/features/auth/shared/VerificationInputForm";
 import { useEmailChallenge } from "@/hooks/auth/challenge/useEmailChallenge";
+import SignupStepHeader from "../../../ui/auth/SignupStepHeader";
 
 type EmailVerificationProps = {
   flowId: string | null;
@@ -40,25 +41,28 @@ export default function EmailVerification({
   });
 
   return (
-    <VerificationInputForm
-      code={code}
-      setCode={setCode}
-      emailDisplay={maskedEmail || undefined}
-      description={
-        <div className="text-center text-sm text-gray-300">
-          登録したメールアドレスに送信された
-          <br />
-          6桁の認証コードを入力してください。
-        </div>
-      }
-      error={error}
-      successMsg={successMsg}
-      isLoading={isLoading}
-      isResending={isResending}
-      timeLeft={timeLeft}
-      resendCooldown={resendCooldown}
-      onResend={onResend}
-      onSubmit={onSubmit}
-    />
+    <>
+      <SignupStepHeader />
+      <VerificationInputForm
+        code={code}
+        setCode={setCode}
+        emailDisplay={maskedEmail || undefined}
+        description={
+          <div className="text-center text-sm text-gray-300">
+            登録したメールアドレスに送信された
+            <br />
+            6桁の認証コードを入力してください。
+          </div>
+        }
+        error={error}
+        successMsg={successMsg}
+        isLoading={isLoading}
+        isResending={isResending}
+        timeLeft={timeLeft}
+        resendCooldown={resendCooldown}
+        onResend={onResend}
+        onSubmit={onSubmit}
+      />
+    </>
   );
 }

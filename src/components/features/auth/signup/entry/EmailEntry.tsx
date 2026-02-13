@@ -7,6 +7,8 @@ import Divider from "@/components/ui/auth/Divider";
 import OrDivider from "@/components/ui/auth/OrDivider";
 import { useEmailEntry } from "@/hooks/auth/signup/useEmailEntry";
 import type { EmailEntryProps } from "@/types/auth/signup-components";
+import SignupStepHeader from "@/components/ui/auth/SignupStepHeader";
+import AuthTitle from "@/components/ui/auth/AuthTitle";
 
 export default function EmailEntry({
   formData,
@@ -24,30 +26,31 @@ export default function EmailEntry({
 
   return (
     <>
-      <form onSubmit={onSubmit}>
-        <section>
-          <AuthInput
-            label="メールアドレス"
-            type="email"
-            value={formData.email}
-            onChange={(e) => {
-              setFormData((prev) => ({ ...prev, email: e.target.value }));
-              clearEmailError();
-            }}
-            placeholder="mail@example.com"
-            autoFocus
-            disabled={isLoading}
-            hasError={hasEmailError}
-            className="bg-black text-white"
-          />
+      {/* タイトル */}
+      <AuthTitle>新規登録</AuthTitle>
 
-          {hasEmailError && (
-            <AuthStatusMessage
-              message="有効なメールアドレスを入力してください。"
-              variant="error"
-            />
-          )}
-        </section>
+      <form onSubmit={onSubmit}>
+        <SignupStepHeader />
+        <AuthInput
+          label="メールアドレス"
+          type="email"
+          value={formData.email}
+          onChange={(e) => {
+            setFormData((prev) => ({ ...prev, email: e.target.value }));
+            clearEmailError();
+          }}
+          placeholder="mail@example.com"
+          autoFocus
+          disabled={isLoading}
+          hasError={hasEmailError}
+        />
+
+        {hasEmailError && (
+          <AuthStatusMessage
+            message="有効なメールアドレスを入力してください。"
+            variant="error"
+          />
+        )}
 
         <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
           次へ

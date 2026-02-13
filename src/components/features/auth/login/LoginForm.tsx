@@ -5,7 +5,7 @@ import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import OrDivider from "@/components/ui/auth/OrDivider";
-import type { LoginFormProps } from "./types";
+import type { LoginFormProps } from "@/types/auth/login-components";
 
 export default function LoginForm({ state, actions }: LoginFormProps) {
   const { step, emailOrUsername, password, error, isLoading, redirectTo } =

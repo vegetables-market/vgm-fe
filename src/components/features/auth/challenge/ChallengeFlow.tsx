@@ -73,7 +73,7 @@ export default function ChallengeFlow({
 
   return (
     <div className="text-center text-red-400">
-      荳肴ｭ｣縺ｪ繝ｪ繧ｯ繧ｨ繧ｹ繝医〒縺吶・Unknown Mode)
+      不正なリクエストです。(Unknown Mode)
     </div>
   );
 }

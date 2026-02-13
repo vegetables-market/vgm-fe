@@ -26,12 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 蛻晏屓繝槭え繝ｳ繝域凾縺ｫlocalStorage縺九ｉ隱崎ｨｼ諠・ｱ繧貞ｾｩ蜈・
+  // 初回マウント時にlocalStorageから認証情報を復元
   useEffect(() => {
     refreshAuthInternal();
   }, []);
 
-  // 401 Unauthorized 繧､繝吶Φ繝医ｒ繝ｪ繝・せ繝ｳ
+  // 401 Unauthorized イベントをリッスン
   useEffect(() => {
     const handleUnauthorizedEvent = () => {
       setUser(null);
@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // 隱崎ｨｼ迥ｶ諷九ｒ蜀崎ｪｭ縺ｿ霎ｼ縺ｿ
+  // 認証状態を再読み込み
   const refreshAuthInternal = () => {
     try {
       const savedUser = localStorage.getItem("vgm_user");
@@ -63,32 +63,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 繝ｭ繧ｰ繧､繝ｳ蜃ｦ逅・
+  // ログイン処理
   const login = (userData: UserInfo) => {
     setUser(userData);
     localStorage.setItem("vgm_user", JSON.stringify(userData));
   };
 
-  // 繝ｭ繧ｰ繧｢繧ｦ繝亥・逅・
+  // ログアウト処理
   const logout = async () => {
     try {
-      // 繝舌ャ繧ｯ繧ｨ繝ｳ繝峨・繝ｭ繧ｰ繧｢繧ｦ繝・PI繧貞他縺ｶ
+      // バックエンドのログアウトAPIを呼ぶ
       await logoutApi();
     } catch (error) {
       console.error("Logout API failed:", error);
-      // API螟ｱ謨励＠縺ｦ繧ゅΟ繝ｼ繧ｫ繝ｫ縺ｮ迥ｶ諷九・繧ｯ繝ｪ繧｢縺吶ｋ
+      // API失敗してもローカルの状態はクリアする
     } finally {
       setUser(null);
       localStorage.removeItem("vgm_user");
     }
   };
 
-  // 螟夜Κ縺九ｉ蜻ｼ縺ｰ繧後ｋ隱崎ｨｼ迥ｶ諷区峩譁ｰ髢｢謨ｰ
+  // 外部から呼ばれる認証状態更新関数
   const refreshAuth = () => {
     refreshAuthInternal();
   };
 
-  // 繝ｦ繝ｼ繧ｶ繝ｼ諠・ｱ繧呈峩譁ｰ
+  // ユーザー情報を更新
   const updateUser = (userData: UserInfo) => {
     setUser(userData);
     localStorage.setItem("vgm_user", JSON.stringify(userData));
@@ -113,7 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// 邁｡蜊倥↓蜻ｼ縺ｳ蜃ｺ縺帙ｋ繝輔ャ繧ｯ
+// 簡単に呼び出せるフック
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {

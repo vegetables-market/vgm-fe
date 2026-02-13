@@ -60,7 +60,7 @@ export function useUsernameEntry({
     };
   }, []);
 
-  const checkAvailability = async (value: string) => {
+    async function checkAvailability(value: string) {
     if (!value || value.length < 3) {
       setChecking(false);
       setIsAvailable(null);
@@ -90,9 +90,10 @@ export function useUsernameEntry({
     abortControllerRef.current = controller;
 
     setChecking(true);
-    setUsernameError("");
-    setSuggestions([]);
-    setIsAvailable(null);
+    // Don't clear previous results while checking to avoid UI flicker
+    // setUsernameError("");
+    // setSuggestions([]);
+    // setIsAvailable(null);
 
     try {
       const result = await checkUsername(value);
@@ -117,22 +118,23 @@ export function useUsernameEntry({
         abortControllerRef.current = null;
       }
     }
-  };
+  }
 
   const debouncedCheck = useDebouncedCallback(checkAvailability, 500);
 
   const handleUsernameChange = (value: string) => {
     setUsername(value);
     setShowError(false);
-    setUsernameError("");
-    setSuggestions([]);
-    setIsAvailable(null);
 
     if (isValidUsernameFormat(value)) {
       setChecking(true);
       debouncedCheck(value);
     } else {
+      // Clear checking state and results if format is invalid
       setChecking(false);
+      setUsernameError("");
+      setSuggestions([]);
+      setIsAvailable(null);
     }
   };
 

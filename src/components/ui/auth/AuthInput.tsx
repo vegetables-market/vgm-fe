@@ -1,31 +1,51 @@
 import React from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 interface AuthInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   hasError?: boolean;
+  onTogglePasswordVisibility?: () => void;
+  isPasswordVisible?: boolean;
+  isSuccess?: boolean;
 }
 
 export default function AuthInput({
   label,
   hasError = false,
   className = "",
+  onTogglePasswordVisibility,
+  isPasswordVisible = false,
+  isSuccess = false,
   ...props
 }: AuthInputProps) {
   const borderClass = hasError
     ? "border-red-400 focus:border-red-400"
-    : "border-white/70 focus:border-white";
+    : isSuccess
+      ? "border-green-500 focus:border-green-500"
+      : "border-white/70 focus:border-white";
 
   return (
-    <div className="mb-3 w-full">
+    <div className={`mb-3 w-full ${className}`}>
       <div className="mb-2 w-full">
-        <span className="cursor-default text-[12px] font-bold">
-          {label}
-        </span>
+        <p className="cursor-default text-[13px] font-bold">{label}</p>
       </div>
-      <input
-        className={`h-9 w-full rounded-lg border-2 pl-3 text-sm transition-colors duration-300 outline-none ${borderClass} ${className}`}
-        {...props}
-      />
+      <div className="relative">
+        <input
+          className={`h-9 w-full rounded-lg border-2 pl-3 text-sm transition-colors duration-300 outline-none ${borderClass} ${
+            onTogglePasswordVisibility ? "pr-10" : ""
+          }`}
+          {...props}
+        />
+        {onTogglePasswordVisibility && (
+          <button
+            type="button"
+            onClick={onTogglePasswordVisibility}
+            className="text-muted-foreground absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3 text-lg"
+          >
+            {isPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
