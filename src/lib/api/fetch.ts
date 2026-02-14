@@ -95,13 +95,6 @@ export async function fetchApi<T>(
     const response = await fetch(url, defaultOptions);
 
     if (!response.ok) {
-      // 401 Unauthorized の場合は自動ログアウト
-      if (response.status === 401) {
-        addLog("[API Error] 401 Unauthorized - Auto logout");
-        handleUnauthorized();
-        throw new ApiError(401, "Unauthorized", "UNAUTHORIZED");
-      }
-
       let errorMessage = `API Error: ${response.status}`;
       let errorCode: string | undefined;
       let details: string[] | undefined;
@@ -110,11 +103,35 @@ export async function fetchApi<T>(
         const errorData = await response.json();
         if (errorData) {
           if (errorData.message) errorMessage = errorData.message;
+          // Handle both camelCase and snake_case
           if (errorData.errorCode) errorCode = errorData.errorCode;
+          else if (errorData.error_code) errorCode = errorData.error_code;
+          
           if (errorData.details) details = errorData.details;
         }
       } catch {
-        // JSONパース失敗
+        // JSONパース失敗時はデフォルトメッセージを使用
+      }
+
+      // 401 Unauthorized の処理
+      if (response.status === 401) {
+        // 自動ログアウトを除外するエラーコード
+        const ignoreAutoLogoutCodes = [
+          "AUTH_INVALID_CREDENTIALS", 
+          "AUTH_ACCOUNT_LOCKED", 
+          "AUTH_FIREBASE_ERROR",
+          "AUTH_CODE_INVALID"
+        ];
+        
+        // エラーコードが特定できない、または除外リストに含まれない場合は自動ログアウト
+        if (!errorCode || !ignoreAutoLogoutCodes.includes(errorCode)) {
+          addLog("[API Error] 401 Unauthorized - Auto logout");
+          handleUnauthorized();
+          // セッション切れの場合はデフォルトメッセージにする（混乱を防ぐため）
+          if (!errorCode) {
+             throw new ApiError(401, "Session expired", "UNAUTHORIZED");
+          }
+        }
       }
 
       addLog(`[API Error] ${response.status}: ${errorMessage}`);

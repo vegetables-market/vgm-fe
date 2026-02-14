@@ -95,7 +95,7 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
           {step === 1 && (
             <SignupEmailVerification
               flowId={formData.flow_id || null}
-              maskedEmail={formData.email}
+              displayEmail={formData.email}
               expiresAt={formData.expiresAt}
               onVerifiedAction={handleNext}
               redirectTo={redirectTo}

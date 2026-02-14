@@ -45,6 +45,7 @@ export function useEmailEntry({
         const params = new URLSearchParams();
         params.set("type", "email");
         params.set("flow_id", result.flow_id);
+        params.set("email", email);
         if (result.expires_at) params.set("expires_at", result.expires_at);
         if (result.next_resend_at) {
           params.set("next_resend_at", result.next_resend_at);

@@ -7,6 +7,7 @@ import type { LoginResponse } from "@/types/auth/login";
 export enum AuthMethod {
   EMAIL = "EMAIL",
   TOTP = "TOTP",
+  PASSWORD = "PASSWORD",
 }
 
 export interface VerifyAuthRequest {

@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/services/auth/login";
-import { initAuthFlow } from "@/services/auth/init-auth-flow";
-import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
-import { useAuth } from "@/context/AuthContext";
-import { withRedirectTo } from "@/lib/next/withRedirectTo";
-import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { checkUser } from "@/services/auth/check-user";
+import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
 type LoginInitialParams = {
@@ -13,14 +9,10 @@ type LoginInitialParams = {
 };
 
 export function useLogin(initial?: LoginInitialParams) {
-  const [step, setStep] = useState<"email" | "password">("email");
   const [emailOrUsername, setEmailOrUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { login: authLogin } = useAuth();
-  const { pushRedirect } = useSafeRedirect();
 
   const redirectTo = initial?.redirectTo || null;
   const safeRedirect = safeRedirectTo(redirectTo);
@@ -35,129 +27,60 @@ export function useLogin(initial?: LoginInitialParams) {
     e.preventDefault();
     setError("");
 
-    // ステップ1: ユーザーID入力後
-    // ステップ1: ユーザーID入力後
-    if (step === "email") {
-      if (!emailOrUsername) {
-        setError("メールアドレスまたはユーザーIDを入力してください。");
-        return;
-      }
-
-      // メールアドレス形式の簡易チェック
-      const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailOrUsername);
-
-      if (!isEmail) {
-        // ユーザーIDとみなして通常ログインフローへ
-        addLog(`Proceeding to password step for username: ${emailOrUsername}`);
-        setStep("password");
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const result = await initAuthFlow(emailOrUsername);
-
-        if (result.flow_id) {
-          addLog("Redirecting to challenge page");
-          // 統一フロー: チャレンジページへ遷移
-          const params = new URLSearchParams();
-          params.set("type", "email");
-          params.set("flow_id", result.flow_id);
-          if (result.expires_at) params.set("expires_at", result.expires_at);
-          if (result.next_resend_at)
-            params.set("next_resend_at", result.next_resend_at);
-          // アクションを指定しても良い (action=login)
-          params.set("action", "login");
-          if (safeRedirect) params.set("redirect_to", safeRedirect);
-
-          router.push(`/challenge?${params.toString()}`);
-        } else {
-          // flow_idがない場合は通常フロー（パスワード入力）へ進む (後方互換またはフォールバック)
-          addLog("No flow_id, proceeding to password step");
-          setStep("password");
-        }
-      } catch (err) {
-        console.error(err);
-        // エラー時はとりあえずパスワード入力へ進める（フォールバック）
-        setStep("password");
-      } finally {
-        setIsLoading(false);
-      }
+    if (!emailOrUsername) {
+      setError("メールアドレスまたはユーザーIDを入力してください。");
       return;
     }
 
-    // ステップ2: パスワード入力後
-    if (step === "password") {
-      if (!password) {
-        setError("パスワードを入力してください。");
-        return;
+    setIsLoading(true);
+    try {
+      // バックエンドに問い合わせて次のステップを決定
+      const checkResult = await checkUser(emailOrUsername);
+
+      if (checkResult.next_step === "password") {
+          addLog(`Proceeding to password challenge for: ${checkResult.identifier}`);
+          // パスワード入力画面へ遷移
+          // ユーザーが存在しない場合でもここに来る（セキュリティ対策）
+          const params = new URLSearchParams();
+          params.set("type", "password");
+          params.set("username", checkResult.identifier);
+          if (safeRedirect) params.set("redirect_to", safeRedirect);
+          
+          router.push(`/challenge?${params.toString()}`);
+
+      } else if (checkResult.next_step === "email_otp" && checkResult.flow_id) {
+          addLog("Proceeding to email verification");
+          // メール認証画面へ遷移
+          const params = new URLSearchParams();
+          params.set("type", "email");
+          params.set("flow_id", checkResult.flow_id);
+          params.set("email", checkResult.identifier); // 表示用
+          if (safeRedirect) params.set("redirect_to", safeRedirect);
+          
+          router.push(`/challenge?${params.toString()}`);
+      } else {
+          // 想定外のレスポンス
+          throw new Error("Invalid auth step");
       }
 
-      setIsLoading(true);
-      addLog(`Attempting login with password for: ${emailOrUsername}`);
-      try {
-        const data = await login({ username: emailOrUsername, password });
-
-        if (data.status === "MFA_REQUIRED" && data.mfa_token) {
-          addLog("MFA Required. Redirecting to challenge page.");
-
-          if (data.masked_email) {
-            localStorage.setItem("vgm_masked_email", data.masked_email);
-          }
-
-          const mfaType = data.mfa_type?.toLowerCase() || "totp";
-          router.push(
-            withRedirectTo(
-              `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
-              redirectTo,
-            ),
-          );
-        } else if (data.require_verification) {
-          if (data.flow_id) {
-            addLog("Verification required after password check.");
-            if (data.masked_email) {
-              localStorage.setItem("vgm_masked_email", data.masked_email);
-            }
-            router.push(
-              withRedirectTo(
-                `/challenge?type=email&flow_id=${data.flow_id}`,
-                redirectTo,
-              ),
-            );
-          } else {
-            addLog("Login failed: Invalid credentials.");
-            setError(
-              "メールアドレス、ユーザーIDまたはパスワードが間違っています。",
-            );
-          }
-        } else if (data.user) {
-          addLog("Login successful!");
-          authLogin(data.user);
-          pushRedirect(redirectTo, "/");
-        }
-      } catch (err: any) {
-        const message = getErrorMessage(err);
-        setError(message);
-        handleGlobalError(err, router);
-      } finally {
-        setIsLoading(false);
-      }
-      return;
+    } catch (err: any) {
+      console.error(err);
+      const message = getErrorMessage(err);
+      setError(message || "認証の開始に失敗しました。");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return {
     state: {
-      step,
       emailOrUsername,
-      password,
       error,
       isLoading,
       redirectTo,
     },
     actions: {
       setEmailOrUsername,
-      setPassword,
       onSubmit: handleSubmit,
       addLog,
     },

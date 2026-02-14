@@ -37,18 +37,24 @@ export default function DeleteAccountPage() {
 
         const currentPath = window.location.pathname; // /settings/delete-account
         const redirectTo = encodeURIComponent(currentPath);
+        const returnTo = encodeURIComponent("/settings");
+        const baseParams = `action=delete_account&redirect_to=${redirectTo}&return_to=${returnTo}`;
 
         if (data.auth_type === "TOTP") {
           // flow_id is actually mfa_token for TOTP
           router.push(
-            `/challenge?type=totp&token=${data.flow_id}&action=delete_account&redirect_to=${redirectTo}`,
+            `/challenge?type=totp&token=${data.flow_id}&${baseParams}`,
+          );
+        } else if (data.auth_type === "PASSWORD") {
+           router.push(
+            `/challenge?type=password&flow_id=${data.flow_id}&${baseParams}`,
           );
         } else {
           const maskedEmailParam = (data as any).masked_email
             ? `&masked_email=${encodeURIComponent((data as any).masked_email)}`
             : "";
           router.push(
-            `/challenge?type=email&flow_id=${data.flow_id}&action=delete_account&redirect_to=${redirectTo}${maskedEmailParam}`,
+            `/challenge?type=email&flow_id=${data.flow_id}&${baseParams}${maskedEmailParam}`,
           );
         }
       } catch (err: any) {

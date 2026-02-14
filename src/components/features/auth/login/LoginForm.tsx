@@ -47,7 +47,8 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
           )}
 
           <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
-            {step === "email" ? "次へ" : "ログイン"}
+            つぎへ
+            {/*{step === "email" ? "次へ" : "ログイン"}*/}
           </AuthSubmitButton>
         </form>
       </div>

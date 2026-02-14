@@ -53,7 +53,7 @@ export default function EmailEntry({
         )}
 
         <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
-          次へ
+          続行
         </AuthSubmitButton>
       </form>
 

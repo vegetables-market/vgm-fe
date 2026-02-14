@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   ChangeEvent,
   ClipboardEvent,
+  FocusEvent,
   KeyboardEvent,
   RefCallback,
 } from "react";
@@ -10,95 +11,212 @@ type UseOtpDigitInputParams = {
   length: number;
   value: string;
   onChange: (value: string) => void;
+  onComplete?: () => void;
 };
 
+/**
+ * OTP入力のロジックを管理するカスタムフック
+ * - 位置ベースの編集（中間の削除でもシフトしない）
+ * - 空きスロットへの自動リダイレクト
+ * - コピペ、矢印キー、Backspace/Delete/Enter 対応
+ */
 export function useOtpDigitInput({
   length,
   value,
   onChange,
+  onComplete,
 }: UseOtpDigitInputParams) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
 
+  // --- Internal state: n-element array ---
+  const [digits, setDigits] = useState<string[]>(() =>
+    parseValue(value, length),
+  );
+  const digitsRef = useRef(digits);
+
+  // Keep ref in sync
   useEffect(() => {
-    const nextOtp = value.split("").slice(0, length);
-    while (nextOtp.length < length) {
-      nextOtp.push("");
+    digitsRef.current = digits;
+  }, [digits]);
+
+  // Sync parent value → internal (external reset, etc.)
+  useEffect(() => {
+    const currentCompact = digitsRef.current.join("");
+    if (value !== currentCompact) {
+      const newDigits = parseValue(value, length);
+      setDigits(newDigits);
+      digitsRef.current = newDigits;
     }
-    setOtp(nextOtp);
   }, [value, length]);
 
-  const setInputRef = (index: number): RefCallback<HTMLInputElement> => {
-    return (el) => {
-      inputRefs.current[index] = el;
-    };
-  };
+  // Auto-focus first input on mount
+  useEffect(() => {
+    inputRefs.current[0]?.focus();
+  }, []);
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
-    const val = e.target.value;
-    if (Number.isNaN(Number(val))) return;
+  // --- Helpers ---
 
-    const newOtp = [...otp];
-    newOtp[index] = val.substring(val.length - 1);
-    setOtp(newOtp);
-    onChange(newOtp.join(""));
+  const syncToParent = useCallback(
+    (nextDigits: string[]) => {
+      digitsRef.current = nextDigits;
+      setDigits(nextDigits);
+      onChange(nextDigits.join(""));
+    },
+    [onChange],
+  );
 
-    if (val && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
+  const setDigitAt = useCallback(
+    (index: number, digit: string) => {
+      const next = [...digitsRef.current];
+      next[index] = digit;
+      syncToParent(next);
+    },
+    [syncToParent],
+  );
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === "Backspace") {
-      if (!otp[index] && index > 0) {
-        const newOtp = [...otp];
-        newOtp[index - 1] = "";
-        setOtp(newOtp);
-        onChange(newOtp.join(""));
-        inputRefs.current[index - 1]?.focus();
-      } else {
-        const newOtp = [...otp];
-        newOtp[index] = "";
-        setOtp(newOtp);
-        onChange(newOtp.join(""));
-      }
-      return;
-    }
-
-    if (e.key === "ArrowLeft" && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-      return;
-    }
-
-    if (e.key === "ArrowRight" && index < length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-
-    const pastedData = e.clipboardData.getData("text").slice(0, length).split("");
-    if (pastedData.some((char) => Number.isNaN(Number(char)))) return;
-
-    const newOtp = [...otp];
-    pastedData.forEach((char, i) => {
-      if (i < length) newOtp[i] = char;
+  const focusInput = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(index, inputRefs.current.length - 1));
+    requestAnimationFrame(() => {
+      inputRefs.current[clamped]?.focus();
+      inputRefs.current[clamped]?.select();
     });
+  }, []);
 
-    setOtp(newOtp);
-    onChange(newOtp.join(""));
+  // --- Ref callback ---
 
-    const focusIndex = Math.min(pastedData.length, length - 1);
-    inputRefs.current[focusIndex]?.focus();
-  };
+  const setInputRef = useCallback(
+    (index: number): RefCallback<HTMLInputElement> =>
+      (el) => {
+        inputRefs.current[index] = el;
+      },
+    [],
+  );
+
+  // --- Event Handlers ---
+
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>, index: number) => {
+      const raw = e.target.value.replace(/\D/g, "");
+      if (!raw) return;
+
+      const digit = raw.slice(-1);
+      const current = digitsRef.current;
+
+      // If current box is filled, redirect to first empty slot
+      let targetIndex = index;
+      if (current[index]) {
+        const emptyIndex = current.findIndex((d) => !d);
+        if (emptyIndex === -1) return; // All filled
+        targetIndex = emptyIndex;
+      }
+
+      setDigitAt(targetIndex, digit);
+
+      // Auto-advance to next empty slot
+      // Note: current still has old state, so check excluding targetIndex
+      const nextEmpty = current.findIndex(
+        (d, i) => i > targetIndex && !d && i !== targetIndex,
+      );
+      if (nextEmpty !== -1) {
+        focusInput(nextEmpty);
+      } else {
+        focusInput(Math.min(targetIndex + 1, length - 1));
+      }
+    },
+    [setDigitAt, focusInput, length],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>, index: number) => {
+      const currentDigit = digitsRef.current[index];
+
+      switch (e.key) {
+        case "Backspace":
+          e.preventDefault();
+          if (currentDigit) {
+            setDigitAt(index, "");
+          } else if (index > 0) {
+            setDigitAt(index - 1, "");
+            focusInput(index - 1);
+          }
+          break;
+
+        case "Delete":
+          e.preventDefault();
+          setDigitAt(index, "");
+          break;
+
+        case "ArrowLeft":
+          e.preventDefault();
+          if (index > 0) focusInput(index - 1);
+          break;
+
+        case "ArrowRight":
+          e.preventDefault();
+          if (index < length - 1) focusInput(index + 1);
+          break;
+
+        case "Enter":
+          e.preventDefault();
+          if (
+            digitsRef.current.join("").length === length &&
+            onComplete
+          ) {
+            onComplete();
+          }
+          break;
+
+        default:
+          break;
+      }
+    },
+    [setDigitAt, focusInput, length, onComplete],
+  );
+
+  const handlePaste = useCallback(
+    (e: ClipboardEvent<HTMLInputElement>, index: number) => {
+      e.preventDefault();
+      const pastedDigits = e.clipboardData
+        .getData("text/plain")
+        .replace(/\D/g, "")
+        .slice(0, length - index)
+        .split("");
+
+      if (!pastedDigits.length) return;
+
+      const next = [...digitsRef.current];
+      pastedDigits.forEach((d, offset) => {
+        next[index + offset] = d;
+      });
+      syncToParent(next);
+
+      const nextIndex = Math.min(index + pastedDigits.length, length - 1);
+      focusInput(nextIndex);
+    },
+    [syncToParent, focusInput, length],
+  );
+
+  const handleFocus = useCallback((e: FocusEvent<HTMLInputElement>) => {
+    e.target.select();
+  }, []);
 
   return {
-    otp,
+    digits,
     setInputRef,
     handleChange,
     handleKeyDown,
     handlePaste,
+    handleFocus,
   };
 }
 
+/** Parse a compact value string into an n-element array */
+function parseValue(value: string, length: number): string[] {
+  const arr = Array(length).fill("");
+  for (let i = 0; i < Math.min(value.length, length); i++) {
+    if (/\d/.test(value[i])) {
+      arr[i] = value[i];
+    }
+  }
+  return arr;
+}

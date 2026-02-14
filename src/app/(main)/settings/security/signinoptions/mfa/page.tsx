@@ -6,13 +6,13 @@ import AuthGuard from "@/components/features/auth/AuthGuard";
 import { fetchApi } from "@/lib/api/fetch";
 
 type MfaStatus = {
-  isEnabled: boolean;
-  createdAt: string | null;
+  is_enabled: boolean;
+  created_at: string | null;
 };
 
 type MfaSetup = {
   secret: string;
-  qrCodeUrl: string;
+  qr_code_url: string;
 };
 
 export default function MfaPage() {
@@ -70,7 +70,7 @@ export default function MfaPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchApi<{ backupCodes: string[] }>(
+      const data = await fetchApi<{ backup_codes: string[] }>(
         "/v1/user/mfa/enable/verify",
         {
           method: "POST",
@@ -78,7 +78,7 @@ export default function MfaPage() {
           body: JSON.stringify({ code: verificationCode }),
         },
       );
-      setBackupCodes(data.backupCodes);
+      setBackupCodes(data.backup_codes);
       setStep("backup");
     } catch (err) {
       setError(err instanceof Error ? err.message : "検証に失敗しました");
@@ -151,17 +151,17 @@ export default function MfaPage() {
               <div className="mb-6">
                 <p className="text-lg">
                   現在の状態:{" "}
-                  <strong>{mfaStatus.isEnabled ? "有効" : "無効"}</strong>
+                  <strong>{mfaStatus.is_enabled ? "有効" : "無効"}</strong>
                 </p>
-                {mfaStatus.createdAt && (
+                {mfaStatus.created_at && (
                   <p className="mt-2 text-sm text-gray-600">
                     設定日時:{" "}
-                    {new Date(mfaStatus.createdAt).toLocaleString("ja-JP")}
+                    {new Date(mfaStatus.created_at).toLocaleString("ja-JP")}
                   </p>
                 )}
               </div>
 
-              {!mfaStatus.isEnabled ? (
+              {!mfaStatus.is_enabled ? (
                 <button
                   onClick={startMfaSetup}
                   disabled={loading}
@@ -192,7 +192,7 @@ export default function MfaPage() {
               </p>
 
               <div className="mb-6 flex justify-center">
-                <QRCodeSVG value={setupData.qrCodeUrl} size={256} />
+                <QRCodeSVG value={setupData.qr_code_url} size={256} />
               </div>
 
               <div className="mb-6 rounded bg-gray-100 p-4">
@@ -251,7 +251,7 @@ export default function MfaPage() {
             </div>
           )}
 
-          {step === "backup" && backupCodes.length > 0 && (
+          {step === "backup" && backupCodes && backupCodes.length > 0 && (
             <div>
               <h2 className="mb-4 text-xl font-bold">
                 ステップ3: バックアップコードを保存

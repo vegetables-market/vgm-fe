@@ -12,17 +12,23 @@ function ChallengeContainerInner() {
   const flowId = searchParams.get("flow_id");
   const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
   const action = searchParams.get("action");
-  const maskedEmail = searchParams.get("masked_email");
+  const displayEmail = searchParams.get("email") || searchParams.get("masked_email");
   const expiresAt = searchParams.get("expires_at");
   const nextResendAt = searchParams.get("next_resend_at");
   const redirectTo = searchParams.get("redirect_to");
+  const returnTo = searchParams.get("return_to");
+  const username = searchParams.get("username");
 
   // Determine Mode
   let mode: VerificationMode | null = null;
   if (action) {
-    mode = typeParam === "totp" ? "totp" : "email"; // Simple heuristic for action
+    if (typeParam === "totp") mode = "totp";
+    else if (typeParam === "password") mode = "password";
+    else mode = "email"; // Default check for action
   } else if (typeParam === "totp") {
     mode = "totp";
+  } else if (typeParam === "password") {
+    mode = "password";
   } else if (typeParam === "email" || flowId) {
     mode = "email";
   }
@@ -36,19 +42,33 @@ function ChallengeContainerInner() {
     flowId,
     mfaToken,
     action,
-    identifier: mode === "totp" ? mfaToken : flowId,
+    identifier: mode === "totp" ? mfaToken : (mode === "password" ? username : flowId),
+    displayEmail,
     redirectTo,
     expiresAt,
     nextResendAt,
   });
 
+  const handleReturn = () => {
+      // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
+      if (returnTo) {
+          const target = decodeURIComponent(returnTo);
+          window.location.href = target;
+          return;
+      }
+      
+      // Default fallback
+      window.location.href = "/login";
+  };
+
   return (
     <ChallengeForm
+      key={safeMode}
       mode={safeMode}
       action={action}
-      maskedEmail={maskedEmail}
+      identifier={mode === "totp" ? mfaToken : (mode === "password" ? username : displayEmail)}
       logic={logic}
-      onReturnToLogin={() => (window.location.href = "/login")} // Or use router
+      onReturnToLogin={handleReturn}
     />
   );
 }

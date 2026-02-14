@@ -1,10 +1,14 @@
+import { useState } from "react";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import { VerificationMode } from "@/types/auth/core";
 import VerificationInput from "@/components/ui/auth/verification/VerificationInput";
 import VerificationResend from "@/components/ui/auth/verification/VerificationResend";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
+import AuthInput from "@/components/ui/auth/AuthInput";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
+import { FaCircleChevronLeft } from "react-icons/fa6";
+import AuthSubTitle from "@/components/ui/auth/AuthSubTitle";
 
 // Type derived from the hook return type
 type ChallengeLogic = ReturnType<typeof useChallengeLogic>;
@@ -12,7 +16,7 @@ type ChallengeLogic = ReturnType<typeof useChallengeLogic>;
 interface ChallengeFormProps {
   mode: VerificationMode;
   action: string | null;
-  maskedEmail: string | null;
+  identifier?: string | null;
   logic: ChallengeLogic;
   onReturnToLogin: () => void;
 }
@@ -20,7 +24,7 @@ interface ChallengeFormProps {
 export default function ChallengeForm({
   mode,
   action,
-  maskedEmail,
+  identifier,
   logic,
   onReturnToLogin,
 }: ChallengeFormProps) {
@@ -34,105 +38,145 @@ export default function ChallengeForm({
     timeLeft,
     resendCooldown,
     isResendSupported,
+    displayEmail,
     onResend,
     onSubmit,
   } = logic;
 
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((prev) => !prev);
+  };
+
   // --- UI Text Helpers ---
   const getTitle = () => {
-    if (action) return "セキュリティ確認";
+    if (action) return "本人確認";
     if (mode === "totp") return "2段階認証";
+    if (mode === "password") return "パスワード確認";
     return "メール認証";
   };
 
   const getDescription = () => {
     if (mode === "totp") {
       return (
-        <div className="text-center text-sm text-gray-300">
-          認証アプリに表示されている
-          <br />
-          6桁のコードを入力してください。
-        </div>
+        <AuthSubTitle>
+          認証アプリに表示されている6桁のコードを入力してください。
+        </AuthSubTitle>
       );
+    }
+    if (mode === "password") {
+      return <AuthSubTitle>パスワードを入力してください</AuthSubTitle>;
     }
     // Default: Email
     return (
-      <div className="text-center text-sm text-gray-300">
-        {maskedEmail && (
-          <div className="mb-4 text-center">
-            <p className="text-sm font-bold text-white">{maskedEmail}</p>
-          </div>
-        )}
-        登録したメールアドレスに送信された
-        <br />
-        6桁の認証コードを入力してください。
-      </div>
+      <AuthSubTitle>
+        {displayEmail && <>{displayEmail}に</>}
+        送信された6桁のコードを入力してください。
+      </AuthSubTitle>
     );
   };
 
   const getButtonLabel = () => {
-    if (action === "delete_account") return "削除する";
     return "認証する";
   };
 
+  // Check if input is valid for button enablement
+  const isSubmitDisabled = () => {
+    if (mode === "password") {
+      return !code || code.length < 8; // Simple check
+    }
+    return code.length !== 6;
+  };
+
   return (
-    <div className="flex w-75 flex-col items-center">
-      <AuthTitle>{getTitle()}</AuthTitle>
+    <>
+      {/* Back Button */}
+      <FaCircleChevronLeft
+        className="absolute top-8 left-8 cursor-pointer text-3xl transition-colors hover:text-gray-300"
+        onClick={onReturnToLogin}
+      />
+      <div className="flex w-75 flex-col items-center">
+        <AuthTitle>{getTitle()}</AuthTitle>
 
-      {error && (
-        <AuthStatusMessage message={error} variant="error" className="mb-4" />
-      )}
-
-      <div className="flex flex-col items-center">
-        {/* Description */}
-        <div className="mb-6">{getDescription()}</div>
-
-        {/* Input */}
-        <VerificationInput
-          value={code}
-          onChange={setCode}
-          onEnter={onSubmit}
-          isLoading={isLoading}
-        />
-
-        {/* Status Message (Success) */}
+        {error && (
+          <AuthStatusMessage message={error} variant="error" className="mb-4" />
+        )}
         {successMsg && (
-          <div className="mb-4 text-center text-sm text-green-400">
-            {successMsg}
-          </div>
+          <AuthStatusMessage
+            message={successMsg}
+            variant="success"
+            className="mb-4"
+          />
         )}
 
-        {/* Submit Button */}
-        <div className="w-full max-w-[280px]">
+        <section className="w-full">
+          {/* サブタイトル */}
+          {getDescription()}
+          
+          {/* ブラウザ・パスワードマネージャー用 隠しユーザー名フィールド */}
+          {mode === "password" && identifier && (
+            <AuthInput
+              label="ユーザー名" // ラベルは空でも良いが、アクセシビリティ的にはあったほうが良いかも？でもhiddenなので関係ない
+              name="username"
+              value={identifier}
+              readOnly
+              autoComplete="username"
+              className="hidden"
+              tabIndex={-1}
+            />
+          )}
+
+          {/* パスワードの際 */}
+          {mode === "password" && (
+            <AuthInput
+              label="パスワード"
+              name="password"
+              type={isPasswordVisible ? "text" : "password"}
+              value={code} // Reuse code state for password
+              onChange={(e) => setCode(e.target.value)}
+              onTogglePasswordVisibility={togglePasswordVisibility}
+              isPasswordVisible={isPasswordVisible}
+              hasError={!!error}
+              autoComplete="current-password"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  onSubmit();
+                }
+              }}
+            />
+          )}
+          {/* 6桁の場合。 */}
+          {mode !== "password" && (
+            <VerificationInput
+              value={code}
+              onChange={setCode}
+              onEnter={onSubmit}
+              isLoading={isLoading}
+              autoComplete={mode === "totp" ? "off" : "one-time-code"}
+            />
+          )}
+
+          {/* 決定ボタン */}
           <AuthSubmitButton
             onClick={onSubmit}
             isLoading={isLoading}
-            disabled={code.length !== 6}
+            disabled={isSubmitDisabled()}
           >
             {getButtonLabel()}
           </AuthSubmitButton>
-        </div>
-
-        {/* Resend Control (Only if supported) */}
-        {isResendSupported && (
-          <VerificationResend
-            onResend={onResend}
-            isResending={isResending}
-            timeLeft={timeLeft}
-            resendCooldown={resendCooldown}
-          />
-        )}
+          {/* Resend Control (Only if supported) */}
+          {isResendSupported && mode !== "password" && (
+            <VerificationResend
+              onResend={onResend}
+              isResending={isResending}
+              timeLeft={timeLeft}
+              resendCooldown={resendCooldown}
+            />
+          )}
+        </section>
       </div>
-
-      <div className="mt-6 flex w-full flex-col items-center justify-center gap-4">
-        <button
-          onClick={onReturnToLogin}
-          type="button"
-          className="cursor-pointer border-none bg-transparent text-xs text-zinc-500 underline transition-colors hover:text-zinc-300"
-        >
-          {action === "delete_account" ? "設定に戻る" : "ログイン画面に戻る"}
-        </button>
-      </div>
-    </div>
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 
-type SignupEmailVerificationProps = {
+type SignupVerifyEmailProps = {
   flowId: string | null;
   displayEmail?: string | null;
   expiresAt?: string | null;
@@ -9,13 +9,13 @@ type SignupEmailVerificationProps = {
   redirectTo?: string | null;
 };
 
-export default function SignupEmailVerification({
+export default function SignupVerifyEmail({
   flowId,
   displayEmail,
   expiresAt,
   onVerifiedAction,
   redirectTo,
-}: SignupEmailVerificationProps) {
+}: SignupVerifyEmailProps) {
   const logic = useChallengeLogic({
     mode: "email",
     flowId,

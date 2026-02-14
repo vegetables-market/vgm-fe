@@ -1,4 +1,4 @@
-export type VerificationMode = "email" | "email_mfa" | "totp";
+export type VerificationMode = "email" | "email_mfa" | "totp" | "password";
 
 export interface UserInfo {
   username: string;
