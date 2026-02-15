@@ -25,5 +25,7 @@ export interface LoginResponse {
   requireTotp?: boolean;
   mfa_token?: string;
   mfa_type?: string;
+  expires_at?: string;
+  next_resend_at?: string;
 }
 

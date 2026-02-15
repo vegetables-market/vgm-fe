@@ -52,4 +52,11 @@ export const recoveryApi = {
       body: JSON.stringify({ token, new_password: newPassword }),
     });
   },
+
+  forgotId: async (email: string): Promise<void> => {
+    return fetchApi(API_ENDPOINTS.RECOVERY_ID_REMINDER, {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
 };

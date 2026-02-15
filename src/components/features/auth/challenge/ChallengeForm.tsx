@@ -35,7 +35,6 @@ export default function ChallengeForm({
     successMsg,
     isLoading,
     isResending,
-    timeLeft,
     resendCooldown,
     isResendSupported,
     displayEmail,
@@ -183,7 +182,6 @@ export default function ChallengeForm({
             <VerificationResend
               onResend={onResend}
               isResending={isResending}
-              timeLeft={timeLeft}
               resendCooldown={resendCooldown}
             />
           )}

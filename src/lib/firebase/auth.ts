@@ -3,8 +3,13 @@ import { getFirebaseAuth } from "./config";
 
 export const loginWithGoogle = async (): Promise<string> => {
   try {
-    const { GoogleAuthProvider, signInWithPopup } = await import("firebase/auth");
-    const result: UserCredential = await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
+    const { GoogleAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      new GoogleAuthProvider(),
+    );
+
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -16,7 +21,10 @@ export const loginWithGoogle = async (): Promise<string> => {
 export const loginWithMicrosoft = async (): Promise<string> => {
   try {
     const { OAuthProvider, signInWithPopup } = await import("firebase/auth");
-    const result: UserCredential = await signInWithPopup(getFirebaseAuth(), new OAuthProvider('microsoft.com'));
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      new OAuthProvider("microsoft.com"),
+    );
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -27,8 +35,12 @@ export const loginWithMicrosoft = async (): Promise<string> => {
 
 export const loginWithGithub = async (): Promise<string> => {
   try {
-    const { GithubAuthProvider, signInWithPopup } = await import("firebase/auth");
-    const result: UserCredential = await signInWithPopup(getFirebaseAuth(), new GithubAuthProvider());
+    const { GithubAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      new GithubAuthProvider(),
+    );
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -36,5 +48,3 @@ export const loginWithGithub = async (): Promise<string> => {
     throw error;
   }
 };
-
-

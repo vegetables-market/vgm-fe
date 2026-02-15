@@ -53,8 +53,7 @@ export function useChallengeLogic({
   useEffect(() => {
     setCode("");
     setError("");
-    setSuccessMsg("");
-  }, [mode, flowId, mfaToken, identifier, setCode, setError, setSuccessMsg]);
+  }, [mode, flowId, mfaToken, identifier, setCode, setError]);
 
   const router = useRouter();
   const { login: authLogin } = useAuth();
@@ -70,6 +69,7 @@ export function useChallengeLogic({
     flowId,
     nextResendAt,
     redirectTo,
+    maskedEmail: displayEmail,
     setError,
     setSuccessMsg: setSuccessMsg as (msg: string) => void,
     verificationType: mode === "email_mfa" ? "email_mfa" : "email",
@@ -181,18 +181,47 @@ export function useChallengeLogic({
         const data = await login({ username: identifier, password: code });
 
         if (data.status === "MFA_REQUIRED" && data.mfa_token) {
-          // TOTP MFAへ遷移
+          // TOTP/Email MFAへ遷移
           const mfaType = data.mfa_type?.toLowerCase() || "totp";
+          const queryParams = new URLSearchParams();
+          queryParams.set("type", mfaType);
+          queryParams.set("token", data.mfa_token);
+          if (data.masked_email) {
+            queryParams.set("masked_email", data.masked_email);
+          }
+          if (data.flow_id) {
+            queryParams.set("flow_id", data.flow_id);
+          }
+          if (data.expires_at) {
+            queryParams.set("expires_at", data.expires_at);
+          }
+          if (data.next_resend_at) {
+            queryParams.set("next_resend_at", data.next_resend_at);
+          }
+          
           const nextUrl = withRedirectTo(
-            `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
+            `/challenge?${queryParams.toString()}`,
             redirectTo,
           );
           router.push(nextUrl);
           return;
         } else if (data.require_verification && data.flow_id) {
           // Email Verificationへ遷移
+          const queryParams = new URLSearchParams();
+          queryParams.set("type", "email");
+          queryParams.set("flow_id", data.flow_id);
+          if (data.masked_email) {
+            queryParams.set("masked_email", data.masked_email);
+          }
+          if (data.expires_at) {
+            queryParams.set("expires_at", data.expires_at);
+          }
+          if (data.next_resend_at) {
+            queryParams.set("next_resend_at", data.next_resend_at);
+          }
+
           const nextUrl = withRedirectTo(
-            `/challenge?type=email&flow_id=${data.flow_id}`,
+            `/challenge?${queryParams.toString()}`,
             redirectTo,
           );
           router.push(nextUrl);

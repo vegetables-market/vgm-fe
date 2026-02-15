@@ -30,5 +30,6 @@ export const API_ENDPOINTS = {
     RECOVERY_SEND: '/v1/auth/recovery/send',
     RECOVERY_VERIFY: '/v1/auth/recovery/verify',
     RECOVERY_COMPLETE: '/v1/auth/recovery/complete',
+    RECOVERY_ID_REMINDER: '/v1/auth/recovery/forgot-id',
     PASSWORD_RESET: '/v1/auth/password/reset',
 } as const;

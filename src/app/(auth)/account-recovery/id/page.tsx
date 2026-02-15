@@ -1,42 +1,91 @@
+"use client";
+
+import { useState } from "react";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
-import AuthSubTitle from "@/components/ui/auth/AuthSubTitle";
-import { FaCircleChevronLeft } from "react-icons/fa6";
+import { FaCircleChevronLeft, FaEnvelope } from "react-icons/fa6";
+import AuthInput from "@/components/ui/auth/AuthInput";
+import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
+import Link from "next/link";
+import { recoveryApi } from "@/lib/api/auth/recovery";
 
 export default function ForgotIdPage() {
-  return (
-       <div className="relative flex w-full flex-col items-center">
-            {/* Back Button */}
-            <a href="/login" className="absolute top-0 left-0 p-4">
-                 <FaCircleChevronLeft className="text-3xl text-gray-400 hover:text-gray-200 transition-colors" />
-            </a>
+  const [email, setEmail] = useState("");
+  const [isSent, setIsSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-            <div className="flex w-75 flex-col items-center mt-12">
-                <AuthTitle>IDを忘れた場合</AuthTitle>
-                <div className="w-full bg-white/5 p-6 rounded-lg border border-white/10 mt-6">
-                    <div className="text-center mb-4">
-                        <AuthSubTitle>
-                            サポートにお問い合わせください
-                        </AuthSubTitle>
-                    </div>
-                    <p className="text-gray-300 text-sm leading-relaxed mb-4">
-                        セキュリティ上の理由により、ユーザーIDの直接の確認機能は提供しておりません。
-                        もし登録済みのメールアドレスを覚えている場合は、パスワード再設定を試みることで、
-                        受信したメールにユーザーIDが記載されている場合があります。
-                    </p>
-                    <p className="text-gray-300 text-sm leading-relaxed">
-                        それでも解決しない場合は、以下のリンクからサポートにお問い合わせください。
-                    </p>
-                    
-                    <div className="mt-6 text-center">
-                        <a 
-                            href="mailto:support@example.com" 
-                            className="bg-primary text-white px-6 py-2 rounded-full hover:bg-primary-hover transition-colors inline-block"
-                        >
-                            サポートへ問い合わせる
-                        </a>
-                    </div>
-                </div>
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    setIsLoading(true);
+    try {
+      await recoveryApi.forgotId(email);
+    } catch (error) {
+      // Error is explicitly ignored for security (prevention of enumeration)
+      console.error("Forgot ID error:", error);
+    } finally {
+      setIsLoading(false);
+      setIsSent(true);
+    }
+  };
+
+  return (
+    <div className="flex w-full flex-col items-center">
+      {/* Back Button */}
+      <Link href="/login" className="absolute top-8 left-8">
+        <FaCircleChevronLeft className="text-3xl transition-colors" />
+      </Link>
+
+      <div className="flex w-75 max-w-md flex-col items-center">
+        <AuthTitle>メールアドレスを探す</AuthTitle>
+
+        {isSent ? (
+          <div className="animate-in fade-in zoom-in bg-background w-full rounded-lg border p-6 text-center duration-300">
+            <div className="mb-4 flex justify-center">
+              <div className="bg-primary/20 rounded-full p-4">
+                <FaEnvelope className="text-primary text-3xl" />
+              </div>
             </div>
-       </div>
+            <h3 className="mb-2 text-xl font-bold text-white">
+              メールを送信しました
+            </h3>
+            <p className="mb-6 text-sm leading-relaxed text-gray-300">
+              入力されたメールアドレスが登録済み（予備メール等）の場合、ログインIDを記載したメールを送信しました。
+            </p>
+            <p className="mb-6 text-xs text-gray-400">
+              届かない場合は、迷惑メールフォルダを確認するか、別のメールアドレスをお試しください。
+            </p>
+            <Link
+              href="/login"
+              className="bg-primary hover:bg-primary-hover block w-full rounded-md px-6 py-3 text-center font-bold text-white transition-colors"
+            >
+              ログイン画面へ戻る
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="w-full">
+            <div className="mb-6 text-center">
+              <p className="text-sm leading-relaxed text-gray-300">
+                再設定用のメールアドレスを入力してください
+              </p>
+            </div>
+
+            <AuthInput
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="name@example.com"
+              label="予備メールアドレス"
+              required
+              disabled={isLoading}
+            />
+
+            <AuthSubmitButton disabled={isLoading || !email}>
+              {isLoading ? "送信中..." : "IDを確認する"}
+            </AuthSubmitButton>
+          </form>
+        )}
+      </div>
+    </div>
   );
 }

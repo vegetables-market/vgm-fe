@@ -9,6 +9,7 @@ type UseChallengeResendParams = {
   flowId?: string | null;
   nextResendAt?: string | null;
   redirectTo?: string | null;
+  maskedEmail?: string | null;
   setError: (msg: string) => void;
   setSuccessMsg: (msg: string) => void;
   verificationType?: "email" | "email_mfa"; // For URL parameter construction
@@ -19,6 +20,7 @@ export function useChallengeResend({
   flowId,
   nextResendAt,
   redirectTo,
+  maskedEmail,
   setError,
   setSuccessMsg,
   verificationType = "email",
@@ -48,14 +50,19 @@ export function useChallengeResend({
       setSuccessMsg("認証コードを再送しました。");
 
       // Reload page with new params
-      // Default to email params, but support email_mfa if needed
-      let base = `/challenge?type=${verificationType}&flow_id=${data.flow_id}&expires_at=${data.expires_at}&next_resend_at=${data.next_resend_at}`;
-      
+      const params = new URLSearchParams();
+      params.set("type", verificationType);
+      params.set("flow_id", data.flow_id);
+      params.set("next_resend_at", data.next_resend_at);
+      params.set("resent", "true");
+      if (maskedEmail) {
+        params.set("masked_email", maskedEmail);
+      }
       if (verificationType === "email_mfa" && token) {
-         base += `&token=${encodeURIComponent(token)}`;
+        params.set("token", token);
       }
 
-      const newUrl = withRedirectTo(base, redirectTo);
+      const newUrl = withRedirectTo(`/challenge?${params.toString()}`, redirectTo);
       router.replace(newUrl);
     } catch (err: any) {
       if (
