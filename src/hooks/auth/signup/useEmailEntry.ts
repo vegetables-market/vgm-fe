@@ -50,6 +50,7 @@ export function useEmailEntry({
         if (result.next_resend_at) {
           params.set("next_resend_at", result.next_resend_at);
         }
+        params.set("signup", "true");
         if (redirectTo) params.set("redirect_to", redirectTo);
 
         router.push(`/challenge?${params.toString()}`);

@@ -18,6 +18,9 @@ function ChallengeContainerInner() {
   const redirectTo = searchParams.get("redirect_to");
   const returnTo = searchParams.get("return_to");
   const username = searchParams.get("username");
+  const isSignup = searchParams.get("signup") === "true";
+
+  const router = useRouter();
 
   // Determine Mode
   let mode: VerificationMode | null = null;
@@ -37,6 +40,18 @@ function ChallengeContainerInner() {
   // For safety, default to email if flowId exists
   const safeMode = mode || "email";
 
+  // 新規登録フローの場合、検証成功後にsignupページへリダイレクト
+  const handleSignupVerified = isSignup
+    ? () => {
+        const params = new URLSearchParams();
+        if (flowId) params.set("flow_id", flowId);
+        if (displayEmail) params.set("email", displayEmail);
+        params.set("verified", "true");
+        if (redirectTo) params.set("redirect_to", redirectTo);
+        router.push(`/signup?${params.toString()}`);
+      }
+    : undefined;
+
   const logic = useChallengeLogic({
     mode: safeMode,
     flowId,
@@ -47,9 +62,8 @@ function ChallengeContainerInner() {
     redirectTo,
     expiresAt,
     nextResendAt,
+    onVerifiedAction: handleSignupVerified,
   });
-
-  const router = useRouter();
 
   const handleReturn = () => {
       // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it

@@ -8,7 +8,6 @@ import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import VerificationInput from "@/components/ui/auth/verification/VerificationInput";
 import { FaEnvelope, FaMobileScreen } from "react-icons/fa6";
-import { getErrorMessage } from "@/lib/api/error-handler";
 
 type RecoveryStep = "LOADING" | "OPTIONS" | "VERIFY" | "COMPLETED";
 
@@ -44,7 +43,8 @@ export default function PasswordRecoveryContainer() {
            setStep("OPTIONS");
         }
       } catch (err) {
-        setError(getErrorMessage(err) || "オプションの取得に失敗しました。");
+        // Generic error message
+        setError("オプションの取得に失敗しました。");
       }
     };
     fetchOptions();
@@ -62,7 +62,7 @@ export default function PasswordRecoveryContainer() {
       setSelectedMethod(method);
       setStep("VERIFY");
     } catch (err) {
-      setError(getErrorMessage(err) || "コードの送信に失敗しました。");
+      setError("コードの送信に失敗しました。");
     } finally {
       setIsLoading(false);
     }
@@ -73,12 +73,17 @@ export default function PasswordRecoveryContainer() {
     setIsLoading(true);
     setError("");
     try {
-      await recoveryApi.verifyChallenge(state, selectedMethod, code);
-      // If verify success, complete recovery
-      await recoveryApi.completeRecovery(state);
-      setStep("COMPLETED");
+      const res = await recoveryApi.verifyChallenge(state, selectedMethod, code);
+      
+      if (res.verified) {
+        // If verify success, complete recovery
+        await recoveryApi.completeRecovery(state);
+        setStep("COMPLETED");
+      } else {
+        setError("認証に失敗しました。コードを確認してください。");
+      }
     } catch (err) {
-      setError(getErrorMessage(err) || "認証に失敗しました。コードを確認してください。");
+      setError("認証に失敗しました。コードを確認してください。");
     } finally {
       setIsLoading(false);
     }
@@ -175,8 +180,10 @@ export default function PasswordRecoveryContainer() {
 
       {step === "COMPLETED" && (
         <div className="text-center w-full">
-            <p className="mb-6 text-gray-300">
-                パスワード再設定用のメールを送信しました。<br />
+            <p className="mb-6 text-gray-300 text-sm leading-relaxed">
+                アカウントが存在し、条件を満たしていればメールを送信しました。<br />
+                数分待っても届かない場合は、入力内容をご確認ください。<br />
+                <br />
                 メール内のリンクからパスワードの再設定を行ってください。
             </p>
             <AuthSubmitButton onClick={() => router.push("/login")}>

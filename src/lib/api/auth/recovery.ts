@@ -9,6 +9,10 @@ export interface GetOptionsResponse {
   options: string[];
 }
 
+export interface VerifyChallengeResponse {
+  verified: boolean;
+}
+
 export const recoveryApi = {
   start: async (username: string): Promise<StartRecoveryResponse> => {
     return fetchApi<StartRecoveryResponse>(API_ENDPOINTS.RECOVERY_START, {
@@ -28,8 +32,8 @@ export const recoveryApi = {
     });
   },
 
-  verifyChallenge: async (state: string, method: string, code: string): Promise<void> => {
-    return fetchApi(API_ENDPOINTS.RECOVERY_VERIFY, {
+  verifyChallenge: async (state: string, method: string, code: string): Promise<VerifyChallengeResponse> => {
+    return fetchApi<VerifyChallengeResponse>(API_ENDPOINTS.RECOVERY_VERIFY, {
       method: "POST",
       body: JSON.stringify({ state, method, code }),
     });

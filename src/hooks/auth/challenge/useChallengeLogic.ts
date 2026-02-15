@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
 import { verifyAuthCode } from "@/services/auth/verify-auth-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
@@ -59,6 +59,7 @@ export function useChallengeLogic({
   const router = useRouter();
   const { login: authLogin } = useAuth();
   const { pushRedirect } = useSafeRedirect();
+  const isSubmittingRef = useRef(false);
 
   // --- Resend Logic ---
   // Only applicable for "email" and "email_mfa" modes.
@@ -105,6 +106,10 @@ export function useChallengeLogic({
       setError("パスワードを入力してください。");
       return;
     }
+
+    // useRef で即時ガード（React state は非同期なので二重送信を防げない）
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
 
     setIsLoading(true);
     setError("");
@@ -211,6 +216,7 @@ export function useChallengeLogic({
       handleGlobalError(err, router);
     } finally {
       setIsLoading(false);
+      isSubmittingRef.current = false;
     }
   };
 
