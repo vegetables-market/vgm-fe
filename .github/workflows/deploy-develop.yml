@@ -1,9 +1,9 @@
-name: Deploy to Cloudflare Pages (Develop)
+name: Home Deploy (Develop)
 
 on:
   push:
-    # すべてのブランチが対象
-  pull_request:
+    branches:
+      - develop
 
 jobs:
   deploy:
@@ -13,46 +13,33 @@ jobs:
       deployments: write
       pull-requests: write
 
-    name: Build and Deploy (Develop)
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build & push web image (dev)
+        uses: docker/build-push-action@v6
         with:
-          node-version: "20"
+          context: ./web
+          push: true
+          tags: ghcr.io/vegetables-market/vgm-web:dev
+          build-args: |
+            NODE_ENV=production
+            NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_DEV_API_URL }}
+            NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
 
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-        env:
-          NODE_ENV: production
-          NEXT_PUBLIC_API_BASE_URL: ${{ vars.API_URL_DEV }}
-          NEXT_PUBLIC_MEDIA_URL: ${{ vars.MEDIA_URL_DEV }}
-
-      - name: Deploy to Cloudflare Pages
-        id: cf-deploy
-        uses: cloudflare/wrangler-action@v3
+      - name: Build & push be image (dev)
+        uses: docker/build-push-action@v6
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # deploy to the specific branch or let Cloudflare handle it (defaults to branch name for non-prod)
-          command: pages deploy out --project-name=vgm-app
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          context: ./be
+          push: true
+          tags: ghcr.io/vegetables-market/vgm-be:dev
 
-      - name: Comment Deployment URL on PR
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        with:
-          script: |
-            const url = '${{ steps.cf-deploy.outputs.deployment-url }}';
-            const body = `### 🚀 Deploy Success! (Develop/Preview)\n\nPreview URL: **[${url}](${url})**`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,halnagoyap@ssw0rd
-              repo: context.repo.repo,
-              body: body
-            })
+      - name: Trigger Portainer dev webhook (via Cloudflare Access)
+        run: |
+          curl -fsS "${{ secrets.PORTAINER_DEV_WEBHOOK_URL }}" \
+            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}"
