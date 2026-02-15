@@ -9,7 +9,6 @@ import AuthInput from "@/components/ui/auth/AuthInput";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthSubTitle from "@/components/ui/auth/AuthSubTitle";
-import AuthRecoveryText from "@/components/ui/auth/AuthRecoveryText";
 
 // Type derived from the hook return type
 type ChallengeLogic = ReturnType<typeof useChallengeLogic>;

@@ -31,7 +31,7 @@ export default function SignupEmailVerification({
       action={null}
       identifier={displayEmail}
       logic={logic}
-      onReturnToLogin={() => (window.location.href = "/login")}
+      onBack={() => (window.location.href = "/login")}
     />
   );
 }
