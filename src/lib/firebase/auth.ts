@@ -5,9 +5,14 @@ export const loginWithGoogle = async (): Promise<string> => {
   try {
     const { GoogleAuthProvider, signInWithPopup } =
       await import("firebase/auth");
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+
     const result: UserCredential = await signInWithPopup(
       getFirebaseAuth(),
-      new GoogleAuthProvider(),
+      provider,
     );
 
     const token = await result.user.getIdToken();
@@ -21,9 +26,13 @@ export const loginWithGoogle = async (): Promise<string> => {
 export const loginWithMicrosoft = async (): Promise<string> => {
   try {
     const { OAuthProvider, signInWithPopup } = await import("firebase/auth");
+    const provider = new OAuthProvider("microsoft.com");
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
     const result: UserCredential = await signInWithPopup(
       getFirebaseAuth(),
-      new OAuthProvider("microsoft.com"),
+      provider,
     );
     const token = await result.user.getIdToken();
     return token;
@@ -37,9 +46,13 @@ export const loginWithGithub = async (): Promise<string> => {
   try {
     const { GithubAuthProvider, signInWithPopup } =
       await import("firebase/auth");
+    const provider = new GithubAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
     const result: UserCredential = await signInWithPopup(
       getFirebaseAuth(),
-      new GithubAuthProvider(),
+      provider,
     );
     const token = await result.user.getIdToken();
     return token;
