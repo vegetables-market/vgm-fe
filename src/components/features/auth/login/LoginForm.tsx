@@ -6,11 +6,11 @@ import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import OrDivider from "@/components/ui/auth/OrDivider";
 import type { LoginFormProps } from "@/types/auth/login-components";
+import AuthRecoveryText from "@/components/ui/auth/AuthRecoveryText";
 
 export default function LoginForm({ state, actions }: LoginFormProps) {
-  const { step, emailOrUsername, password, error, isLoading, redirectTo } =
-    state;
-  const { setEmailOrUsername, setPassword, onSubmit, addLog } = actions;
+  const { emailOrUsername, error, isLoading, redirectTo } = state;
+  const { setEmailOrUsername, onSubmit, addLog } = actions;
 
   return (
     <div className="flex w-75 flex-col items-center">
@@ -25,7 +25,7 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
 
       {error && <AuthStatusMessage message={error} variant="error" />}
 
-      <div className="mb-3">
+      <div className="">
         <form onSubmit={onSubmit}>
           <AuthInput
             label="メールアドレスまたはユーザーID"
@@ -34,21 +34,8 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
             onChange={(e) => setEmailOrUsername(e.target.value)}
           />
 
-          {step === "password" && (
-            <AuthInput
-              label="パスワード"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="パスワード"
-              autoFocus
-              disabled={isLoading}
-            />
-          )}
-
           <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
             つぎへ
-            {/*{step === "email" ? "次へ" : "ログイン"}*/}
           </AuthSubmitButton>
         </form>
       </div>
@@ -57,6 +44,12 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
         promptText="アカウントを"
         linkText="新規登録する"
         href="/signup"
+        redirectTo={redirectTo}
+      />
+
+      <AuthRecoveryText
+        linkText="ログインにお困りですか？"
+        href="/account-recovery/id"
         redirectTo={redirectTo}
       />
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 import { VerificationMode } from "@/types/auth/core";
@@ -49,16 +49,18 @@ function ChallengeContainerInner() {
     nextResendAt,
   });
 
+  const router = useRouter();
+
   const handleReturn = () => {
       // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
       if (returnTo) {
           const target = decodeURIComponent(returnTo);
-          window.location.href = target;
+          router.push(target);
           return;
       }
       
-      // Default fallback
-      window.location.href = "/login";
+      // Default behavior: go back in history
+      router.back();
   };
 
   return (
@@ -68,7 +70,7 @@ function ChallengeContainerInner() {
       action={action}
       identifier={mode === "totp" ? mfaToken : (mode === "password" ? username : displayEmail)}
       logic={logic}
-      onReturnToLogin={handleReturn}
+      onBack={handleReturn}
     />
   );
 }

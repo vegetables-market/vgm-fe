@@ -9,6 +9,7 @@ import AuthInput from "@/components/ui/auth/AuthInput";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthSubTitle from "@/components/ui/auth/AuthSubTitle";
+import AuthRecoveryText from "@/components/ui/auth/AuthRecoveryText";
 
 // Type derived from the hook return type
 type ChallengeLogic = ReturnType<typeof useChallengeLogic>;
@@ -18,7 +19,7 @@ interface ChallengeFormProps {
   action: string | null;
   identifier?: string | null;
   logic: ChallengeLogic;
-  onReturnToLogin: () => void;
+  onBack: () => void;
 }
 
 export default function ChallengeForm({
@@ -26,7 +27,7 @@ export default function ChallengeForm({
   action,
   identifier,
   logic,
-  onReturnToLogin,
+  onBack,
 }: ChallengeFormProps) {
   const {
     code,
@@ -94,7 +95,7 @@ export default function ChallengeForm({
       {/* Back Button */}
       <FaCircleChevronLeft
         className="absolute top-8 left-8 cursor-pointer text-3xl transition-colors hover:text-gray-300"
-        onClick={onReturnToLogin}
+        onClick={onBack}
       />
       <div className="flex w-75 flex-col items-center">
         <AuthTitle>{getTitle()}</AuthTitle>
@@ -110,10 +111,10 @@ export default function ChallengeForm({
           />
         )}
 
-        <section className="w-full">
+        <section className="flex w-full flex-col justify-center">
           {/* サブタイトル */}
           {getDescription()}
-          
+
           {/* ブラウザ・パスワードマネージャー用 隠しユーザー名フィールド */}
           {mode === "password" && identifier && (
             <AuthInput
@@ -166,6 +167,18 @@ export default function ChallengeForm({
           >
             {getButtonLabel()}
           </AuthSubmitButton>
+
+          {mode === "password" && (
+            // <AuthRecoveryText linkText="パスワードを忘れた場合" href="/" />
+            <button
+              type="button"
+              onClick={logic.handleForgotPassword}
+              className="text-disabled-foreground hover:text-muted-foreground mx-auto cursor-pointer text-sm hover:underline"
+            >
+              パスワードを忘れた場合
+            </button>
+          )}
+
           {/* Resend Control (Only if supported) */}
           {isResendSupported && mode !== "password" && (
             <VerificationResend

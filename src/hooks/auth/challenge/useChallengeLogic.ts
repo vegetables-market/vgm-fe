@@ -64,7 +64,7 @@ export function useChallengeLogic({
   // Only applicable for "email" and "email_mfa" modes.
   // "totp" does not support resend.
   const isResendSupported = mode === "email" || mode === "email_mfa";
-  
+
   const { isResending, resendCooldown, onResend } = useChallengeResend({
     flowId,
     nextResendAt,
@@ -84,13 +84,13 @@ export function useChallengeLogic({
       localStorage.removeItem("vgm_masked_email");
       pushRedirect(redirectTo, "/");
     } else if (data.require_verification && data.flow_id) {
-       // e.g. Email MFA -> TOTP fallback or next step
-       router.push(
-          withRedirectTo(
-            `/challenge?type=email&flow_id=${data.flow_id}`,
-            redirectTo,
-          ),
-        );
+      // e.g. Email MFA -> TOTP fallback or next step
+      router.push(
+        withRedirectTo(
+          `/challenge?type=email&flow_id=${data.flow_id}`,
+          redirectTo,
+        ),
+      );
     } else {
       setError("ログインに失敗しました。");
     }
@@ -102,8 +102,8 @@ export function useChallengeLogic({
       return;
     }
     if (mode === "password" && !code) {
-       setError("パスワードを入力してください。");
-       return;
+      setError("パスワードを入力してください。");
+      return;
     }
 
     setIsLoading(true);
@@ -115,7 +115,7 @@ export function useChallengeLogic({
         // 4. Action Verification (Delete Account etc)
         const id = identifier || (mode === "totp" ? mfaToken : flowId);
         if (!id) throw new Error("識別子が見つかりません。");
-        
+
         let method = AuthMethod.EMAIL;
         if (mode === "totp") method = AuthMethod.TOTP;
         if (mode === "password") method = AuthMethod.PASSWORD;
@@ -128,14 +128,14 @@ export function useChallengeLogic({
         });
 
         setSuccessMsg("認証に成功しました。");
-        
+
         if (redirectTo) {
-            let finalRedirectUrl = redirectTo;
-            if (res.action_token) {
-                 const separator = finalRedirectUrl.includes('?') ? '&' : '?';
-                 finalRedirectUrl = `${finalRedirectUrl}${separator}action_token=${encodeURIComponent(res.action_token)}`;
-            }
-            pushRedirect(finalRedirectUrl);
+          let finalRedirectUrl = redirectTo;
+          if (res.action_token) {
+            const separator = finalRedirectUrl.includes("?") ? "&" : "?";
+            finalRedirectUrl = `${finalRedirectUrl}${separator}action_token=${encodeURIComponent(res.action_token)}`;
+          }
+          pushRedirect(finalRedirectUrl);
         }
         return;
       }
@@ -160,17 +160,15 @@ export function useChallengeLogic({
         } else {
           throw new Error("フローIDが見つかりません。");
         }
-
       } else if (mode === "totp") {
         // 2. TOTP Verification
         if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
         const data = await verifyLogin({
-            method: AuthMethod.TOTP,
-            identifier: mfaToken,
-            code,
+          method: AuthMethod.TOTP,
+          identifier: mfaToken,
+          code,
         });
         handleLoginSuccess(data);
-
       } else if (mode === "password") {
         if (!identifier) throw new Error("ユーザーIDが見つかりません。");
 
@@ -178,42 +176,59 @@ export function useChallengeLogic({
         const data = await login({ username: identifier, password: code });
 
         if (data.status === "MFA_REQUIRED" && data.mfa_token) {
-            // TOTP MFAへ遷移
-            const mfaType = data.mfa_type?.toLowerCase() || "totp";
-            const nextUrl = withRedirectTo(
-              `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
-              redirectTo
-            );
-            router.push(nextUrl);
-            return;
+          // TOTP MFAへ遷移
+          const mfaType = data.mfa_type?.toLowerCase() || "totp";
+          const nextUrl = withRedirectTo(
+            `/challenge?type=${mfaType}&token=${encodeURIComponent(data.mfa_token)}`,
+            redirectTo,
+          );
+          router.push(nextUrl);
+          return;
         } else if (data.require_verification && data.flow_id) {
-            // Email Verificationへ遷移
-            const nextUrl = withRedirectTo(
-              `/challenge?type=email&flow_id=${data.flow_id}`,
-              redirectTo
-            );
-            router.push(nextUrl);
-            return;
+          // Email Verificationへ遷移
+          const nextUrl = withRedirectTo(
+            `/challenge?type=email&flow_id=${data.flow_id}`,
+            redirectTo,
+          );
+          router.push(nextUrl);
+          return;
         } else if (data.user) {
-            // Login Success
-            handleLoginSuccess(data);
-            return;
+          // Login Success
+          handleLoginSuccess(data);
+          return;
         } else {
-            // Fallback error
-             setError("ユーザー名またはパスワードが間違っています。");
+          // Fallback error
+          setError("ユーザー名またはパスワードが間違っています。");
         }
-
       } else if (mode === "email_mfa") {
         // 3. Email MFA (Login Known Device)
-         if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-         setError("この認証モードは現在サポートされていません。");
+        if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
+        setError("この認証モードは現在サポートされていません。");
       }
-
-
     } catch (err: any) {
       const message = getErrorMessage(err);
       setError(message);
       handleGlobalError(err, router);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!identifier) {
+      setError("ユーザーIDが見つかりません。");
+      return;
+    }
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      // Lazy import to avoid circular dependency if any (though recoveryApi should be fine)
+      const { recoveryApi } = await import("@/lib/api/auth/recovery");
+      const { state } = await recoveryApi.start(identifier);
+      router.push(`/account-recovery/password?state=${state}`);
+    } catch (err: any) {
+      const message = getErrorMessage(err);
+      setError(message || "リカバリーの開始に失敗しました。");
     } finally {
       setIsLoading(false);
     }
@@ -232,5 +247,6 @@ export function useChallengeLogic({
     displayEmail: displayEmail || null,
     onResend,
     onSubmit,
+    handleForgotPassword,
   };
 }

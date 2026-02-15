@@ -24,4 +24,11 @@ export const API_ENDPOINTS = {
     PAYMENT_RELEASE_ESCROW: '/payment/release-escrow',
     PAYMENT_REFUND: '/payment/refund',
     PAYMENT_STATUS: '/payment',
+    // アカウント復元・パスワードリセット
+    RECOVERY_START: '/v1/auth/recovery/start',
+    RECOVERY_OPTIONS: '/v1/auth/recovery/options',
+    RECOVERY_SEND: '/v1/auth/recovery/send',
+    RECOVERY_VERIFY: '/v1/auth/recovery/verify',
+    RECOVERY_COMPLETE: '/v1/auth/recovery/complete',
+    PASSWORD_RESET: '/v1/auth/password/reset',
 } as const;
