@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
 
     steps:
       - name: Checkout
@@ -27,7 +28,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/vegetables-market/vgm-web:dev
+          tags: ghcr.io/yukidayo/vgm-web:dev
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_DEV_API_URL }}
