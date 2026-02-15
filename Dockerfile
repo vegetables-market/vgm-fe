@@ -16,7 +16,7 @@ ENV NODE_ENV=$NODE_ENV
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_MEDIA_URL=$NEXT_PUBLIC_MEDIA_URL
 
-RUN npm run build && npx next export
+RUN npm run build
 
 FROM node:20-alpine AS runner
 WORKDIR /app
