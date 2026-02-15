@@ -5,7 +5,8 @@ import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 import { useAuth } from "@/context/AuthContext";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
-interface LoginResponse {
+// Backend response matches snake_case strategy
+interface ApiLoginResponse {
   status: string;
   user: {
     username: string;
@@ -16,6 +17,8 @@ interface LoginResponse {
   } | null;
   flow_id?: string;
   message?: string;
+  oauth_token?: string;
+  oauth_provider?: string;
 }
 
 export function useFirebaseOAuthLogin() {
@@ -45,12 +48,33 @@ export function useFirebaseOAuthLogin() {
       }
 
       // 2. Send token to Backend
-      const response = await fetchApi<LoginResponse>(endpoint, {
+      const response = await fetchApi<ApiLoginResponse>(endpoint, {
         method: "POST",
         body: JSON.stringify({ token }),
       });
 
-      // 3. Authenticated successfully (Session Cookie set)
+      // 3. Handle specific status: OAUTH_REGISTRATION_REQUIRED
+      if (response && response.status === "OAUTH_REGISTRATION_REQUIRED" && response.oauth_token) {
+           const params = new URLSearchParams();
+           // NewUser result provides email/name in the 'user' object even if user doesn't exist in DB yet
+           params.set("email", response.user?.email || "");
+           params.set("name", response.user?.display_name || "");
+           params.set("use_oauth_session", "true");
+           
+           // Store token in sessionStorage as it might be too large for URL
+           try {
+               sessionStorage.setItem("signup_oauth_token", response.oauth_token);
+               sessionStorage.setItem("signup_oauth_provider", response.oauth_provider || "");
+           } catch (e) {
+               console.warn("Session storage failed", e);
+           }
+
+           const redirect = safeRedirectTo("/signup") + "?" + params.toString();
+           window.location.href = redirect;
+           return;
+      }
+
+      // 4. Authenticated successfully (Session Cookie set)
       if (response && response.status === "AUTHENTICATED" && response.user) {
         // Save user info to AuthContext (which also saves to localStorage)
         login({

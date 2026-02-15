@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/services/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { SignupFormData } from "@/types/auth/core";
@@ -18,6 +18,7 @@ export function useSignup(initial?: SignupInitialParams) {
   const initialEmail = initial?.email || "";
   const initialFlowId = initial?.flowId || "";
   const redirectTo = initial?.redirectTo || null;
+  const searchParams = useSearchParams();
 
   // verified=true・医メ繝｣繝ｬ繝ｳ繧ｸ逕ｻ髱｢縺ｧ隱崎ｨｼ貂医∩・峨↑繧蔚sernameEntry(2)縺九ｉ髢句ｧ・
   const [step, setStep] = useState(
@@ -46,6 +47,30 @@ export function useSignup(initial?: SignupInitialParams) {
     }
   };
 
+  // OAuth登録フローの初期化
+  useEffect(() => {
+    const useOauthSession = searchParams.get("use_oauth_session");
+    if (useOauthSession === "true") {
+       const token = sessionStorage.getItem("signup_oauth_token");
+       const provider = sessionStorage.getItem("signup_oauth_provider");
+       const email = searchParams.get("email") || "";
+       const name = searchParams.get("name") || "";
+
+       if (token) {
+           addLog("Initializing OAuth signup flow");
+           setFormData(prev => ({
+               ...prev,
+               email,
+               name, // 表示名として使用
+               oauth_token: token,
+               oauth_provider: provider || undefined
+           }));
+           // メール認証確認ステップをスキップしてユーザー名入力へ
+           setStep(2); 
+       }
+    }
+  }, [searchParams]);
+
   const handleNext = () => {
     setError("");
     setStep((prev) => prev + 1);
@@ -69,6 +94,7 @@ export function useSignup(initial?: SignupInitialParams) {
       birth_month: formData.birthMonth,
       birth_day: formData.birthDay,
       gender: formData.gender,
+      oauth_provider: formData.oauth_provider
     };
     addLog(`Submitting signup data: ${JSON.stringify(requestData)}`);
 
@@ -80,7 +106,15 @@ export function useSignup(initial?: SignupInitialParams) {
         display_name: formData.username, // display_name繧置sername縺ｧ蛻晄悄蛹・
         flow_id: formData.flow_id,
         // 繝励Ο繝輔ぅ繝ｼ繝ｫ髢｢騾｣縺ｯ逵∫払・医ヰ繝・け繧ｨ繝ｳ繝峨′Nullable縺ｾ縺溘・繝・ヵ繧ｩ繝ｫ繝亥､繧呈戟縺､蜑肴署・・
+        oauth_token: formData.oauth_token, // OAuth Tokenを含める
+        oauth_provider: formData.oauth_provider
       });
+      
+      // 成功したらセッションストレージをクリア
+      if (formData.oauth_token) {
+          sessionStorage.removeItem("signup_oauth_token");
+          sessionStorage.removeItem("signup_oauth_provider");
+      }
 
       addLog(`Signup successful: ${JSON.stringify(data)}`);
 

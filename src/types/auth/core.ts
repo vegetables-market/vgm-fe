@@ -19,6 +19,8 @@ export interface SignupFormData {
   birthDay: string;
   flow_id?: string;
   expiresAt?: string;
+  oauth_token?: string;
+  oauth_provider?: string;
 }
 
 export interface LoginResult {

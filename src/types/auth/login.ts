@@ -27,5 +27,7 @@ export interface LoginResponse {
   mfa_type?: string;
   expires_at?: string;
   next_resend_at?: string;
+  oauth_provider?: string;
+  oauth_token?: string;
 }
 

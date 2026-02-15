@@ -14,6 +14,8 @@ export interface RegisterRequest {
   birth_day?: number;
   gender?: string;
   flow_id?: string;
+  oauth_token?: string;
+  oauth_provider?: string;
 }
 
 export interface RegisterResponse {
