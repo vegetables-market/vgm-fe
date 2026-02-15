@@ -34,7 +34,6 @@ jobs:
             NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
 
       - name: Trigger Portainer dev webhook (via Cloudflare Access)
-        if: ${{ secrets.PORTAINER_DEV_WEBHOOK_URL != '' }}
         run: |
           curl -fsS "${{ secrets.PORTAINER_DEV_WEBHOOK_URL }}" \
             -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
