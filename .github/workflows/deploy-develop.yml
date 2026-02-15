@@ -3,7 +3,7 @@ name: Deploy to Cloudflare Pages (Develop)
 on:
   push:
     branches:
-      - develop
+      - '*'
   pull_request:
 
 jobs:
