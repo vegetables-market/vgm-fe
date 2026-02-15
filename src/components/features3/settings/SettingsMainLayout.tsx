@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 export default function SettingsMainLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <div className="flex-1 overflow-y-auto">

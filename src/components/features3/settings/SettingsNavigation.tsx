@@ -84,9 +84,9 @@ export default function SettingsNavigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex h-14 w-fit items-center gap-3 rounded-full p-2 pr-4 transition-all hover:bg-neutral-100 ${
-                  isActive ? "bg-white shadow-md" : ""
-                } ${item.danger ? "hover:bg-red-50" : ""}`}
+                className={`hover:bg-disabled flex h-14 w-fit items-center gap-3 rounded-full p-2 pr-4 transition-all ${
+                  isActive ? "bg-surface" : ""
+                } ${item.danger ? "hover:opacity-90" : ""}`}
               >
                 <div
                   className={`flex aspect-square h-full items-center justify-center rounded-full ${item.iconBgColor}`}
