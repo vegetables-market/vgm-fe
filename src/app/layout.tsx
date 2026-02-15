@@ -11,7 +11,6 @@ import ThemeSwitcher from "@/components/debug/ThemeSwitcher";
 
 //Viewport設定
 export const viewport: Viewport = {
-  themeColor: "#166534",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1, // アプリっぽくするために拡大縮小を無効化
@@ -111,7 +110,7 @@ export default function RootLayout({
   // デバイス判定はクライアント側で実施（DeviceInfoWrapper内部で処理）
   return (
     <html lang="ja">
-      <body className="antialiased">
+      <body className="h-dvh">
         <SerwistProvider swUrl="/sw.js">
           <ThemeProvider>
             <AuthProvider>

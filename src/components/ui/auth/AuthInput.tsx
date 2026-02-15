@@ -25,7 +25,7 @@ export default function AuthInput({
       : "border-border focus:border-muted-foreground";
 
   return (
-    <div className={`mb-3 w-full ${className}`}>
+    <div className={`mb-3 w-full ${className} min-w-0`}>
       <div className="mb-2 w-full">
         <p className="cursor-default text-[13px] font-bold">{label}</p>
       </div>

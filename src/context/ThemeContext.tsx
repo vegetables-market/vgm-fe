@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
 
 type Theme = "light" | "dark";
 
@@ -46,13 +52,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Actually, we can just render the provider. The 'theme' state defaults to 'light', which matches server.
   // The useEffect handles the update.
   // The early return `if (!mounted) return <>{children}</>` was causing the issue because it stripped the Provider.
-  
+
   // We still want to avoid rendering mismatches if possible, but providing context is essential.
   // So we just remove the early return.
-  
+
   if (!mounted) {
-     // 初期表示時は常にlightとしてProviderを提供 (フックがエラーにならないように)
-     // ただし、useEffectが走るまでクラス適用などはされない
+    // 初期表示時は常にlightとしてProviderを提供 (フックがエラーにならないように)
+    // ただし、useEffectが走るまでクラス適用などはされない
   }
 
   return (

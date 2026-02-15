@@ -29,7 +29,7 @@ export default function EmailEntry({
       {/* タイトル */}
       <AuthTitle>新規登録</AuthTitle>
 
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="w-full">
         <SignupStepHeader />
         <AuthInput
           label="メールアドレス"

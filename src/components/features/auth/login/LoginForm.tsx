@@ -13,7 +13,7 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
   const { setEmailOrUsername, onSubmit, addLog } = actions;
 
   return (
-    <div className="flex w-75 flex-col items-center">
+    <div className="flex min-w-75 flex-col items-center">
       <AuthTitle>ログイン</AuthTitle>
 
       <AuthSocialButtons
@@ -25,20 +25,18 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
 
       {error && <AuthStatusMessage message={error} variant="error" />}
 
-      <div className="">
-        <form onSubmit={onSubmit}>
-          <AuthInput
-            label="メールアドレスまたはユーザーID"
-            type="text"
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-          />
+      <form onSubmit={onSubmit} className="w-full">
+        <AuthInput
+          label="メールアドレスまたはユーザーID"
+          type="text"
+          value={emailOrUsername}
+          onChange={(e) => setEmailOrUsername(e.target.value)}
+        />
 
-          <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
-            つぎへ
-          </AuthSubmitButton>
-        </form>
-      </div>
+        <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">
+          つぎへ
+        </AuthSubmitButton>
+      </form>
 
       <AuthSwitchLink
         promptText="アカウントを"
