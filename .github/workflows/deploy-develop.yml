@@ -17,26 +17,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Build
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Build & push web image (dev)
         uses: docker/build-push-action@v6
         with:
-          context: ./web
+          context: .
+          file: ./Dockerfile
           push: true
           tags: ghcr.io/vegetables-market/vgm-web:dev
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_DEV_API_URL }}
             NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
-
-      - name: Build & push be image (dev)
-        uses: docker/build-push-action@v6
-        with:
-          context: ./be
-          push: true
-          tags: ghcr.io/vegetables-market/vgm-be:dev
 
       - name: Trigger Portainer dev webhook (via Cloudflare Access)
         run: |
