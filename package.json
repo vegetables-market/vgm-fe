@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "concurrently \"serwist build --watch\" \"next dev\"",
     "build": "serwist build && next build",
+    "workers:build": "open-next build --cloudflare",
     "start": "next start",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -31,6 +32,7 @@
     "use-debounce": "^10.0.5"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.16.5",
     "@eslint/eslintrc": "^3.2.0",
     "@serwist/cli": "^9.0.9",
     "@tailwindcss/postcss": "^4.1.17",
