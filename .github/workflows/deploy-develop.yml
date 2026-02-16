@@ -40,8 +40,13 @@ jobs:
             NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
 
       - name: Trigger home deploy webhook (Cloudflare Access)
+        env:
+          URL: ${{ secrets.HOME_DEPLOY_WEBHOOK_URL }}
+          CF_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
-          curl -fsS "${{ secrets.HOME_DEPLOY_WEBHOOK_URL }}" \
-            -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
-            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+          curl -fsS "$URL" \
+            -H "CF-Access-Client-Id: $CF_ID" \
+            -H "CF-Access-Client-Secret: $CF_SECRET" \
             --max-time 120
+
