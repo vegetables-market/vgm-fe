@@ -39,8 +39,9 @@ jobs:
             NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_DEV_API_URL }}
             NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
 
-      - name: Trigger Portainer dev webhook (via Cloudflare Access)
+      - name: Trigger home deploy webhook (Cloudflare Access)
         run: |
-          curl -fsS "${{ secrets.PORTAINER_DEV_WEBHOOK_URL }}" \
+          curl -fsS "${{ secrets.HOME_DEPLOY_WEBHOOK_URL }}" \
             -H "CF-Access-Client-Id: ${{ secrets.CF_ACCESS_CLIENT_ID }}" \
-            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}"
+            -H "CF-Access-Client-Secret: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}" \
+            --max-time 120

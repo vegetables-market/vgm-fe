@@ -26,7 +26,7 @@ COPY --from=build /app/package*.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
-COPY --from=build /app/next.config.ts ./next.config.ts
+COPY --from=build /app/next.config.* ./
 
 EXPOSE 80
 CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "80"]
