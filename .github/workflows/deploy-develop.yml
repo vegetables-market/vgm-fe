@@ -48,5 +48,5 @@ jobs:
           curl -fsS "$URL" \
             -H "CF-Access-Client-Id: $CF_ID" \
             -H "CF-Access-Client-Secret: $CF_SECRET" \
-            --max-time 120
+            --max-time 200
 
