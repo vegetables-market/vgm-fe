@@ -14,9 +14,19 @@ ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
 ENV NEXT_PUBLIC_MEDIA_URL=$NEXT_PUBLIC_MEDIA_URL
 
 RUN npm run build
-# output: "export" なので out/ が生成される想定
 
-# serve
-FROM nginx:alpine
-COPY --from=build /app/out /usr/share/nginx/html
+# serve (Next.js app server)
+FROM node:20-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+ENV HOSTNAME=0.0.0.0
+ENV PORT=80
+
+COPY --from=build /app/package*.json ./
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/next.config.ts ./next.config.ts
+
 EXPOSE 80
+CMD ["npm", "run", "start", "--", "-H", "0.0.0.0", "-p", "80"]
