@@ -32,6 +32,12 @@ export default function MainPage() {
         >
           購入する
         </Link>
+        <Link
+          href="/"
+          className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+        >
+          デプロイテスト001
+        </Link>
 
         {/* UI確認用ボタン */}
         <button
