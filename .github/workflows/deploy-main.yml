@@ -1,4 +1,4 @@
-name: Home Build (main)
+name: Home Build (Main)
 
 on:
   push:

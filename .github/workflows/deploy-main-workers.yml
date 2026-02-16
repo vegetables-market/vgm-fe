@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Workers (Production)
+name: Cloudflare Workers Deploy (Main)
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    name: Deploy Production
     permissions:
       contents: read
       deployments: write
@@ -24,9 +25,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Set Environment Variables
+      - name: Set Production Environment
         run: |
-          echo "DEPLOY_PROJECT_NAME=${{ vars.WORKERS_PROD_PROJECT_NAME }}" >> $GITHUB_ENV
+          echo "Current branch is MAIN (Production)"
+          # 本番用
+          echo "DEPLOY_NAME=${{ vars.WORKERS_PROD_PROJECT_NAME }}" >> $GITHUB_ENV
           echo "API_BASE_URL=${{ vars.WORKERS_PROD_API_URL }}" >> $GITHUB_ENV
           echo "MEDIA_URL=${{ vars.WORKERS_PROD_MEDIA_URL }}" >> $GITHUB_ENV
 
@@ -40,17 +43,25 @@ jobs:
       - name: Generate wrangler.toml
         run: |
           TODAY=$(date +%Y-%m-%d)
-          
-          echo "name = \"${DEPLOY_PROJECT_NAME}\"" > wrangler.toml
-          echo "pages_build_output_dir = \"out\"" >> wrangler.toml
+
+          # 環境変数に入れた値を使用 (DEPLOY_NAME)
+          echo "name = \"$DEPLOY_NAME\"" > wrangler.toml
+
           echo "compatibility_date = \"$TODAY\"" >> wrangler.toml
-          
+          echo "compatibility_flags = [\"nodejs_compat\"]" >> wrangler.toml
+
+          echo "" >> wrangler.toml
+          echo "[site]" >> wrangler.toml
+          echo "bucket = \"./out\"" >> wrangler.toml
+
           echo "" >> wrangler.toml
           echo "[vars]" >> wrangler.toml
-          echo "API_BASE_URL = \"${API_BASE_URL}\"" >> wrangler.toml
-          echo "MEDIA_URL = \"${MEDIA_URL}\"" >> wrangler.toml
-          
-          # 確認用
+
+          # 環境変数に入れた値を使用
+          echo "API_BASE_URL = \"$API_BASE_URL\"" >> wrangler.toml
+          echo "MEDIA_URL = \"$MEDIA_URL\"" >> wrangler.toml
+
+          # 確認用 (Secrets以外を表示)
           cat wrangler.toml
 
       - name: Deploy to Cloudflare Workers
@@ -58,6 +69,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=${DEPLOY_PROJECT_NAME} --branch=production
 
 
