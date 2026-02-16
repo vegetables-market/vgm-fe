@@ -35,12 +35,23 @@ jobs:
       - name: Build with OpenNext for Cloudflare Workers
         run: npm run workers:build
 
+      - name: Debug - Check build output
+        run: |
+          echo "=== Checking .open-next directory ==="
+          ls -la .open-next/ || echo ".open-next directory not found"
+          
+          echo "=== Checking for worker.js ==="
+          if [ -f .open-next/worker.js ]; then
+            echo "worker.js found"
+          else
+            echo "worker.js NOT found"
+          fi
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --name ${{ vars.WORKERS_PROD_PROJECT_NAME }}
-          workingDirectory: .open-next/worker
 
 

@@ -35,6 +35,22 @@ jobs:
       - name: Build with OpenNext for Cloudflare Workers
         run: npm run workers:build
 
+      - name: Debug - Check build output
+        run: |
+          echo "=== Checking .open-next directory ==="
+          ls -la .open-next/ || echo ".open-next directory not found"
+          
+          echo "=== Checking .open-next/worker directory ==="
+          ls -la .open-next/worker/ || echo ".open-next/worker directory not found"
+          
+          echo "=== Checking for wrangler.toml ==="
+          if [ -f .open-next/worker/wrangler.toml ]; then
+            echo "wrangler.toml found:"
+            cat .open-next/worker/wrangler.toml
+          else
+            echo "wrangler.toml NOT found"
+          fi
+
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
