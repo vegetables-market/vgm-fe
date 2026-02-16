@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Workers (Preview)
+name: Cloudflare Workers Deploy (Preview)
 
 on:
   push:
