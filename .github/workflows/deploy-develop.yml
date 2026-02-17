@@ -38,10 +38,10 @@ jobs:
             NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_DEV_API_URL }}
             NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_DEV_MEDIA_URL }}
 
-      - name: Prune old GHCR versions (keep last 5)
+      - name: Delete untagged GHCR versions
         uses: actions/delete-package-versions@v5
         with:
           package-name: vgm-web
           package-type: container
-          min-versions-to-keep: 5
-          delete-only-untagged-versions: false
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: true
