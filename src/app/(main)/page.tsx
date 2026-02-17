@@ -36,7 +36,7 @@ export default function MainPage() {
           href="/"
           className="rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
         >
-          デプロイテスト002
+          デプロイテスト003
         </Link>
 
         {/* UI確認用ボタン */}
