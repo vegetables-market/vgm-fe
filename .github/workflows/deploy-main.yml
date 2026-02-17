@@ -26,13 +26,13 @@ jobs:
           username: yukiidayo
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Build & push web image (prod)
+      - name: Build & push web image (main)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/yukiidayo/vgm-web:prod
+          tags: ghcr.io/yukiidayo/vgm-web:main
           build-args: |
             NODE_ENV=production
             NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_PROD_API_URL }}
