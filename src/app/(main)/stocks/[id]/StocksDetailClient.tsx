@@ -6,41 +6,41 @@ import { fetchApi } from "@/lib/api/fetch";
 
 interface StockDetail {
   item: {
-    itemId: string;
+    item_id: string;
     title: string;
     description: string | null;
     price: number;
     quantity: number;
-    categoryId: number | null;
-    categoryName: string | null;
+    category_id: number | null;
+    category_name: string | null;
     condition: number;
     status: number;
-    likesCount: number;
-    isLiked: boolean;
+    likes_count: number;
+    is_liked: boolean;
     brand: string | null;
     weight: number | null;
-    shippingPayerType: number;
+    shipping_payer_type: number;
     images: Array<{
-      imageId: number;
-      imageUrl: string;
-      displayOrder: number;
+      image_id: number;
+      image_url: string;
+      display_order: number;
     }>;
     seller: {
-      userId: number;
+      user_id: number;
       username: string;
-      displayName: string;
-      avatarUrl: string | null;
-      ratingAverage: number | null;
-      ratingCount: number;
+      display_name: string;
+      avatar_url: string | null;
+      rating_average: number | null;
+      rating_count: number;
     };
-    createdAt: string;
-    updatedAt: string;
+    created_at: string;
+    updated_at: string;
   };
   relatedItems: Array<{
-    itemId: string;
+    item_id: string;
     title: string;
     price: number;
-    thumbnailUrl: string | null;
+    thumbnail_url: string | null;
   }>;
 }
 
@@ -67,7 +67,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
         credentials: "include",
       });
       setStock(data);
-      setIsLiked(data.item.isLiked);
+      setIsLiked(data.item.is_liked);
     } catch (err: any) {
       setError(err.message || "在庫の取得に失敗しました");
     } finally {
@@ -88,7 +88,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
             ...stock,
             item: {
               ...stock.item,
-              likesCount: stock.item.likesCount - 1,
+              likes_count: stock.item.likes_count - 1,
             },
           });
         }
@@ -103,7 +103,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
             ...stock,
             item: {
               ...stock.item,
-              likesCount: stock.item.likesCount + 1,
+              likes_count: stock.item.likes_count + 1,
             },
           });
         }
@@ -120,7 +120,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
       await fetchApi("/v1/market/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId: stock.item.itemId, quantity: 1 }),
+        body: JSON.stringify({ item_id: stock.item.item_id, quantity: 1 }),
         credentials: "include",
       });
       if (confirm("カートに追加しました。カートへ移動しますか？")) {
@@ -185,7 +185,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
           <div className="main-image">
             {item.images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.images[selectedImage].imageUrl} alt={item.title} />
+              <img src={item.images[selectedImage].image_url} alt={item.title} />
             ) : (
               <div className="no-image">画像なし</div>
             )}
@@ -194,12 +194,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
             <div className="thumbnail-list">
               {item.images.map((image, index) => (
                 <div
-                  key={image.imageId}
+                  key={image.image_id}
                   className={`thumbnail ${index === selectedImage ? "active" : ""}`}
                   onClick={() => setSelectedImage(index)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.imageUrl} alt={`${item.title} ${index + 1}`} />
+                  <img src={image.image_url} alt={`${item.title} ${index + 1}`} />
                 </div>
               ))}
             </div>
@@ -212,9 +212,9 @@ export default function StocksDetailClient({ id }: { id: string }) {
           <p className="stock-price">{formatPrice(item.price)}</p>
 
           <div className="stock-meta">
-            <span className="likes-count">♥ {item.likesCount}</span>
-            {item.categoryName && (
-              <span className="category">{item.categoryName}</span>
+            <span className="likes-count">♥ {item.likes_count}</span>
+            {item.category_name && (
+              <span className="category">{item.category_name}</span>
             )}
           </div>
 
@@ -252,7 +252,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
             <h2>商品情報</h2>
             <dl>
               <dt>カテゴリ</dt>
-              <dd>{item.categoryName || "未設定"}</dd>
+              <dd>{item.category_name || "未設定"}</dd>
               <dt>状態</dt>
               <dd>{getConditionText(item.condition)}</dd>
               <dt>ブランド</dt>
@@ -260,7 +260,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
               <dt>重量</dt>
               <dd>{item.weight ? `${item.weight}g` : "未設定"}</dd>
               <dt>送料</dt>
-              <dd>{getShippingText(item.shippingPayerType)}</dd>
+              <dd>{getShippingText(item.shipping_payer_type)}</dd>
               <dt>在庫</dt>
               <dd>{item.quantity}</dd>
             </dl>
@@ -272,15 +272,15 @@ export default function StocksDetailClient({ id }: { id: string }) {
               <div className="related-grid">
                 {relatedItems.map((related) => (
                   <div
-                    key={related.itemId}
+                    key={related.item_id}
                     className="related-card"
-                    onClick={() => router.push(`/stocks/${related.itemId}`)}
+                    onClick={() => router.push(`/stocks/${related.item_id}`)}
                   >
                     <div className="related-image">
-                      {related.thumbnailUrl ? (
+                      {related.thumbnail_url ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={related.thumbnailUrl}
+                          src={related.thumbnail_url}
                           alt={related.title}
                         />
                       ) : (

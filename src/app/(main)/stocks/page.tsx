@@ -74,7 +74,7 @@ export default function StocksPage() {
       params.append("limit", "20");
 
       const data = await fetchApi<PaginatedResponse>(
-        `/v1/market/items/search?${params.toString()}`,
+        `/api/v1/market/items/search?${params.toString()}`,
         { credentials: "include" }
       );
 

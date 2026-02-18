@@ -2,7 +2,7 @@ import "server-only";
 
 import StocksDetailClient from "./StocksDetailClient";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 type SearchResponse = {
   items?: Array<{ itemId: string }>;
@@ -25,10 +25,7 @@ export async function generateStaticParams() {
   }
 }
 
-export default function StocksDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  return <StocksDetailClient id={params.id} />;
+export default async function StocksDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; 
+  return <StocksDetailClient id={id} />;
 }
