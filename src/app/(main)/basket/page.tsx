@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-// TODO: Implement cart API
-import { cartApi } from "@/lib/api/stubs";
+import { getCart as fetchCartApi } from "@/services/market/cart/get-cart";
+import { updateCartItem } from "@/services/market/cart/update-cart-item";
+import { removeFromCart as removeCartItem } from "@/services/market/cart/remove-from-cart";
 import type { CartResponse } from "@/types/market/cart";
 
 export default function BasketPage() {
@@ -18,7 +19,7 @@ export default function BasketPage() {
 
   const fetchCart = async () => {
     try {
-      const data = await cartApi.getCart();
+      const data = await fetchCartApi();
       setCart(data);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
@@ -34,7 +35,7 @@ export default function BasketPage() {
     if (newQuantity < 1) return;
     setIsUpdating(true);
     try {
-      await cartApi.updateCartItemQuantity(cartItemId, newQuantity);
+      await updateCartItem(cartItemId, newQuantity);
       await fetchCart(); // Refresh cart
     } catch (error) {
       alert("数量の変更に失敗しました");
@@ -48,7 +49,7 @@ export default function BasketPage() {
     if (!confirm("商品をカートから削除しますか？")) return;
     setIsUpdating(true);
     try {
-      await cartApi.removeFromCart(cartItemId);
+      await removeCartItem(cartItemId);
       await fetchCart(); // Refresh cart
     } catch (error) {
       alert("削除に失敗しました");

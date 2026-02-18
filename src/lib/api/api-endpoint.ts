@@ -16,6 +16,8 @@ export const API_ENDPOINTS = {
     // 商品関連
     ITEMS: '/v1/market/items',
     CATEGORIES: '/v1/market/categories',
+    // カート関連
+    CART: '/v1/market/cart',
     // 注文関連
     ORDERS: '/orders',
     // 決済関連
