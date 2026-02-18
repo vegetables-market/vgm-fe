@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
+import { addToCart } from "@/services/market/cart/add-to-cart";
 
 interface StockDetail {
   item: {
@@ -117,12 +118,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
     if (!stock) return;
     setIsProcessing(true);
     try {
-      await fetchApi("/v1/market/cart", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId: stock.item.itemId, quantity: 1 }),
-        credentials: "include",
-      });
+      await addToCart({ itemId: stock.item.itemId, quantity: 1 });
       if (confirm("カートに追加しました。カートへ移動しますか？")) {
         router.push("/basket");
       }
