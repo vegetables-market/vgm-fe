@@ -85,7 +85,7 @@ export function useFirebaseOAuthLogin() {
           isEmailVerified: response.user.is_email_verified,
         });
         
-        // Settings/OAuthページからの連携フローの場合、そこに戻る
+        // Settings/OAuthペ�Eジからの連携フローの場合、そこに戻めE
         const urlParams = new URLSearchParams(window.location.search);
         const rawRedirect =
           urlParams.get("redirect_to") || urlParams.get("redirect");
@@ -96,8 +96,22 @@ export function useFirebaseOAuthLogin() {
       }
 
     } catch (error) {
+      const firebaseErrorCode =
+        typeof error === "object" && error && "code" in error
+          ? String((error as { code?: unknown }).code ?? "")
+          : "";
+
       console.error(`${provider} Login failed`, error);
-      alert(`${provider}ログインに失敗しました。`);
+
+      if (firebaseErrorCode === "auth/unauthorized-domain") {
+        const currentHost = window.location.hostname;
+        alert(
+          `OAuth domain is not authorized in Firebase Auth. Add "${currentHost}" to Firebase Console -> Authentication -> Settings -> Authorized domains.`,
+        );
+        return;
+      }
+
+      alert(`${provider} login failed. Please try again.`);
     } finally {
       setLoading(false);
     }
