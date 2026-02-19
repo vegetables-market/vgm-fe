@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-// TODO: Implement favorite API
-import { favoriteApi } from "@/lib/api/stubs";
+import { favoriteApi } from "@/lib/api/favorite";
 import type { ItemResponse } from "@/types/market/item";
 
 export default function FavoritesPage() {
@@ -28,6 +27,7 @@ export default function FavoritesPage() {
 
     try {
       const data = await favoriteApi.getFavorites(page, 20);
+      console.log("取得したデータ:", data.items);
       setStocks(data.items);
       setPagination(data.pagination);
     } catch (err: any) {
@@ -38,7 +38,7 @@ export default function FavoritesPage() {
   };
 
   const handleRemoveFavorite = async (
-    itemId: string,
+    item_id: string,
     event: React.MouseEvent,
   ) => {
     event.stopPropagation();
@@ -48,17 +48,17 @@ export default function FavoritesPage() {
     }
 
     try {
-      await favoriteApi.removeFavorite(itemId);
+      await favoriteApi.removeFavorite(item_id);
       // 削除後にリストを更新
-      setStocks(stocks.filter((s) => s.itemId !== itemId));
+      setStocks(stocks.filter((s) => s.item_id !== item_id));
       setPagination((prev) => ({ ...prev, total: prev.total - 1 }));
     } catch (err: any) {
       alert(err.message || "お気に入りの削除に失敗しました");
     }
   };
 
-  const handleStockClick = (itemId: string) => {
-    router.push(`/stocks/${itemId}`);
+  const handleStockClick = (itemid: string) => {
+    router.push(`/stocks/${itemid}`);
   };
 
   return (
@@ -80,14 +80,14 @@ export default function FavoritesPage() {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
             {stocks.map((stock) => (
               <div
-                key={stock.itemId}
-                onClick={() => handleStockClick(stock.itemId)}
+                key={stock.item_id}
+                onClick={() => handleStockClick(stock.item_id)}
                 className="cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg"
               >
                 <div className="relative aspect-square bg-gray-100">
-                  {stock.thumbnailUrl ? (
+                  {stock.thumbnail_url ? (
                     <img
-                      src={stock.thumbnailUrl}
+                      src={stock.thumbnail_url}
                       alt={stock.title}
                       className="h-full w-full object-cover"
                     />
@@ -97,7 +97,7 @@ export default function FavoritesPage() {
                     </div>
                   )}
                   <button
-                    onClick={(e) => handleRemoveFavorite(stock.itemId, e)}
+                    onClick={(e) => handleRemoveFavorite(stock.item_id, e)}
                     className="absolute top-2 right-2 rounded-full bg-white p-2 shadow hover:bg-red-50"
                     title="お気に入りから削除"
                   >
