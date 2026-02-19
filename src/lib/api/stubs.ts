@@ -3,19 +3,6 @@
  * TODO: 実際のAPIが実装されたら削除してください
  */
 
-// Cart API Stub
-export const cartApi = {
-  getCart: async () => {
-    throw new Error('Cart API is not implemented yet');
-  },
-  updateCartItemQuantity: async (_itemId: number, _quantity: number) => {
-    throw new Error('Cart API is not implemented yet');
-  },
-  removeFromCart: async (_itemId: number) => {
-    throw new Error('Cart API is not implemented yet');
-  },
-};
-
 // Category API Stub
 export const categoryApi = {
   getAllCategories: async () => {

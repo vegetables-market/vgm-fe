@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
+import { addToCart } from "@/services/market/cart/add-to-cart";
 
 interface StockDetail {
   item: {
