@@ -98,7 +98,6 @@ export type FavoritesResponse = PaginatedResponse<ItemResponse>;
  */
 export interface CreateDraftResponse {
   itemId: string;
-  message: string;
 }
 
 /**
