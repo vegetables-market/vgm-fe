@@ -1,13 +1,15 @@
-name: Home Build (Main)
+name: Home Deploy (Develop)
 
 on:
   push:
     branches:
-      - main
+      - develop
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    name: Deploy Development
+    environment: home-dev
     permissions:
       contents: read
       packages: write
@@ -26,17 +28,23 @@ jobs:
           username: yukiidayo
           password: ${{ secrets.GHCR_PAT }}
 
-      - name: Build & push web image (main)
+      - name: Build & push web image (dev)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/yukiidayo/vgm-web:main
+          tags: ghcr.io/yukiidayo/vgm-web:dev
           build-args: |
             NODE_ENV=production
-            NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_PROD_API_URL }}
-            NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_PROD_MEDIA_URL }}
+            NEXT_PUBLIC_API_BASE_URL=${{ vars.HOME_API_URL }}
+            NEXT_PUBLIC_MEDIA_URL=${{ vars.HOME_MEDIA_URL }}
+            NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ vars.FIREBASE_AUTH_DOMAIN }}
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ vars.FIREBASE_PROJECT_ID }}
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ vars.FIREBASE_STORAGE_BUCKET }}
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+            NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.FIREBASE_APP_ID }}
 
       - name: Delete untagged GHCR versions
         uses: actions/delete-package-versions@v5
