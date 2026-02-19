@@ -26,18 +26,22 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const storageKey = "vgm_cart";
+  const legacyStorageKey = "harvest_cart";
 
   // 初期ロード時にローカルストレージからカート情報を復元
   useEffect(() => {
-    const savedCart = localStorage.getItem('harvest_cart');
+    const savedCart = localStorage.getItem(storageKey) ?? localStorage.getItem(legacyStorageKey);
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
+      localStorage.setItem(storageKey, savedCart);
+      localStorage.removeItem(legacyStorageKey);
     }
   }, []);
 
   // カートが更新されたらローカルストレージに保存
   useEffect(() => {
-    localStorage.setItem('harvest_cart', JSON.stringify(cartItems));
+    localStorage.setItem(storageKey, JSON.stringify(cartItems));
   }, [cartItems]);
 
   // カートに追加

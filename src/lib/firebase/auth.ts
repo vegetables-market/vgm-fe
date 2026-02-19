@@ -1,20 +1,20 @@
-import { 
-  GoogleAuthProvider, 
-  OAuthProvider,
-  GithubAuthProvider,
-  signInWithPopup, 
-  UserCredential 
-} from "firebase/auth";
-import { auth } from "./config";
-
-const googleProvider = new GoogleAuthProvider();
-const microsoftProvider = new OAuthProvider('microsoft.com');
-const githubProvider = new GithubAuthProvider();
-
+import type { UserCredential } from "firebase/auth";
+import { getFirebaseAuth } from "./config";
 
 export const loginWithGoogle = async (): Promise<string> => {
   try {
-    const result: UserCredential = await signInWithPopup(auth, googleProvider);
+    const { GoogleAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      provider,
+    );
+
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -25,7 +25,15 @@ export const loginWithGoogle = async (): Promise<string> => {
 
 export const loginWithMicrosoft = async (): Promise<string> => {
   try {
-    const result: UserCredential = await signInWithPopup(auth, microsoftProvider);
+    const { OAuthProvider, signInWithPopup } = await import("firebase/auth");
+    const provider = new OAuthProvider("microsoft.com");
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      provider,
+    );
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -36,7 +44,16 @@ export const loginWithMicrosoft = async (): Promise<string> => {
 
 export const loginWithGithub = async (): Promise<string> => {
   try {
-    const result: UserCredential = await signInWithPopup(auth, githubProvider);
+    const { GithubAuthProvider, signInWithPopup } =
+      await import("firebase/auth");
+    const provider = new GithubAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account",
+    });
+    const result: UserCredential = await signInWithPopup(
+      getFirebaseAuth(),
+      provider,
+    );
     const token = await result.user.getIdToken();
     return token;
   } catch (error) {
@@ -44,5 +61,3 @@ export const loginWithGithub = async (): Promise<string> => {
     throw error;
   }
 };
-
-

@@ -1,38 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { usePWAInstallPrompt } from "@/hooks/pwa/usePWAInstallPrompt";
 
 export default function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const { variant, install, dismiss } = usePWAInstallPrompt();
 
-  useEffect(() => {
-    const handler = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setIsVisible(true);
-    };
-
-    window.addEventListener("beforeinstallprompt", handler);
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handler);
-    };
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-
-    if (outcome === "accepted") {
-      setDeferredPrompt(null);
-    }
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
+  if (!variant) return null;
 
   return (
     <div className="fixed right-4 bottom-4 left-4 z-50 rounded-lg border border-gray-200 bg-white p-4 shadow-lg md:right-4 md:left-auto md:w-96 dark:border-gray-700 dark:bg-gray-800">
@@ -47,7 +20,7 @@ export default function InstallPrompt() {
             </p>
           </div>
           <button
-            onClick={() => setIsVisible(false)}
+            onClick={dismiss}
             className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
           >
             <span className="sr-only">閉じる</span>
@@ -60,12 +33,28 @@ export default function InstallPrompt() {
             </svg>
           </button>
         </div>
-        <button
-          onClick={handleInstallClick}
-          className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
-        >
-          インストールする
-        </button>
+        {variant === "chromium" ? (
+          <button
+            onClick={install}
+            className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700"
+          >
+            インストールする
+          </button>
+        ) : variant === "ios" ? (
+          <div className="rounded-md bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
+            <div className="font-medium">iPhone / iPad の場合</div>
+            <div className="mt-1">
+              共有ボタンから「ホーム画面に追加」を選択してください。
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-md bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/40 dark:text-gray-200">
+            <div className="font-medium">このブラウザの場合</div>
+            <div className="mt-1">
+              ブラウザのメニューから「ホーム画面に追加」または「アプリをインストール」を選択してください。
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

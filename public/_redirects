@@ -1,7 +1,0 @@
-# API リダイレクト設定
-# ローカル開発環境
-/api/* http://localhost:8080/:splat  200
-
-# 環境変数を使用する場合は、ビルド時に置き換える
-# 本番環境: /api/* https://vgm-backend-887701498766.asia-northeast1.run.app/:splat  200
-# dev環境: /api/* https://vgm-backend-dev.asia-northeast1.run.app/:splat  200

@@ -1,5 +1,5 @@
 import React from 'react';
-import MainLayoutClient from './MainLayoutClient';
+import MainLayoutClient from '@/components/layouts/MainLayout';
 
 export default function MainLayout({
   children,

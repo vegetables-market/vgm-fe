@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { fetchApi } from "@/lib/api/client";
+import { fetchApi } from "@/lib/api/fetch";
 
 interface ProfileInfo {
   userId: number;
@@ -27,7 +27,7 @@ export default function PasswordChangePage() {
 
   const fetchProfileInfo = async () => {
     try {
-      const data = await fetchApi<ProfileInfo>("/v1/user/profile/me", {
+      const data = await fetchApi<ProfileInfo>("/v1/user/account/me", {
         credentials: "include"
       });
       setProfileInfo(data);

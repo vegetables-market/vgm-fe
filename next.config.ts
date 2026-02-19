@@ -1,13 +1,19 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export', // 完全静的サイトとしてエクスポート
+  // output: "export",
   productionBrowserSourceMaps: false,
   trailingSlash: true,
   images: {
-    unoptimized: true,
-    remotePatterns: [{ protocol: 'https', hostname: 'images.unsplash.com' }],
+    // unoptimized: true,
+    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com" }],
   },
 };
 
 export default nextConfig;
+
+if (process.env.NODE_ENV === "development") {
+  import("@opennextjs/cloudflare").then((m) =>
+    m.initOpenNextCloudflareForDev(),
+  );
+}
