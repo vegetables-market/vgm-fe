@@ -56,20 +56,12 @@ jobs:
         run: npm ci
 
       - name: Build with OpenNext for Cloudflare Workers
+        timeout-minutes: 12
         shell: bash
         run: |
           set -euo pipefail
 
-          npm run workers:build &
-          BUILD_PID=$!
-
-          # Keep emitting logs so long-running Next.js builds are not treated as stalled.
-          while kill -0 "$BUILD_PID" 2>/dev/null; do
-            echo "workers:build still running: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
-            sleep 30
-          done
-
-          wait "$BUILD_PID"
+          timeout 12m npm run workers:build
         env:
           NODE_ENV: development
           NEXT_PUBLIC_API_BASE_URL: ${{ vars.WORKERS_API_URL || vars.WORKERS_DEV_API_URL }}
