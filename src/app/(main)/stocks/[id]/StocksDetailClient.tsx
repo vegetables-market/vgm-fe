@@ -23,6 +23,7 @@ interface StockDetail {
     images: Array<{
       image_id: number;
       image_url: string;
+      imageUrl?: string;
       display_order: number;
     }>;
     seller: {
@@ -36,11 +37,19 @@ interface StockDetail {
     created_at: string;
     updated_at: string;
   };
-  relatedItems: Array<{
+  relatedItems?: Array<{
     item_id: string;
     title: string;
     price: number;
     thumbnail_url: string | null;
+    thumbnailUrl?: string | null;
+  }>;
+  related_items?: Array<{
+    item_id: string;
+    title: string;
+    price: number;
+    thumbnail_url: string | null;
+    thumbnailUrl?: string | null;
   }>;
 }
 
@@ -160,6 +169,19 @@ export default function StocksDetailClient({ id }: { id: string }) {
     return type === 0 ? "送料込み（出品者負担）" : "着払い（購入者負担）";
   };
 
+  const getImageUrl = (raw: string | null | undefined) => {
+    const imagePath = raw?.trim();
+    if (!imagePath) return "/images/no-image.png";
+    if (imagePath.startsWith("http")) return imagePath;
+    const mediaUrl =
+      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = imagePath.startsWith("/")
+      ? imagePath.slice(1)
+      : imagePath;
+    return `${baseUrl}/${cleanedPath}`;
+  };
+
   if (isLoading) {
     return <div className="loading">読み込み中...</div>;
   }
@@ -175,7 +197,8 @@ export default function StocksDetailClient({ id }: { id: string }) {
     );
   }
 
-  const { item, relatedItems } = stock;
+  const { item } = stock;
+  const relatedItems = stock.relatedItems ?? stock.related_items ?? [];
 
   return (
     <div className="stock-detail-page">
@@ -185,7 +208,13 @@ export default function StocksDetailClient({ id }: { id: string }) {
           <div className="main-image">
             {item.images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.images[selectedImage].image_url} alt={item.title} />
+              <img
+                src={getImageUrl(
+                  item.images[selectedImage].image_url ??
+                    item.images[selectedImage].imageUrl,
+                )}
+                alt={item.title}
+              />
             ) : (
               <div className="no-image">画像なし</div>
             )}
@@ -199,7 +228,10 @@ export default function StocksDetailClient({ id }: { id: string }) {
                   onClick={() => setSelectedImage(index)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.image_url} alt={`${item.title} ${index + 1}`} />
+                  <img
+                    src={getImageUrl(image.image_url ?? image.imageUrl)}
+                    alt={`${item.title} ${index + 1}`}
+                  />
                 </div>
               ))}
             </div>
@@ -277,10 +309,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
                     onClick={() => router.push(`/stocks/${related.item_id}`)}
                   >
                     <div className="related-image">
-                      {related.thumbnail_url ? (
+                      {related.thumbnail_url ?? related.thumbnailUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={related.thumbnail_url}
+                          src={getImageUrl(
+                            related.thumbnail_url ?? related.thumbnailUrl,
+                          )}
                           alt={related.title}
                         />
                       ) : (
