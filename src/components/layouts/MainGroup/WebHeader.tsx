@@ -15,6 +15,7 @@ import { IoCartOutline } from "react-icons/io5";
 export default function WebHeader() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
   const redirectTo = getRedirectToFromLocation();
@@ -60,7 +61,14 @@ export default function WebHeader() {
           {/*/>*/}
           <input
             type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="商品を検索..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                router.push(`/search?q=${searchQuery}`);
+              }
+            }}
             className="peer absolute z-30 h-full w-full rounded-full py-2 pr-4 pl-10 outline-none placeholder:text-neutral-400"
           />
           <FaMagnifyingGlass className="peer-focus:text-primary pointer-events-none absolute left-3 z-20 transition-all duration-200 dark:text-neutral-400 peer-hover:dark:text-white" />
