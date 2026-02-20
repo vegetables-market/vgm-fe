@@ -2,7 +2,7 @@ import "server-only";
 
 import StocksDetailClient from "./StocksDetailClient";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
 type SearchResponse = {
   items?: Array<{ itemId: string }>;
@@ -11,7 +11,7 @@ type SearchResponse = {
 export async function generateStaticParams() {
   const apiBaseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-  const url = `${apiBaseUrl}/api/v1/market/items/search?sort=newest&page=1&limit=100`;
+  const url = `${apiBaseUrl}/v1/market/items/search?sort=newest&page=1&limit=100`;
 
   try {
     const res = await fetch(url, { method: "GET" });
@@ -25,10 +25,7 @@ export async function generateStaticParams() {
   }
 }
 
-export default function StocksDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  return <StocksDetailClient id={params.id} />;
+export default async function StocksDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params; 
+  return <StocksDetailClient id={id} />;
 }

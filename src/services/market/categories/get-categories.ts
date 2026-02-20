@@ -5,9 +5,9 @@ import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
  * カテゴリ一覧取得
  */
 export interface Category {
-  categoryId: number;
-  name: string;
-  parentCategoryId: number | null;
+  category_id: number;
+  category_name: string;
+  parent_category_id: number | null;
 }
 
 interface CategoryApiNode {

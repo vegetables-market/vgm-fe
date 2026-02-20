@@ -10,6 +10,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy Preview
+    environment: workers-dev
     permissions:
       contents: read
       deployments: write
@@ -20,16 +21,76 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+
+      - name: Preflight - Validate workers-dev variables/secrets
+        shell: bash
+        env:
+          RESOLVED_WORKERS_API_URL: ${{ vars.WORKERS_API_URL }}
+          RESOLVED_WORKERS_MEDIA_URL: ${{ vars.WORKERS_MEDIA_URL }}
+          RESOLVED_WORKERS_PREVIEW_PROJECT_NAME: ${{ vars.WORKERS_PREVIEW_PROJECT_NAME }}
+          RESOLVED_CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RESOLVED_CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          check_required() {
+            local name="$1"
+            local value="${!name:-}"
+            if [ -z "$value" ]; then
+              echo "::error::$name is empty. Check workers-dev environment vars/secrets."
+              exit 1
+            fi
+            echo "$name=OK"
+          }
+
+          echo "=== workers-dev preview preflight ==="
+          check_required RESOLVED_WORKERS_API_URL
+          check_required RESOLVED_WORKERS_MEDIA_URL
+          check_required RESOLVED_WORKERS_PREVIEW_PROJECT_NAME
+          check_required RESOLVED_CLOUDFLARE_ACCOUNT_ID
+          check_required RESOLVED_CLOUDFLARE_API_TOKEN
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Build with OpenNext for Cloudflare Workers
-        run: npm run workers:build
+        timeout-minutes: 30
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          npm run workers:build &
+          BUILD_PID=$!
+          START_TS=$(date +%s)
+          MAX_SEC=$((25 * 60))
+
+          while kill -0 "$BUILD_PID" 2>/dev/null; do
+            NOW_TS=$(date +%s)
+            ELAPSED=$((NOW_TS - START_TS))
+
+            if [ "$ELAPSED" -ge "$MAX_SEC" ]; then
+              echo "::error::workers:build exceeded ${MAX_SEC}s. terminating."
+              kill -TERM "$BUILD_PID" || true
+              wait "$BUILD_PID" || true
+              exit 1
+            fi
+
+            echo "workers:build running (${ELAPSED}s elapsed)"
+            sleep 30
+          done
+
+          wait "$BUILD_PID"
         env:
           NODE_ENV: production
-          NEXT_PUBLIC_API_BASE_URL: ${{ vars.WORKERS_DEV_API_URL }}
-          NEXT_PUBLIC_MEDIA_URL: ${{ vars.WORKERS_DEV_MEDIA_URL }}
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.WORKERS_API_URL }}
+          NEXT_PUBLIC_MEDIA_URL: ${{ vars.WORKERS_MEDIA_URL }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.FIREBASE_AUTH_DOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.FIREBASE_MESSAGING_SENDER_ID }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
 
       - name: Debug - Check build output
         run: |
