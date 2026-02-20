@@ -9,7 +9,7 @@ import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 
 export default function StockNewPage() {
   const router = useRouter();
-  const { itemId, initDraft, getItemId, loading: draftLoading } = useItemDraft();
+  const { itemId, initDraft, loading: draftLoading } = useItemDraft();
   const {
     files,
     addFiles,
@@ -91,19 +91,7 @@ export default function StockNewPage() {
     e.preventDefault();
     setError("");
 
-    // StateのitemIdまたはRefから取得（Reactの非同期State更新によるタイミングずれを回避）
-    let currentItemId = itemId ?? getItemId();
-    if (!currentItemId) {
-      // まだDraftが作られていない場合は作成を試みる
-      try {
-        currentItemId = await initDraft();
-      } catch {
-        setError("Draft Item initialization failed. Please reload.");
-        return;
-      }
-    }
-
-    if (!currentItemId) {
+    if (!itemId) {
       setError("Draft Item initialization failed. Please reload.");
       return;
     }
@@ -151,7 +139,7 @@ export default function StockNewPage() {
         item_condition: itemCondition,
       };
 
-      await updateItem(currentItemId, payload);
+      await updateItem(itemId, payload);
       router.push("/stock"); // 一覧へ遷移
     } catch (err) {
       console.error(err);

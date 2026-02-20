@@ -2,7 +2,7 @@ import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 
 export const updateItemStatus = async (
-  itemId: string | number,
+  itemId: number,
   status: number,
 ): Promise<void> => {
   return fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/status`, {

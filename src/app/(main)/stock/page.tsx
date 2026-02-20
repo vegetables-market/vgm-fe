@@ -7,37 +7,26 @@ import { deleteItem } from "@/services/market/items/delete-item";
 import { updateItemStatus } from "@/services/market/items/update-item-status";
 
 interface Item {
-  id: string;
+  id: number;
   name: string;
   price: number;
   status: number;
   imageUrl: string | null;
   image_url?: string | null;
   createdAt: string;
-  created_at?: string;
 }
 
 export default function StockPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<number | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
 
   const loadItems = () => {
     setLoading(true);
     getMyItems()
       .then((data: any[]) => {
-        const normalizedItems: Item[] = (data || []).map((item) => ({
-          id: String(item.id ?? item.itemId ?? item.item_id ?? ""),
-          name: item.name ?? item.title ?? "",
-          price: Number(item.price ?? 0),
-          status: Number(item.status ?? 0),
-          imageUrl: item.imageUrl ?? item.image_url ?? null,
-          image_url: item.image_url ?? item.imageUrl ?? null,
-          createdAt: item.createdAt ?? item.created_at ?? "",
-          created_at: item.created_at ?? item.createdAt ?? "",
-        }));
-        setItems(normalizedItems);
+        setItems(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -50,7 +39,7 @@ export default function StockPage() {
     loadItems();
   }, []);
 
-  const handleDelete = async (itemId: string, itemName: string) => {
+  const handleDelete = async (itemId: number, itemName: string) => {
     if (!confirm(`「${itemName}」を削除しますか？この操作は取り消せません。`)) {
       return;
     }
@@ -67,7 +56,7 @@ export default function StockPage() {
     }
   };
 
-  const handleToggleStatus = async (itemId: string, currentStatus: number) => {
+  const handleToggleStatus = async (itemId: number, currentStatus: number) => {
     // status 2 (出品中) ⇔ status 5 (停止中) の切り替え
     const newStatus = currentStatus === 2 ? 5 : 2;
     const statusText = newStatus === 2 ? "出品中" : "停止中";
@@ -219,7 +208,7 @@ export default function StockPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                    {new Date(item.createdAt || item.created_at || "").toLocaleDateString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                     <div className="flex items-center justify-end gap-2">
