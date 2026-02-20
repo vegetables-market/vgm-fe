@@ -12,7 +12,9 @@ interface Item {
   price: number;
   status: number;
   imageUrl: string | null;
+  image_url?: string | null;
   createdAt: string;
+  created_at?: string;
 }
 
 export default function StockPage() {
@@ -25,7 +27,17 @@ export default function StockPage() {
     setLoading(true);
     getMyItems()
       .then((data: any[]) => {
-        setItems(data);
+        const normalizedItems: Item[] = (data || []).map((item) => ({
+          id: Number(item.id ?? item.itemId ?? item.item_id ?? 0),
+          name: item.name ?? item.title ?? "",
+          price: Number(item.price ?? 0),
+          status: Number(item.status ?? 0),
+          imageUrl: item.imageUrl ?? item.image_url ?? null,
+          image_url: item.image_url ?? item.imageUrl ?? null,
+          createdAt: item.createdAt ?? item.created_at ?? "",
+          created_at: item.created_at ?? item.createdAt ?? "",
+        }));
+        setItems(normalizedItems);
         setLoading(false);
       })
       .catch((err) => {
@@ -182,7 +194,7 @@ export default function StockPage() {
                       <div className="h-14 w-14 flex-shrink-0">
                         <img
                           className="h-14 w-14 rounded border object-cover"
-                          src={getImageUrl(item.imageUrl)}
+                          src={getImageUrl(item.imageUrl ?? item.image_url ?? null)}
                           alt={item.name}
                         />
                       </div>
@@ -207,7 +219,7 @@ export default function StockPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                    {new Date(item.createdAt).toLocaleDateString()}
+                    {new Date(item.createdAt || item.created_at || "").toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                     <div className="flex items-center justify-end gap-2">

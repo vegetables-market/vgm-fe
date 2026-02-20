@@ -15,6 +15,9 @@ interface StockItem {
   status: number;
   likes_count: number;
   thumbnail_url: string | null;
+  thumbnailUrl?: string | null;
+  image_url?: string | null;
+  imageUrl?: string | null;
   seller: {
     user_id: number;
     username: string;
@@ -25,12 +28,13 @@ interface StockItem {
 }
 
 interface PaginatedResponse {
-  items: StockItem[];
+  items: any[];
   pagination: {
     page: number;
     limit: number;
     total: number;
-    totalPages: number;
+    totalPages?: number;
+    total_pages?: number;
   };
 }
 
@@ -78,8 +82,38 @@ export default function StocksPage() {
         { credentials: "include" }
       );
 
-      setStocks(data.items);
-      setPagination(data.pagination);
+      const normalizedStocks: StockItem[] = (data.items || []).map((item) => ({
+        item_id: String(item.item_id ?? item.itemId ?? ""),
+        title: item.title ?? item.name ?? "",
+        description: item.description ?? null,
+        price: Number(item.price ?? 0),
+        category_id: item.category_id ?? item.categoryId ?? null,
+        category_name: item.category_name ?? item.categoryName ?? null,
+        condition: Number(item.condition ?? 0),
+        status: Number(item.status ?? 0),
+        likes_count: Number(item.likes_count ?? item.likesCount ?? 0),
+        thumbnail_url: item.thumbnail_url ?? item.thumbnailUrl ?? null,
+        thumbnailUrl: item.thumbnailUrl ?? item.thumbnail_url ?? null,
+        image_url: item.image_url ?? item.imageUrl ?? null,
+        imageUrl: item.imageUrl ?? item.image_url ?? null,
+        seller: {
+          user_id: Number(item.seller?.user_id ?? item.seller?.userId ?? 0),
+          username: item.seller?.username ?? "",
+          display_name:
+            item.seller?.display_name ?? item.seller?.displayName ?? "",
+          avatar_url: item.seller?.avatar_url ?? item.seller?.avatarUrl ?? null,
+        },
+        created_at: item.created_at ?? item.createdAt ?? "",
+      }));
+
+      setStocks(normalizedStocks);
+      setPagination({
+        page: data.pagination?.page ?? 1,
+        limit: data.pagination?.limit ?? 20,
+        total: data.pagination?.total ?? 0,
+        totalPages:
+          data.pagination?.totalPages ?? data.pagination?.total_pages ?? 0,
+      });
     } catch (err: any) {
       setError(err.message || "在庫の取得に失敗しました");
     } finally {
@@ -110,6 +144,20 @@ export default function StocksPage() {
       style: "currency",
       currency: "JPY"
     }).format(price);
+  };
+
+  const getImageUrl = (raw: string | null | undefined) => {
+    const imagePath = raw?.trim();
+    if (!imagePath) return "/images/no-image.png";
+    if (imagePath.startsWith("http")) return imagePath;
+
+    const mediaUrl =
+      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = imagePath.startsWith("/")
+      ? imagePath.slice(1)
+      : imagePath;
+    return `${baseUrl}/${cleanedPath}`;
   };
 
   return (
@@ -194,11 +242,18 @@ export default function StocksPage() {
                 onClick={() => router.push(`/stocks/${stock.item_id}`)}
               >
                 <div className="stock-image">
-                  {stock.thumbnail_url ? (
-                    <img src={stock.thumbnail_url} alt={stock.title} />
-                  ) : (
-                    <div className="no-image">画像なし</div>
-                  )}
+                  <img
+                    src={getImageUrl(
+                      stock.thumbnail_url ??
+                        stock.thumbnailUrl ??
+                        stock.image_url ??
+                        stock.imageUrl,
+                    )}
+                    alt={stock.title}
+                    onError={(e) => {
+                      e.currentTarget.src = "/images/no-image.png";
+                    }}
+                  />
                 </div>
                 <div className="stock-info">
                   <h3 className="stock-title">{stock.title}</h3>
