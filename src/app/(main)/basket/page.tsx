@@ -7,8 +7,9 @@ import { getCart as fetchCartApi } from "@/services/market/cart/get-cart";
 import { updateCartItem } from "@/services/market/cart/update-cart-item";
 import { removeFromCart as removeCartItem } from "@/services/market/cart/remove-from-cart";
 import type { CartResponse } from "@/types/market/cart";
+import AuthGuard from "@/components/features/auth/AuthGuard";
 
-export default function BasketPage() {
+function BasketContent() {
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -185,10 +186,19 @@ export default function BasketPage() {
             href="/stocks"
             className="block w-full rounded-lg border border-gray-300 py-3 text-center text-gray-600 transition-colors hover:bg-gray-50"
           >
-            買い物を続ける
-          </Link>
+          買い物を続ける
+        </Link>
         </div>
       </div>
     </div>
   );
 }
+
+export default function BasketPage() {
+  return (
+    <AuthGuard mode="redirect">
+      <BasketContent />
+    </AuthGuard>
+  );
+}
+

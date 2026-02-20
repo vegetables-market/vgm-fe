@@ -1,7 +1,7 @@
 "use client";
 
 import SettingsTitle from "@/components/features3/settings/ui/SettingsTitle";
-import Btn from "@/components/features3/settings/ui/Btn";
+import Btn from "@/components/ui/settings/Btn";
 import BtnWrappers from "@/components/features3/settings/ui/BtnWrappers";
 
 import LoggedInDevices from "@/components/features3/settings/security/LoggedInDevices";

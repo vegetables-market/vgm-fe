@@ -35,7 +35,7 @@ export default function WebHeader() {
     <header className="border-border sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 shadow-sm backdrop-blur-sm">
       <div className="flex items-center">
         <Link
-          href="/vgm-fe/public"
+          href="/"
           className="flex items-center gap-3 pr-3 transition-transform duration-300 hover:scale-102"
         >
           <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl font-bold">
@@ -49,16 +49,6 @@ export default function WebHeader() {
 
       <div className="mx-6 block h-10 max-w-md flex-1 items-center">
         <div className="relative flex h-10 items-center">
-          {/*<FaMagnifyingGlass className=" text-xl text-gray-400 transition-colors group-focus-within:text-emerald-600 group-hover:text-gray-500 group-focus-within:group-hover:text-emerald-600" />*/}
-
-          {/*<div className="  flex items-center pointer-events-none ">*/}
-          {/*  <FaMagnifyingGlass className="text-gray-400 text-xl group-hover:text-gray-500 group-focus-within:text-emerald-600 group-focus-within:group-hover:text-emerald-600 transition-colors " />*/}
-          {/*</div>*/}
-          {/*<input*/}
-          {/*  type="text"*/}
-          {/*  placeholder="商品を検索..."*/}
-          {/*  className=" w-full py-2 pr-4 pl-10 outline-1 outline-gray-300 transition-all  hover:outline-gray-400 focus:bg-green-50 focus:ring-2 focus:ring-emerald-600 focus:outline-none dark:text-white dark:outline-gray-700 dark:hover:bg-gray-800 dark:focus:bg-gray-800"*/}
-          {/*/>*/}
           <input
             type="search"
             value={searchQuery}

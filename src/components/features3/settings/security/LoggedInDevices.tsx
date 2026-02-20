@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Btn from "@/components/features3/settings/ui/Btn";
+import Btn from "@/components/ui/settings/Btn";
 import BtnWrappers from "@/components/features3/settings/ui/BtnWrappers";
 import { getSessions } from "@/services/user/sessions/get-sessions";
 import { SessionResponse } from "@/types/session";
