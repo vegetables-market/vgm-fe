@@ -226,10 +226,18 @@ export default function StockNewPage() {
                   )}
 
                   {file.status === "error" && (
-                    <div className="absolute top-0 right-0 bg-red-500 px-1 text-xs text-white">
-                      Error
-                    </div>
+                    <>
+                      <div className="absolute top-0 right-0 bg-red-500 px-1 text-xs text-white">
+                        Error
+                      </div>
+                      {file.error && (
+                        <div className="absolute right-0 bottom-0 left-0 bg-red-600/90 px-1 py-0.5 text-[10px] text-white">
+                          {file.error}
+                        </div>
+                      )}
+                    </>
                   )}
+
                 </div>
               ))}
             </div>

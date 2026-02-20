@@ -445,7 +445,10 @@ function PurchaseContent() {
               </div>
 
               <p className="mb-4 text-xs text-gray-500">
-                <span className="text-blue-500">利用規約</span>および
+                <Link href="/terms" className="text-blue-500 underline">
+                  利用規約
+                </Link>
+                および
                 <span className="text-blue-500">プライバシーポリシー</span>
                 に同意の上、ご購入ください。
               </p>
