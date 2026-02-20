@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "serwist build && next build",
-    "dev": "concurrently \"serwist build --watch\" \"next dev\"",
+    "build": "cross-env CI=1 NO_UPDATE_NOTIFIER=1 serwist build && next build",
+    "dev": "concurrently \"cross-env CI=1 NO_UPDATE_NOTIFIER=1 serwist build --watch\" \"next dev\"",
     "workers:build": "opennextjs-cloudflare build",
     "start": "next start",
     "lint": "eslint .",
