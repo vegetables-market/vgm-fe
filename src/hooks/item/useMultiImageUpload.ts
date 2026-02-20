@@ -31,6 +31,31 @@ export interface UploadFile {
 }
 
 const MAX_CONCURRENCY = 3;
+const TOKEN_TIMEOUT_MS = 15_000;
+const UPLOAD_TIMEOUT_MS = 45_000;
+const LINK_TIMEOUT_MS = 15_000;
+
+function withTimeout<T>(
+  promise: Promise<T>,
+  ms: number,
+  label: string,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      reject(new Error(`${label} timed out after ${ms}ms`));
+    }, ms);
+
+    promise
+      .then((value) => {
+        clearTimeout(timeoutId);
+        resolve(value);
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        reject(err);
+      });
+  });
+}
 
 interface UseMultiImageUploadOptions {
   initDraft?: () => Promise<string>;
@@ -95,13 +120,25 @@ export function useMultiImageUpload(
 
     try {
       // 1. Token取得
-      const { token, filename } = await getUploadToken();
+      const { token, filename } = await withTimeout(
+        getUploadToken(),
+        TOKEN_TIMEOUT_MS,
+        "getUploadToken",
+      );
 
       // 2. Direct Upload (Workers)
-      await uploadImage(targetFile.file, "jpg", token, filename);
+      await withTimeout(
+        uploadImage(targetFile.file, "jpg", token, filename),
+        UPLOAD_TIMEOUT_MS,
+        "uploadImage",
+      );
 
       // 3. Link (Backend)
-      await linkImages(currentItemId, [filename]);
+      await withTimeout(
+        linkImages(currentItemId, [filename]),
+        LINK_TIMEOUT_MS,
+        "linkImages",
+      );
 
       // 完了
       setFiles((prev) =>
@@ -143,6 +180,18 @@ export function useMultiImageUpload(
       processQueue();
     }
   }, [itemId, processQueue]);
+
+  // キュー取りこぼし対策: 定期的に処理を再駆動
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if (!itemIdRef.current) return;
+      if (uploadQueueRef.current.size === 0) return;
+      if (activeUploadsRef.current >= MAX_CONCURRENCY) return;
+      processQueue();
+    }, 500);
+
+    return () => clearInterval(timer);
+  }, [processQueue]);
 
   /**
    * ファイル追加（ドラフトがなければ作成）

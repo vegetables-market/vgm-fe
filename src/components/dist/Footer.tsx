@@ -54,7 +54,7 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-bold mb-4 tracking-wider text-sm uppercase">Legal</h3>
             <ul className="space-y-3 text-sm">
-              <li><Link href="#" className="hover:text-green-500 transition">利用規約</Link></li>
+              <li><Link href="/terms" className="hover:text-green-500 transition">利用規約</Link></li>
               <li><Link href="#" className="hover:text-green-500 transition">プライバシーポリシー</Link></li>
               <li><Link href="#" className="hover:text-green-500 transition">特定商取引法に基づく表記</Link></li>
               <li><Link href="#" className="hover:text-green-500 transition">運営会社</Link></li>
