@@ -53,7 +53,11 @@ export async function fetchApi<T>(
   options?: RequestInit,
 ): Promise<T> {
   const apiUrl = getApiUrl();
-  const url = `${apiUrl}/api${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith("/api") 
+  ? endpoint.slice(4) // "/api" の4文字を削る
+  : endpoint;
+
+const url = `${apiUrl}/api${cleanEndpoint.startsWith("/") ? cleanEndpoint : `/${cleanEndpoint}`}`;
 
   // デバッグログ出力
   const addLog = (msg: string) => {

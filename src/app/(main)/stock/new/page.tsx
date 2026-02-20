@@ -52,9 +52,12 @@ export default function StockNewPage() {
   const [itemCondition, setItemCondition] = useState(0); // 0:新品
 
   // Fetch categories on mount (draft is created when first image is added)
-  useEffect(() => {
+    useEffect(() => {
     getCategories()
-      .then((data) => setCategories(data))
+      .then((data) => {
+        console.log("取得したデータ:", data);
+        setCategories(data);
+      })
       .catch((err) => console.error("Failed to fetch categories", err));
   }, []);
 
@@ -279,13 +282,13 @@ export default function StockNewPage() {
             <option value="" className="text-gray-900">
               選択してください
             </option>
-            {categories.map((cat) => (
+            {categories?.map((cat) => (
               <option
-                key={cat.categoryId}
-                value={cat.categoryId}
+                key={cat.category_id}
+                value={cat.category_id}
                 className="text-gray-900"
               >
-                {cat.name}
+                {cat.category_name}
               </option>
             ))}
           </select>

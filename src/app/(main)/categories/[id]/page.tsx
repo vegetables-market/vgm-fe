@@ -11,7 +11,7 @@ type CategoriesResponse =
 export async function generateStaticParams() {
   const apiBaseUrl =
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-  const url = `${apiBaseUrl}/api/v1/market/categories`;
+  const url = `${apiBaseUrl}/v1/market/categories`;
 
   const collectIds = (cats: Array<any>, acc: string[]) => {
     for (const c of cats) {

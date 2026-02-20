@@ -29,16 +29,16 @@ export interface SellerInfo {
  * Backend: ItemResponse.kt
  */
 export interface ItemResponse {
-  itemId: string; // changed
+  item_id: string; // changed
   title: string;
   description: string | null;
   price: number;
-  categoryId: number | null;
-  categoryName: string | null;
+  category_id: number | null;
+  category_name: string | null;
   condition: number;
   status: number;
-  likesCount: number;
-  thumbnailUrl: string | null;
+  likes_count: number;
+  thumbnail_url: string | null;
   seller: SellerInfo;
   createdAt: string;
 }

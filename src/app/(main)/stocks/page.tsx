@@ -5,23 +5,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
 
 interface StockItem {
-  itemId: number;
+  item_id: string;
   title: string;
   description: string | null;
   price: number;
-  categoryId: number | null;
-  categoryName: string | null;
+  category_id: number | null;
+  category_name: string | null;
   condition: number;
   status: number;
-  likesCount: number;
-  thumbnailUrl: string | null;
+  likes_count: number;
+  thumbnail_url: string | null;
   seller: {
-    userId: number;
+    user_id: number;
     username: string;
-    displayName: string;
-    avatarUrl: string | null;
+    display_name: string;
+    avatar_url: string | null;
   };
-  createdAt: string;
+  created_at: string;
 }
 
 interface PaginatedResponse {
@@ -74,7 +74,7 @@ export default function StocksPage() {
       params.append("limit", "20");
 
       const data = await fetchApi<PaginatedResponse>(
-        `/v1/market/items/search?${params.toString()}`,
+        `/api/v1/market/items/search?${params.toString()}`,
         { credentials: "include" }
       );
 
@@ -189,13 +189,13 @@ export default function StocksPage() {
           <div className="stocks-grid">
             {stocks.map((stock) => (
               <div
-                key={stock.itemId}
+                key={stock.item_id}
                 className="stock-card"
-                onClick={() => router.push(`/stocks/${stock.itemId}`)}
+                onClick={() => router.push(`/stocks/${stock.item_id}`)}
               >
                 <div className="stock-image">
-                  {stock.thumbnailUrl ? (
-                    <img src={stock.thumbnailUrl} alt={stock.title} />
+                  {stock.thumbnail_url ? (
+                    <img src={stock.thumbnail_url} alt={stock.title} />
                   ) : (
                     <div className="no-image">画像なし</div>
                   )}
@@ -204,13 +204,13 @@ export default function StocksPage() {
                   <h3 className="stock-title">{stock.title}</h3>
                   <p className="stock-price">{formatPrice(stock.price)}</p>
                   <div className="stock-meta">
-                    <span className="likes-count">♥ {stock.likesCount}</span>
-                    {stock.categoryName && (
-                      <span className="category">{stock.categoryName}</span>
+                    <span className="likes-count">♥ {stock.likes_count}</span>
+                    {stock.category_name && (
+                      <span className="category">{stock.category_name}</span>
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{stock.seller.displayName}</span>
+                    <span className="seller-name">{stock.seller.display_name}</span>
                   </div>
                 </div>
               </div>
