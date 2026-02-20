@@ -25,7 +25,7 @@ export default function TermsAgreement({
         <AuthAgreementItem checked={agreed} onChange={() => setAgreed(!agreed)}>
           <span className="text-white">
             <Link
-              href="/"
+              href="/terms"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary underline"

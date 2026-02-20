@@ -61,6 +61,16 @@ export default function FavoritesPage() {
     router.push(`/stocks/${itemid}`);
   };
 
+  const getImageUrl = (raw: string | null | undefined) => {
+    if (!raw) return "/images/no-image.png";
+    if (raw.startsWith("http")) return raw;
+
+    const mediaUrl =
+      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    return `${baseUrl}/${raw}`;
+  };
+
   return (
     <div className="p-8 pt-24">
       <h1 className="mb-6 text-2xl font-bold">お気に入り</h1>
@@ -85,17 +95,11 @@ export default function FavoritesPage() {
                 className="cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg"
               >
                 <div className="relative aspect-square bg-gray-100">
-                  {stock.thumbnail_url ? (
-                    <img
-                      src={stock.thumbnail_url}
-                      alt={stock.title}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-gray-400">
-                      No Image
-                    </div>
-                  )}
+                  <img
+                    src={getImageUrl(stock.thumbnail_url)}
+                    alt={stock.title}
+                    className="h-full w-full object-cover"
+                  />
                   <button
                     onClick={(e) => handleRemoveFavorite(stock.item_id, e)}
                     className="absolute top-2 right-2 rounded-full bg-white p-2 shadow hover:bg-red-50"

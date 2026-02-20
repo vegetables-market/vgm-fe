@@ -15,6 +15,7 @@ interface StockItem {
   status: number;
   likes_count: number;
   thumbnail_url: string | null;
+  thumbnailUrl?: string | null;
   seller: {
     user_id: number;
     username: string;
@@ -112,6 +113,16 @@ export default function StocksPage() {
     }).format(price);
   };
 
+  const getImageUrl = (raw: string | null | undefined) => {
+    if (!raw) return "/images/no-image.png";
+    if (raw.startsWith("http")) return raw;
+
+    const mediaUrl =
+      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    return `${baseUrl}/${raw}`;
+  };
+
   return (
     <div className="stocks-page">
       <div className="page-header">
@@ -194,11 +205,10 @@ export default function StocksPage() {
                 onClick={() => router.push(`/stocks/${stock.item_id}`)}
               >
                 <div className="stock-image">
-                  {stock.thumbnail_url ? (
-                    <img src={stock.thumbnail_url} alt={stock.title} />
-                  ) : (
-                    <div className="no-image">画像なし</div>
-                  )}
+                  <img
+                    src={getImageUrl(stock.thumbnail_url ?? stock.thumbnailUrl)}
+                    alt={stock.title}
+                  />
                 </div>
                 <div className="stock-info">
                   <h3 className="stock-title">{stock.title}</h3>
