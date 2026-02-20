@@ -7,7 +7,7 @@ import { deleteItem } from "@/services/market/items/delete-item";
 import { updateItemStatus } from "@/services/market/items/update-item-status";
 
 interface Item {
-  id: number;
+  id: string;
   name: string;
   price: number;
   status: number;
@@ -20,15 +20,15 @@ interface Item {
 export default function StockPage() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<number | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const loadItems = () => {
     setLoading(true);
     getMyItems()
       .then((data: any[]) => {
         const normalizedItems: Item[] = (data || []).map((item) => ({
-          id: Number(item.id ?? item.itemId ?? item.item_id ?? 0),
+          id: String(item.id ?? item.itemId ?? item.item_id ?? ""),
           name: item.name ?? item.title ?? "",
           price: Number(item.price ?? 0),
           status: Number(item.status ?? 0),
@@ -50,7 +50,7 @@ export default function StockPage() {
     loadItems();
   }, []);
 
-  const handleDelete = async (itemId: number, itemName: string) => {
+  const handleDelete = async (itemId: string, itemName: string) => {
     if (!confirm(`「${itemName}」を削除しますか？この操作は取り消せません。`)) {
       return;
     }
@@ -67,7 +67,7 @@ export default function StockPage() {
     }
   };
 
-  const handleToggleStatus = async (itemId: number, currentStatus: number) => {
+  const handleToggleStatus = async (itemId: string, currentStatus: number) => {
     // status 2 (出品中) ⇔ status 5 (停止中) の切り替え
     const newStatus = currentStatus === 2 ? 5 : 2;
     const statusText = newStatus === 2 ? "出品中" : "停止中";
