@@ -19,8 +19,20 @@ export default function BasketPage() {
 
   const fetchCart = async () => {
     try {
-      const data = await fetchCartApi();
-      setCart(data);
+      const data: any = await fetchCartApi();
+      const normalizedCart: CartResponse = {
+        items: (data?.items || []).map((item: any) => ({
+          cartItemId: Number(item.cartItemId ?? item.cart_item_id ?? 0),
+          itemId: String(item.itemId ?? item.item_id ?? ""),
+          name: item.name ?? "",
+          price: Number(item.price ?? 0),
+          quantity: Number(item.quantity ?? 0),
+          subtotal: Number(item.subtotal ?? item.sub_total ?? 0),
+          thumbnailUrl: item.thumbnailUrl ?? item.thumbnail_url ?? null,
+        })),
+        totalAmount: Number(data?.totalAmount ?? data?.total_amount ?? 0),
+      };
+      setCart(normalizedCart);
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {
@@ -176,7 +188,7 @@ export default function BasketPage() {
 
         <div className="flex flex-col gap-4">
           <Link
-            href="/purchase"
+            href={`/purchase?itemId=${encodeURIComponent(cart.items[0].itemId)}`}
             className="block w-full rounded-lg bg-red-500 py-4 text-center text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600"
           >
             購入手続きへ進む
