@@ -8,6 +8,11 @@ export interface Category {
   category_id: number;
   category_name: string;
   parent_category_id: number | null;
+  categoryId?: number;
+  categoryName?: string;
+  name?: string;
+  parentId?: number | null;
+  parentCategoryId?: number | null;
 }
 
 interface CategoryApiNode {
@@ -21,28 +26,21 @@ interface CategoryApiNode {
 }
 
 export const getCategories = async (): Promise<Category[]> => {
-<<<<<<< HEAD
-  const response = await fetchApi<Category[]>(
-=======
   const response = await fetchApi<CategoryApiNode[]>(
->>>>>>> 6886c9c602790a287d5c2e66191cb7809bf2397a
     `${API_ENDPOINTS.CATEGORIES}`,
     {
       method: "GET",
     },
   );
-<<<<<<< HEAD
-  return response;
-=======
 
   const flat: Category[] = [];
   const seen = new Set<number>();
   const visit = (node: CategoryApiNode) => {
     const categoryId = node.categoryId ?? node.category_id;
-    const name = node.categoryName ?? node.category_name;
+    const categoryName = node.categoryName ?? node.category_name;
     const parentCategoryId = node.parentId ?? node.parent_id ?? null;
 
-    if (categoryId == null || !name) {
+    if (categoryId == null || !categoryName) {
       node.children?.forEach(visit);
       return;
     }
@@ -54,8 +52,13 @@ export const getCategories = async (): Promise<Category[]> => {
     seen.add(categoryId);
 
     flat.push({
+      category_id: categoryId,
+      category_name: categoryName,
+      parent_category_id: parentCategoryId,
       categoryId,
-      name,
+      categoryName,
+      name: categoryName,
+      parentId: parentCategoryId,
       parentCategoryId,
     });
     node.children?.forEach(visit);
@@ -63,5 +66,4 @@ export const getCategories = async (): Promise<Category[]> => {
 
   response.forEach(visit);
   return flat;
->>>>>>> 6886c9c602790a287d5c2e66191cb7809bf2397a
 };

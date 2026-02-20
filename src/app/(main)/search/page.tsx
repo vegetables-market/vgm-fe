@@ -37,14 +37,6 @@ export default function SearchPage() {
     };
   }, []);
 
-  const handleInputFocus = () => {
-    // iOSでのキーボード表示を確実にするための処理
-    if (inputRef.current) {
-      inputRef.current.click();
-      inputRef.current.setSelectionRange(0, 0);
-    }
-  };
-
   return (
   <div>
     <h1>「{query}」の検索結果: {items.length}件</h1>
