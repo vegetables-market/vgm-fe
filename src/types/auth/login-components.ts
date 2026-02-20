@@ -16,4 +16,5 @@ export interface LoginActions {
 export interface LoginFormProps {
   state: LoginState;
   actions: LoginActions;
+  connectProvider?: "google" | "microsoft" | "github" | null;
 }

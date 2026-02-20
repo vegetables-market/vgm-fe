@@ -8,7 +8,11 @@ import OrDivider from "@/components/ui/auth/OrDivider";
 import type { LoginFormProps } from "@/types/auth/login-components";
 import AuthRecoveryText from "@/components/ui/auth/AuthRecoveryText";
 
-export default function LoginForm({ state, actions }: LoginFormProps) {
+export default function LoginForm({
+  state,
+  actions,
+  connectProvider,
+}: LoginFormProps) {
   const { emailOrUsername, error, isLoading, redirectTo } = state;
   const { setEmailOrUsername, onSubmit, addLog } = actions;
 
@@ -18,6 +22,7 @@ export default function LoginForm({ state, actions }: LoginFormProps) {
 
       <AuthSocialButtons
         mode="login"
+        autoProvider={connectProvider ?? undefined}
         onProviderClick={(id) => addLog(`Social login clicked: ${id}`)}
       />
 
