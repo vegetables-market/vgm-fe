@@ -12,6 +12,7 @@ interface Item {
   price: number;
   status: number;
   imageUrl: string | null;
+  image_url?: string | null;
   createdAt: string;
 }
 
@@ -182,7 +183,7 @@ export default function StockPage() {
                       <div className="h-14 w-14 flex-shrink-0">
                         <img
                           className="h-14 w-14 rounded border object-cover"
-                          src={getImageUrl(item.imageUrl)}
+                          src={getImageUrl(item.imageUrl ?? item.image_url ?? null)}
                           alt={item.name}
                         />
                       </div>
