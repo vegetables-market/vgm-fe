@@ -15,7 +15,7 @@ export default function MainPage() {
 
       <div className="mb-4 flex flex-wrap gap-4">
         <Link
-          href="/stock/new"
+          href="/my/stocks/new"
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
         >
           出品する

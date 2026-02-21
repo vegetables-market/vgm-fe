@@ -1,5 +1,5 @@
-import type { StockListPagination } from "@/lib/market/types/stock-list-pagination";
-import type { StockListPaginationRaw } from "@/service/market/providers/vgm/dto/stock-list-pagination-raw";
+import type { StockListPagination } from "@/lib/market/stocks/types/stock-list-pagination";
+import type { StockListPaginationRaw } from "@/service/market/stocks/dto/stock-list-pagination-raw";
 
 export function mapStockListPagination(
   raw?: StockListPaginationRaw,

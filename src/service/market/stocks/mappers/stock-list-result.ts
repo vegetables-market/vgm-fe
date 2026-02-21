@@ -1,5 +1,5 @@
-import type { StockListResult } from "@/lib/market/types/stock-list-result";
-import type { StockListApiResponse } from "@/service/market/providers/vgm/dto/stock-list-api-response";
+import type { StockListResult } from "@/lib/market/stocks/types/stock-list-result";
+import type { StockListApiResponse } from "@/service/market/stocks/dto/stock-list-api-response";
 import { mapStockListItem } from "./stock-list-item";
 import { mapStockListPagination } from "./stock-list-pagination";
 

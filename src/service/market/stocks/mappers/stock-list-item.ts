@@ -1,5 +1,5 @@
-import type { StockListItem } from "@/lib/market/types/stock-list-item";
-import type { StockItemRaw } from "@/service/market/providers/vgm/dto/stock-item-raw";
+import type { StockListItem } from "@/lib/market/stocks/types/stock-list-item";
+import type { StockItemRaw } from "@/service/market/stocks/dto/stock-item-raw";
 import { mapStockSeller } from "./stock-seller";
 
 export function mapStockListItem(raw: StockItemRaw): StockListItem {

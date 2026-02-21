@@ -1,4 +1,4 @@
-import type { StockListQuery } from "@/lib/market/types/stock-list-query";
+import type { StockListQuery } from "@/lib/market/stocks/types/stock-list-query";
 
 export function buildStockListSearchParams(query: StockListQuery): URLSearchParams {
   const params = new URLSearchParams();

@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getCategories } from "@/services/market/categories/get-categories";
-import { updateItem } from "@/services/market/items/update-item";
+import { getCategories } from "@/service/market/stocks/get-categories";
+import { updateItem } from "@/service/market/stocks/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 
@@ -38,24 +38,24 @@ export default function StockNewPage() {
   ];
   const shippingMethodOptions = [
     { id: 1, name: "未定" },
-    { id: 2, name: "らくらくメルカリ便" },
+    { id: 2, name: "繧峨￥繧峨￥繝｡繝ｫ繧ｫ繝ｪ萓ｿ" },
   ];
   const prefectureOptions = [
-    { id: 13, name: "東京都" },
+    { id: 13, name: "譚ｱ莠ｬ驛ｽ" },
     { id: 27, name: "大阪府" },
   ];
 
   const [shippingDaysId, setShippingDaysId] = useState(1);
   const [shippingMethodId, setShippingMethodId] = useState(1);
   const [prefectureId, setPrefectureId] = useState(13);
-  const [shippingPayerType, setShippingPayerType] = useState(0); // 0:送料込
-  const [itemCondition, setItemCondition] = useState(0); // 0:新品
+  const [shippingPayerType, setShippingPayerType] = useState(0); // 0:騾∵侭霎ｼ
+  const [itemCondition, setItemCondition] = useState(0); // 0:譁ｰ蜩・
 
   // Fetch categories on mount (draft is created when first image is added)
     useEffect(() => {
     getCategories()
       .then((data) => {
-        console.log("取得したデータ:", data);
+        console.log("蜿門ｾ励＠縺溘ョ繝ｼ繧ｿ:", data);
         setCategories(data);
       })
       .catch((err) => console.error("Failed to fetch categories", err));
@@ -83,7 +83,7 @@ export default function StockNewPage() {
     if (e.target.files && e.target.files.length > 0) {
       addFiles(Array.from(e.target.files));
     }
-    // file inputクリア
+    // file input繧ｯ繝ｪ繧｢
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -91,10 +91,10 @@ export default function StockNewPage() {
     e.preventDefault();
     setError("");
 
-    // StateのitemIdまたはRefから取得（Reactの非同期State更新によるタイミングずれを回避）
+    // State縺ｮitemId縺ｾ縺滂ｿｽERef縺九ｉ蜿門ｾ暦ｼ・eact縺ｮ髱槫酔譛欖tate譖ｴ譁ｰ縺ｫ繧医ｋ繧ｿ繧､繝溘Φ繧ｰ縺壹ｌ繧貞屓驕ｿ・ｽE・ｽE
     let currentItemId = itemId ?? getItemId();
     if (!currentItemId) {
-      // まだDraftが作られていない場合は作成を試みる
+      // 縺ｾ縺Draft縺御ｽ懊ｉ繧後※縺・・ｽ・ｽ縺・・ｽ・ｽ蜷茨ｿｽE菴懶ｿｽE繧定ｩｦ縺ｿ繧・
       try {
         currentItemId = await initDraft();
       } catch {
@@ -109,25 +109,25 @@ export default function StockNewPage() {
     }
 
     if (files.length === 0) {
-      setError("画像アップロードは必須です。");
+      setError("画像を1枚以上選択してください。");
       return;
     }
 
     if (pendingCount > 0) {
-      setError("画像のアップロード中です。完了までお待ちください。");
+      setError("画像のアップロード中です。完了まで待ってください。");
       return;
     }
 
     if (hasError) {
       setError(
-        "画像のアップロードに失敗しているものがあります。削除してやり直してください。",
+        "画像のアップロードでエラーが発生しています。再アップロードしてください。",
       );
       return;
     }
 
-    // 既に完了していなければチェック
+    // 譌｢縺ｫ螳御ｺ・・ｽ・ｽ縺ｦ縺・・ｽ・ｽ縺代ｌ縺ｰ繝√ぉ繝・・ｽ・ｽ
     if (!isAllCompleted) {
-      setError("画像のアップロードが完了していません。");
+      setError("画像アップロードの完了を待ってください。");
       return;
     }
 
@@ -152,7 +152,7 @@ export default function StockNewPage() {
       };
 
       await updateItem(currentItemId, payload);
-      router.push("/stock"); // 一覧へ遷移
+      router.push("/my/stocks"); // 荳隕ｧ縺ｸ驕ｷ遘ｻ
     } catch (err) {
       console.error(err);
       setError("出品に失敗しました。");
@@ -162,7 +162,7 @@ export default function StockNewPage() {
   };
 
   if (draftLoading) {
-    return <div className="p-8 text-center">読み込み中...</div>;
+    return <div className="p-8 text-center">隱ｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>;
   }
 
   return (
@@ -176,10 +176,10 @@ export default function StockNewPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 画像アップロード UI */}
+        {/* 逕ｻ蜒上い繝・・ｽE繝ｭ繝ｼ繝・UI */}
         <div>
           <label className="mb-2 block text-sm font-medium text-gray-900">
-            商品画像 (必須)
+            蝠・・ｽ・ｽ逕ｻ蜒・(蠢・・ｽ・ｽE
           </label>
 
           <div
@@ -197,11 +197,11 @@ export default function StockNewPage() {
               onChange={handleFileSelect}
             />
             <p className="text-gray-500">
-              ドラッグ＆ドロップ または クリックして画像をアップロード
+              繝峨Λ繝・・ｽ・ｽ・ｽE・ｽE・ｽ・ｽ繝ｭ繝・・ｽE 縺ｾ縺滂ｿｽE 繧ｯ繝ｪ繝・・ｽ・ｽ縺励※逕ｻ蜒上ｒ繧｢繝・・ｽE繝ｭ繝ｼ繝・
             </p>
           </div>
 
-          {/* プレビューグリッド */}
+          {/* 繝励Ξ繝薙Η繝ｼ繧ｰ繝ｪ繝・・ｽ・ｽ */}
           {files.length > 0 && (
             <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4">
               {files.map((file) => (
@@ -223,7 +223,7 @@ export default function StockNewPage() {
                       onClick={() => removeFile(file.id)}
                       className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
                     >
-                      ×
+                      ﾃ・
                     </button>
                   </div>
 
@@ -256,15 +256,15 @@ export default function StockNewPage() {
           )}
 
           <div className="mt-2 text-right text-sm text-gray-500">
-            {files.length}枚の画像 (アップロード済み:{" "}
+            {files.length}譫夲ｿｽE逕ｻ蜒・(繧｢繝・・ｽE繝ｭ繝ｼ繝画ｸ医∩:{" "}
             {files.filter((f) => f.status === "completed").length})
           </div>
         </div>
 
-        {/* 商品詳細 */}
+        {/* 蝠・・ｽ・ｽ隧ｳ邏ｰ */}
         <div>
           <label className="block text-sm font-medium text-gray-900">
-            商品名 (必須)
+            蝠・・ｽ・ｽ蜷・(蠢・・ｽ・ｽE
           </label>
           <input
             type="text"
@@ -277,7 +277,7 @@ export default function StockNewPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-900">
-            商品の説明 (必須)
+            蝠・・ｽ・ｽ縺ｮ隱ｬ譏・(蠢・・ｽ・ｽE
           </label>
           <textarea
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
@@ -288,10 +288,10 @@ export default function StockNewPage() {
           />
         </div>
 
-        {/* カテゴリ */}
+        {/* 繧ｫ繝・・ｽ・ｽ繝ｪ */}
         <div>
           <label className="block text-sm font-medium text-gray-900">
-            カテゴリー (必須)
+            繧ｫ繝・・ｽ・ｽ繝ｪ繝ｼ (蠢・・ｽ・ｽE
           </label>
           <select
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
@@ -300,7 +300,7 @@ export default function StockNewPage() {
             required
           >
             <option value="" className="text-gray-900">
-              選択してください
+              驕ｸ謚槭＠縺ｦ縺上□縺輔＞
             </option>
             {categories?.map((cat) => (
               <option
@@ -314,10 +314,10 @@ export default function StockNewPage() {
           </select>
         </div>
 
-        {/* 商品の状態 */}
+        {/* 蝠・・ｽ・ｽ縺ｮ迥ｶ諷・*/}
         <div>
           <label className="block text-sm font-medium text-gray-900">
-            商品の状態
+            蝠・・ｽ・ｽ縺ｮ迥ｶ諷・
           </label>
           <select
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
@@ -325,26 +325,26 @@ export default function StockNewPage() {
             onChange={(e) => setItemCondition(Number(e.target.value))}
           >
             <option value="0" className="text-gray-900">
-              新品、未使用
+              譁ｰ蜩√∵悴菴ｿ逕ｨ
             </option>
             <option value="1" className="text-gray-900">
-              未使用に近い
+              譛ｪ菴ｿ逕ｨ縺ｫ霑代＞
             </option>
             <option value="2" className="text-gray-900">
-              目立った傷や汚れなし
+              逶ｮ遶九▲縺溷す繧・・ｽ・ｽ繧後↑縺・
             </option>
           </select>
         </div>
 
-        {/* 配送について */}
+        {/* 驟埼√↓縺､縺・・ｽ・ｽ */}
         <div className="border-t pt-4">
           <h3 className="mb-4 text-lg font-medium text-gray-900">
-            配送について
+            驟埼√↓縺､縺・・ｽ・ｽ
           </h3>
           <div className="grid grid-cols-1 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                配送料の負担
+                驟埼∵侭縺ｮ雋諡・
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm"
@@ -352,17 +352,17 @@ export default function StockNewPage() {
                 onChange={(e) => setShippingPayerType(Number(e.target.value))}
               >
                 <option value="0" className="text-gray-900">
-                  送料込み (出品者負担)
+                  騾∵侭霎ｼ縺ｿ (蜃ｺ蜩∬・・ｽ・ｽ諡・
                 </option>
                 <option value="1" className="text-gray-900">
-                  着払い (購入者負担)
+                  逹謇輔＞ (雉ｼ蜈･閠・・ｽ・ｽ諡・
                 </option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                発送元の地域
+                逋ｺ騾・ｿｽE縺ｮ蝨ｰ蝓・
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm"
@@ -379,7 +379,7 @@ export default function StockNewPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                発送までの日数
+                逋ｺ騾√∪縺ｧ縺ｮ譌･謨ｰ
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm"
@@ -396,7 +396,7 @@ export default function StockNewPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                配送方法
+                驟埼∵婿豕・
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm"
@@ -413,17 +413,17 @@ export default function StockNewPage() {
           </div>
         </div>
 
-        {/* 価格・在庫 */}
+        {/* 萓｡譬ｼ繝ｻ蝨ｨ蠎ｫ */}
         <div className="border-t pt-4">
-          <h3 className="mb-4 text-lg font-medium text-gray-900">価格と在庫</h3>
+          <h3 className="mb-4 text-lg font-medium text-gray-900">萓｡譬ｼ縺ｨ蝨ｨ蠎ｫ</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                販売価格 (必須)
+                雋ｩ螢ｲ萓｡譬ｼ (蠢・・ｽ・ｽE
               </label>
               <div className="relative mt-1 rounded-md shadow-sm">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span className="text-gray-500 sm:text-sm">¥</span>
+                  <span className="text-gray-500 sm:text-sm">ﾂ･</span>
                 </div>
                 <input
                   type="number"
@@ -437,7 +437,7 @@ export default function StockNewPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                在庫数
+                蝨ｨ蠎ｫ謨ｰ
               </label>
               <input
                 type="number"
@@ -461,9 +461,9 @@ export default function StockNewPage() {
             } focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none`}
           >
             {loading
-              ? "処理中..."
+              ? "蜃ｦ逅・・ｽ・ｽ..."
               : pendingCount > 0
-                ? `画像アップロード中 (${pendingCount})`
+                ? `逕ｻ蜒上い繝・・ｽE繝ｭ繝ｼ繝我ｸｭ (${pendingCount})`
                 : "出品する"}
           </button>
         </div>

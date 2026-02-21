@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getCart as fetchCartApi } from "@/services/market/cart/get-cart";
-import { updateCartItem } from "@/services/market/cart/update-cart-item";
-import { removeFromCart as removeCartItem } from "@/services/market/cart/remove-from-cart";
+import { getCart as fetchCartApi } from "@/service/market/cart/get-cart";
+import { updateCartItem } from "@/service/market/cart/update-cart-item";
+import { removeFromCart as removeCartItem } from "@/service/market/cart/remove-from-cart";
 import type { CartResponse } from "@/types/market/cart";
 import AuthGuard from "@/components/features/auth/AuthGuard";
 
@@ -39,7 +39,7 @@ function BasketContent() {
       await updateCartItem(cartItemId, newQuantity);
       await fetchCart(); // Refresh cart
     } catch (error) {
-      alert("数量の変更に失敗しました");
+      alert("謨ｰ驥擾ｿｽE螟画峩縺ｫ螟ｱ謨励＠縺ｾ縺励◆");
       console.error(error);
     } finally {
       setIsUpdating(false);
@@ -53,7 +53,7 @@ function BasketContent() {
       await removeCartItem(cartItemId);
       await fetchCart(); // Refresh cart
     } catch (error) {
-      alert("削除に失敗しました");
+      alert("蜑企勁縺ｫ螟ｱ謨励＠縺ｾ縺励◆");
       console.error(error);
     } finally {
       setIsUpdating(false);
@@ -70,19 +70,19 @@ function BasketContent() {
   };
 
   if (isLoading) {
-    return <div className="p-8 text-center text-gray-500">読み込み中...</div>;
+    return <div className="p-8 text-center text-gray-500">隱ｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>;
   }
 
   if (!cart || cart.items.length === 0) {
     return (
       <div className="mx-auto max-w-4xl p-4 text-center md:p-8">
         <h1 className="mb-8 text-2xl font-bold">カート</h1>
-        <p className="mb-8 text-gray-500">カートに商品が入っていません</p>
+        <p className="mb-8 text-gray-500">繧ｫ繝ｼ繝医↓蝠・・ｽ・ｽ縺鯉ｿｽE縺｣縺ｦ縺・・ｽ・ｽ縺帙ｓ</p>
         <Link
           href="/stocks"
           className="inline-block rounded-lg bg-red-500 px-6 py-3 font-bold text-white transition-colors hover:bg-red-600"
         >
-          商品一覧へ
+          蝠・・ｽ・ｽ荳隕ｧ縺ｸ
         </Link>
       </div>
     );
@@ -91,7 +91,7 @@ function BasketContent() {
   return (
     <div className="mx-auto min-h-screen max-w-4xl bg-white p-4 md:p-8">
       <h1 className="mb-8 border-b pb-4 text-2xl font-bold text-gray-900">
-        カート
+        繧ｫ繝ｼ繝・
       </h1>
 
       <div className="space-y-6">
@@ -121,7 +121,7 @@ function BasketContent() {
                 {item.name}
               </Link>
               <p className="mt-1 font-bold text-red-500">
-                ¥{item.price.toLocaleString()}
+                ﾂ･{item.price.toLocaleString()}
               </p>
             </div>
 
@@ -155,13 +155,13 @@ function BasketContent() {
                 disabled={isUpdating}
                 className="text-sm text-gray-500 underline hover:text-red-500"
               >
-                削除
+                蜑企勁
               </button>
             </div>
 
             <div className="text-right text-gray-800 sm:min-w-[100px]">
               <p className="text-xs text-gray-500">小計</p>
-              <p className="font-bold">¥{item.subtotal.toLocaleString()}</p>
+              <p className="font-bold">ﾂ･{item.subtotal.toLocaleString()}</p>
             </div>
           </div>
         ))}
@@ -171,7 +171,7 @@ function BasketContent() {
         <div className="mb-6 flex items-center justify-between text-xl font-bold text-gray-900">
           <span>合計金額</span>
           <span className="text-red-500">
-            ¥{cart.totalAmount.toLocaleString()}
+            ﾂ･{cart.totalAmount.toLocaleString()}
           </span>
         </div>
 
@@ -180,13 +180,13 @@ function BasketContent() {
             href="/purchase"
             className="block w-full rounded-lg bg-red-500 py-4 text-center text-lg font-bold text-white shadow-md transition-colors hover:bg-red-600"
           >
-            購入手続きへ進む
+            雉ｼ蜈･謇狗ｶ壹″縺ｸ騾ｲ繧
           </Link>
           <Link
             href="/stocks"
             className="block w-full rounded-lg border border-gray-300 py-3 text-center text-gray-600 transition-colors hover:bg-gray-50"
           >
-          買い物を続ける
+          雋ｷ縺・・ｽ・ｽ繧堤ｶ壹￠繧・
         </Link>
         </div>
       </div>

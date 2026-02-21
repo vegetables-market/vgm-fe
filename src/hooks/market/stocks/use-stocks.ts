@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
-import type { StockListQuery } from "@/lib/market/types/stock-list-query";
-import type { StockListResult } from "@/lib/market/types/stock-list-result";
-import { getStocks } from "@/service/market/get-stocks";
+import type { StockListQuery } from "@/lib/market/stocks/types/stock-list-query";
+import type { StockListResult } from "@/lib/market/stocks/types/stock-list-result";
+import { getStocks } from "@/service/market/stocks/get-stocks";
 
 const INITIAL_RESULT: StockListResult = {
   items: [],
@@ -27,7 +27,7 @@ export function useStocks() {
       setResult(next);
       return next;
     } catch (error_: unknown) {
-      const message = error_ instanceof Error ? error_.message : "商品の取得に失敗しました";
+      const message = error_ instanceof Error ? error_.message : "啁E��の取得に失敗しました";
       setError(message);
       throw error_;
     } finally {

@@ -1,26 +1,26 @@
 import { useState, useCallback, useRef } from "react";
-import { createDraft } from "@/services/market/items/create-draft";
+import { createDraft } from "@/service/market/stocks/create-draft";
 
 export function useItemDraft() {
   const [itemId, setItemId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  // 重複呼び出し防止用のRef
+  // 重褁E��び出し防止用のRef
   const isCreatingRef = useRef(false);
   const createdIdRef = useRef<string | null>(null);
-  // 待機中のPromise resolver を保持
+  // 征E��中のPromise resolver を保持
   const waitingResolversRef = useRef<Array<(id: string) => void>>([]);
 
   /**
-   * Draft Itemを作成または既存のIDを返却
-   * 既にitemIdがある場合はAPIコールせずそのIDを返す
+   * Draft Itemを作�Eまた�E既存�EIDを返却
+   * 既にitemIdがある場合�EAPIコールせずそ�EIDを返す
    */
   const initDraft = useCallback(async (): Promise<string> => {
-    // 既に作成済みの場合は即座に返す
+    // 既に作�E済みの場合�E即座に返す
     if (createdIdRef.current) return createdIdRef.current;
 
-    // 作成中の場合は完了を待機（重複防止）
+    // 作�E中の場合�E完亁E��征E��（重褁E��止�E�E
     if (isCreatingRef.current) {
       return new Promise<string>((resolve) => {
         waitingResolversRef.current.push(resolve);
@@ -36,7 +36,7 @@ export function useItemDraft() {
       createdIdRef.current = response.itemId;
       setItemId(response.itemId);
 
-      // 待機中の呼び出しに結果を通知
+      // 征E��中の呼び出しに結果を通知
       waitingResolversRef.current.forEach((resolve) =>
         resolve(response.itemId),
       );
@@ -51,12 +51,12 @@ export function useItemDraft() {
       throw errorObj;
     } finally {
       setLoading(false);
-      // エラー時のみリセット（成功時は createdIdRef が設定されているので再試行されない）
+      // エラー時�EみリセチE���E��E功時は createdIdRef が設定されてぁE��ので再試行されなぁE��E
       if (!createdIdRef.current) {
         isCreatingRef.current = false;
       }
     }
-  }, []); // 依存配列を空に - Refで状態管理しているので不要
+  }, []); // 依存�E列を空に - Refで状態管琁E��てぁE��ので不要E
 
   return {
     itemId,
