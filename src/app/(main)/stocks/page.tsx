@@ -1,125 +1,47 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { fetchApi } from "@/lib/api/fetch";
-
-interface StockItem {
-  item_id: string;
-  title: string;
-  description: string | null;
-  price: number;
-  category_id: number | null;
-  category_name: string | null;
-  condition: number;
-  status: number;
-  likes_count: number;
-  thumbnail_url: string | null;
-  thumbnailUrl?: string | null;
-  image_url?: string | null;
-  imageUrl?: string | null;
-  seller: {
-    user_id: number;
-    username: string;
-    display_name: string;
-    avatar_url: string | null;
-  };
-  created_at: string;
-}
-
-interface PaginatedResponse {
-  items: any[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages?: number;
-    total_pages?: number;
-  };
-}
+import type { StockListSort } from "@/lib/market/types/stock-list-sort";
+import { useStocks } from "@/hooks/market/use-stocks";
 
 export default function StocksPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  const [stocks, setStocks] = useState<StockItem[]>([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const { result, isLoading, error, searchStocks } = useStocks();
 
-  // 検索パラメータ
+  // 讀懃ｴ｢繝代Λ繝｡繝ｼ繧ｿ
   const [keyword, setKeyword] = useState(searchParams.get("q") || "");
   const categoryId = searchParams.get("categoryId") || "";
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
-  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
+  const [sort, setSort] = useState<StockListSort>(
+    (searchParams.get("sort") as StockListSort) || "newest",
+  );
 
   useEffect(() => {
-    searchStocks();
-  }, [searchParams]);
+    const rawSort = searchParams.get("sort");
+    const page = Number(searchParams.get("page") || "1");
+    const resolvedPage = Number.isFinite(page) && page > 0 ? page : 1;
 
-  const searchStocks = async () => {
-    setIsLoading(true);
-    setError("");
+    const load = async () => {
+      try {
+        await searchStocks({
+          keyword: searchParams.get("q") || undefined,
+          categoryId: searchParams.get("categoryId") || undefined,
+          minPrice: searchParams.get("minPrice") || undefined,
+          maxPrice: searchParams.get("maxPrice") || undefined,
+          sort: (rawSort as StockListSort) || "newest",
+          page: resolvedPage,
+          limit: 20,
+        });
+      } catch {
+        // error state is managed in hook
+      }
+    };
 
-    try {
-      const params = new URLSearchParams();
-      if (keyword) params.append("q", keyword);
-      if (categoryId) params.append("categoryId", categoryId);
-      if (minPrice) params.append("minPrice", minPrice);
-      if (maxPrice) params.append("maxPrice", maxPrice);
-      params.append("sort", sort);
-      params.append("page", searchParams.get("page") || "1");
-      params.append("limit", "20");
-
-      const data = await fetchApi<PaginatedResponse>(
-        `/api/v1/market/items/search?${params.toString()}`,
-        { credentials: "include" }
-      );
-
-      const normalizedStocks: StockItem[] = (data.items || []).map((item) => ({
-        item_id: String(item.item_id ?? item.itemId ?? ""),
-        title: item.title ?? item.name ?? "",
-        description: item.description ?? null,
-        price: Number(item.price ?? 0),
-        category_id: item.category_id ?? item.categoryId ?? null,
-        category_name: item.category_name ?? item.categoryName ?? null,
-        condition: Number(item.condition ?? 0),
-        status: Number(item.status ?? 0),
-        likes_count: Number(item.likes_count ?? item.likesCount ?? 0),
-        thumbnail_url: item.thumbnail_url ?? item.thumbnailUrl ?? null,
-        thumbnailUrl: item.thumbnailUrl ?? item.thumbnail_url ?? null,
-        image_url: item.image_url ?? item.imageUrl ?? null,
-        imageUrl: item.imageUrl ?? item.image_url ?? null,
-        seller: {
-          user_id: Number(item.seller?.user_id ?? item.seller?.userId ?? 0),
-          username: item.seller?.username ?? "",
-          display_name:
-            item.seller?.display_name ?? item.seller?.displayName ?? "",
-          avatar_url: item.seller?.avatar_url ?? item.seller?.avatarUrl ?? null,
-        },
-        created_at: item.created_at ?? item.createdAt ?? "",
-      }));
-
-      setStocks(normalizedStocks);
-      setPagination({
-        page: data.pagination?.page ?? 1,
-        limit: data.pagination?.limit ?? 20,
-        total: data.pagination?.total ?? 0,
-        totalPages:
-          data.pagination?.totalPages ?? data.pagination?.total_pages ?? 0,
-      });
-    } catch (err: any) {
-      setError(err.message || "在庫の取得に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    load();
+  }, [searchParams, searchStocks]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -163,10 +85,10 @@ export default function StocksPage() {
   return (
     <div className="stocks-page">
       <div className="page-header">
-        <h1 className="page-title">在庫検索</h1>
+        <h1 className="page-title">蝨ｨ蠎ｫ讀懃ｴ｢</h1>
       </div>
 
-      {/* 検索バー */}
+      {/* 讀懃ｴ｢繝舌・ */}
       <div className="search-section">
         <div className="search-bar">
           <input
@@ -174,24 +96,24 @@ export default function StocksPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="在庫を検索..."
+            placeholder="蝨ｨ蠎ｫ繧呈､懃ｴ｢..."
             className="search-input"
           />
           <button onClick={handleSearch} className="search-button">
-            検索
+            讀懃ｴ｢
           </button>
         </div>
 
-        {/* フィルター */}
+        {/* 繝輔ぅ繝ｫ繧ｿ繝ｼ */}
         <div className="filters">
           <div className="filter-group">
-            <label>価格範囲</label>
+            <label>萓｡譬ｼ遽・峇</label>
             <div className="price-range">
               <input
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                placeholder="最低価格"
+                placeholder="譛菴惹ｾ｡譬ｼ"
                 className="price-input"
               />
               <span>〜</span>
@@ -199,7 +121,7 @@ export default function StocksPage() {
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                placeholder="最高価格"
+                placeholder="譛鬮倅ｾ｡譬ｼ"
                 className="price-input"
               />
             </div>
@@ -209,7 +131,7 @@ export default function StocksPage() {
             <label>並び替え</label>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => setSort(e.target.value as StockListSort)}
               className="sort-select"
             >
               <option value="newest">新着順</option>
@@ -220,34 +142,31 @@ export default function StocksPage() {
           </div>
 
           <button onClick={handleSearch} className="filter-apply-button">
-            適用
+            驕ｩ逕ｨ
           </button>
         </div>
       </div>
 
-      {/* エラー表示 */}
+      {/* 繧ｨ繝ｩ繝ｼ陦ｨ遉ｺ */}
       {error && <div className="error-box">{error}</div>}
 
-      {/* ローディング */}
-      {isLoading && <div className="loading">読み込み中...</div>}
+      {/* 繝ｭ繝ｼ繝・ぅ繝ｳ繧ｰ */}
+      {isLoading && <div className="loading">隱ｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>}
 
-      {/* 商品一覧 */}
+      {/* 蝠・刀荳隕ｧ */}
       {!isLoading && (
         <>
           <div className="stocks-grid">
-            {stocks.map((stock) => (
+            {result.items.map((stock) => (
               <div
-                key={stock.item_id}
+                key={stock.itemId}
                 className="stock-card"
-                onClick={() => router.push(`/stocks/${stock.item_id}`)}
+                onClick={() => router.push(`/stocks/${stock.itemId}`)}
               >
                 <div className="stock-image">
                   <img
                     src={getImageUrl(
-                      stock.thumbnail_url ??
-                        stock.thumbnailUrl ??
-                        stock.image_url ??
-                        stock.imageUrl,
+                      stock.thumbnailUrl ?? stock.imageUrl,
                     )}
                     alt={stock.title}
                     onError={(e) => {
@@ -259,45 +178,45 @@ export default function StocksPage() {
                   <h3 className="stock-title">{stock.title}</h3>
                   <p className="stock-price">{formatPrice(stock.price)}</p>
                   <div className="stock-meta">
-                    <span className="likes-count">♥ {stock.likes_count}</span>
-                    {stock.category_name && (
-                      <span className="category">{stock.category_name}</span>
+                    <span className="likes-count">笙･ {stock.likesCount}</span>
+                    {stock.categoryName && (
+                      <span className="category">{stock.categoryName}</span>
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{stock.seller.display_name}</span>
+                    <span className="seller-name">{stock.seller.displayName}</span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* ページネーション */}
-          {pagination.totalPages > 1 && (
+          {/* 繝壹・繧ｸ繝阪・繧ｷ繝ｧ繝ｳ */}
+          {result.pagination.totalPages > 1 && (
             <div className="pagination">
               <button
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
+                onClick={() => handlePageChange(result.pagination.page - 1)}
+                disabled={result.pagination.page === 1}
                 className="pagination-button"
               >
-                前へ
+                蜑阪∈
               </button>
               <span className="pagination-info">
-                {pagination.page} / {pagination.totalPages}
+                {result.pagination.page} / {result.pagination.totalPages}
               </span>
               <button
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page === pagination.totalPages}
+                onClick={() => handlePageChange(result.pagination.page + 1)}
+                disabled={result.pagination.page === result.pagination.totalPages}
                 className="pagination-button"
               >
-                次へ
+                谺｡縺ｸ
               </button>
             </div>
           )}
 
-          {stocks.length === 0 && !isLoading && (
+          {result.items.length === 0 && !isLoading && (
             <div className="no-results">
-              <p>在庫が見つかりませんでした</p>
+              <p>蝨ｨ蠎ｫ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縺ｧ縺励◆</p>
             </div>
           )}
         </>
@@ -557,3 +476,4 @@ export default function StocksPage() {
     </div>
   );
 }
+
