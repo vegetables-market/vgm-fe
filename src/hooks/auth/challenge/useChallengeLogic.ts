@@ -1,6 +1,5 @@
 ﻿import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { verifyLogin, AuthMethod } from "@/service/auth/verify-login";
 import { verifyAuthCode } from "@/service/auth/verify-auth-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
@@ -10,9 +9,13 @@ import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
-import { verifyAction } from "@/service/auth/verify-action";
-import { login } from "@/service/auth/login";
+import { loginWithPasswordChallenge } from "@/service/auth/challenge/login-with-password-challenge";
+import { verifyActionChallenge } from "@/service/auth/challenge/verify-action-challenge";
+import { verifyEmailChallengeLogin } from "@/service/auth/challenge/verify-email-challenge-login";
+import { verifyEmailMfaChallengeLogin } from "@/service/auth/challenge/verify-email-mfa-challenge-login";
+import { verifyTotpChallengeLogin } from "@/service/auth/challenge/verify-totp-challenge-login";
 import { startPasswordRecovery } from "@/service/auth/recovery/start-password-recovery";
+import { buildNextChallengeUrl } from "@/lib/auth/challenge/build-next-challenge-url";
 
 export type UseChallengeLogicParams = {
   mode: VerificationMode;
@@ -118,19 +121,13 @@ export function useChallengeLogic({
 
     try {
       if (action) {
-        // 4. Action Verification (Delete Account etc)
-        const id = identifier || (mode === "totp" ? mfaToken : flowId);
-        if (!id) throw new Error("識別子が見つかりません。");
-
-        let method = AuthMethod.EMAIL;
-        if (mode === "totp") method = AuthMethod.TOTP;
-        if (mode === "password") method = AuthMethod.PASSWORD;
-
-        const res = await verifyAction({
-          method,
-          identifier: id,
-          code,
+        const res = await verifyActionChallenge({
+          mode,
+          flowId,
+          mfaToken,
           action,
+          identifier,
+          code,
         });
 
         setSuccessMsg("認証に成功しました。");
@@ -156,12 +153,7 @@ export function useChallengeLogic({
             return;
           }
         } else if (flowId) {
-          // Login flow: verifyLogin でセッション作成
-          const data = await verifyLogin({
-            method: AuthMethod.EMAIL,
-            identifier: flowId,
-            code,
-          });
+          const data = await verifyEmailChallengeLogin(flowId, code);
           handleLoginSuccess(data);
         } else {
           throw new Error("フローIDが見つかりません。");
@@ -169,80 +161,28 @@ export function useChallengeLogic({
       } else if (mode === "totp") {
         // 2. TOTP Verification
         if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-        const data = await verifyLogin({
-          method: AuthMethod.TOTP,
-          identifier: mfaToken,
-          code,
-        });
+        const data = await verifyTotpChallengeLogin(mfaToken, code);
         handleLoginSuccess(data);
       } else if (mode === "password") {
         if (!identifier) throw new Error("ユーザーIDが見つかりません。");
 
-        // Call standard login API
-        const data = await login({ username: identifier, password: code });
-
-        if (data.status === "MFA_REQUIRED" && data.mfa_token) {
-          // TOTP/Email MFAへ遷移
-          const mfaType = data.mfa_type?.toLowerCase() || "totp";
-          const queryParams = new URLSearchParams();
-          queryParams.set("type", mfaType);
-          queryParams.set("token", data.mfa_token);
-          if (data.masked_email) {
-            queryParams.set("masked_email", data.masked_email);
-          }
-          if (data.flow_id) {
-            queryParams.set("flow_id", data.flow_id);
-          }
-          if (data.expires_at) {
-            queryParams.set("expires_at", data.expires_at);
-          }
-          if (data.next_resend_at) {
-            queryParams.set("next_resend_at", data.next_resend_at);
-          }
-          
-          const nextUrl = withRedirectTo(
-            `/challenge?${queryParams.toString()}`,
-            redirectTo,
-          );
+        const data = await loginWithPasswordChallenge(identifier, code);
+        const nextUrl = buildNextChallengeUrl(data, redirectTo);
+        if (nextUrl) {
           router.push(nextUrl);
           return;
-        } else if (data.require_verification && data.flow_id) {
-          // Email Verificationへ遷移
-          const queryParams = new URLSearchParams();
-          queryParams.set("type", "email");
-          queryParams.set("flow_id", data.flow_id);
-          if (data.masked_email) {
-            queryParams.set("masked_email", data.masked_email);
-          }
-          if (data.expires_at) {
-            queryParams.set("expires_at", data.expires_at);
-          }
-          if (data.next_resend_at) {
-            queryParams.set("next_resend_at", data.next_resend_at);
-          }
-
-          const nextUrl = withRedirectTo(
-            `/challenge?${queryParams.toString()}`,
-            redirectTo,
-          );
-          router.push(nextUrl);
-          return;
-        } else if (data.user) {
+        }
+        if (data.user) {
           // Login Success
           handleLoginSuccess(data);
           return;
-        } else {
-          // Fallback error
-          setError("ユーザー名またはパスワードが間違っています。");
         }
+        // Fallback error
+        setError("ユーザー名またはパスワードが間違っています。");
       } else if (mode === "email_mfa") {
         // 3. Email MFA (Login Known Device)
         if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-        const data = await verifyLogin({
-          method: AuthMethod.EMAIL,
-          identifier: mfaToken,
-          code,
-        });
+        const data = await verifyEmailMfaChallengeLogin(mfaToken, code);
         handleLoginSuccess(data);
       }
     } catch (err: any) {
