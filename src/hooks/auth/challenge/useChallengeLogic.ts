@@ -237,7 +237,12 @@ export function useChallengeLogic({
       } else if (mode === "email_mfa") {
         // 3. Email MFA (Login Known Device)
         if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-        setError("この認証モードは現在サポートされていません。");
+        const data = await verifyLogin({
+          method: AuthMethod.EMAIL,
+          identifier: mfaToken,
+          code,
+        });
+        handleLoginSuccess(data);
       }
     } catch (err: any) {
       const message = getErrorMessage(err);

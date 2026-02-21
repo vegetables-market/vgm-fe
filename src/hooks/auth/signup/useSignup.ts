@@ -7,6 +7,8 @@ import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 
+const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
+
 type SignupInitialParams = {
   email?: string;
   flowId?: string;
@@ -19,10 +21,15 @@ export function useSignup(initial?: SignupInitialParams) {
   const initialFlowId = initial?.flowId || "";
   const redirectTo = initial?.redirectTo || null;
   const searchParams = useSearchParams();
+  const hasVerifiedFlowId =
+    typeof window !== "undefined" &&
+    !!initialFlowId &&
+    initial?.verified === true &&
+    sessionStorage.getItem(SIGNUP_VERIFIED_FLOW_ID_KEY) === initialFlowId;
 
-  // verified=true・医メ繝｣繝ｬ繝ｳ繧ｸ逕ｻ髱｢縺ｧ隱崎ｨｼ貂医∩・峨↑繧蔚sernameEntry(2)縺九ｉ髢句ｧ・
+  // verified=true は Challenge 成功時に保存した flow_id と一致する場合のみ採用する
   const [step, setStep] = useState(
-    initial?.verified && initialFlowId ? 2 : initialFlowId ? 1 : 0
+    hasVerifiedFlowId ? 2 : initialFlowId ? 1 : 0
   );
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -70,6 +77,11 @@ export function useSignup(initial?: SignupInitialParams) {
        }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if (!hasVerifiedFlowId) return;
+    sessionStorage.removeItem(SIGNUP_VERIFIED_FLOW_ID_KEY);
+  }, [hasVerifiedFlowId]);
 
   const handleNext = () => {
     setError("");

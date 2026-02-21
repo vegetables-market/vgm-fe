@@ -7,6 +7,8 @@ import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 import { VerificationMode } from "@/types/auth/core";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
+const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
+
 function ChallengeContainerInner() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
@@ -28,11 +30,14 @@ function ChallengeContainerInner() {
   if (action) {
     if (typeParam === "totp") mode = "totp";
     else if (typeParam === "password") mode = "password";
+    else if (typeParam === "email_mfa") mode = "email_mfa";
     else mode = "email"; // Default check for action
   } else if (typeParam === "totp") {
     mode = "totp";
   } else if (typeParam === "password") {
     mode = "password";
+  } else if (typeParam === "email_mfa") {
+    mode = "email_mfa";
   } else if (typeParam === "email" || flowId) {
     mode = "email";
   }
@@ -40,10 +45,28 @@ function ChallengeContainerInner() {
   // If no valid mode, we might want to show error or let the hook handle it
   // For safety, default to email if flowId exists
   const safeMode = mode || "email";
+  const identifierForLogic =
+    safeMode === "totp"
+      ? mfaToken
+      : safeMode === "password"
+        ? username
+        : safeMode === "email_mfa"
+          ? mfaToken
+          : flowId;
+  const identifierForView =
+    safeMode === "totp"
+      ? mfaToken
+      : safeMode === "password"
+        ? username
+        : displayEmail;
 
   // 新規登録フローの場合、検証成功後にsignupページへリダイレクト
   const handleSignupVerified = isSignup
     ? () => {
+        if (flowId) {
+          sessionStorage.setItem(SIGNUP_VERIFIED_FLOW_ID_KEY, flowId);
+        }
+
         const params = new URLSearchParams();
         if (flowId) params.set("flow_id", flowId);
         if (displayEmail) params.set("email", displayEmail);
@@ -58,7 +81,7 @@ function ChallengeContainerInner() {
     flowId,
     mfaToken,
     action,
-    identifier: mode === "totp" ? mfaToken : (mode === "password" ? username : flowId),
+    identifier: identifierForLogic,
     displayEmail,
     redirectTo,
     expiresAt,
@@ -85,7 +108,7 @@ function ChallengeContainerInner() {
       key={safeMode}
       mode={safeMode}
       action={action}
-      identifier={mode === "totp" ? mfaToken : (mode === "password" ? username : displayEmail)}
+      identifier={identifierForView}
       logic={logic}
       onBack={handleReturn}
     />

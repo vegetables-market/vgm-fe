@@ -16,13 +16,17 @@ export default function EmailEntry({
   addLog,
   redirectTo,
 }: EmailEntryProps) {
-  const { isLoading, hasEmailError, clearEmailError, onSubmit } = useEmailEntry(
-    {
+  const {
+    isLoading,
+    hasEmailError,
+    errorMessage,
+    clearEmailError,
+    onSubmit,
+  } = useEmailEntry({
       email: formData.email,
       redirectTo,
       addLog,
-    },
-  );
+    });
 
   return (
     <>
@@ -50,6 +54,9 @@ export default function EmailEntry({
             message="有効なメールアドレスを入力してください。"
             variant="error"
           />
+        )}
+        {!hasEmailError && errorMessage && (
+          <AuthStatusMessage message={errorMessage} variant="error" />
         )}
 
         <AuthSubmitButton isLoading={isLoading} loadingText="確認中...">

@@ -125,9 +125,11 @@ export function useUsernameEntry({
     if (isValidUsernameFormat(value)) {
       setChecking(true);
       debouncedCheck(value);
-      // Clear checking state but keep previous results
-      setChecking(false);
+      return;
     }
+
+    setChecking(false);
+    setIsAvailable(null);
   };
 
   const applySuggestion = (suggestion: string) => {

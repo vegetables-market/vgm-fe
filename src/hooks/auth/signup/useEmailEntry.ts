@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { initAuthFlow } from "@/service/auth/init-auth-flow";
+import { getErrorMessage } from "@/lib/api/error-handler";
 
 type UseEmailEntryParams = {
   email: string;
@@ -15,6 +16,7 @@ export function useEmailEntry({
   addLog,
 }: UseEmailEntryParams) {
   const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -31,10 +33,12 @@ export function useEmailEntry({
     e.preventDefault();
     if (!isEmailValid) {
       setShowError(true);
+      setErrorMessage("");
       return;
     }
 
     setShowError(false);
+    setErrorMessage("");
     setIsLoading(true);
     try {
       addLog(`Checking email status: ${email}`);
@@ -56,11 +60,13 @@ export function useEmailEntry({
         router.push(`/challenge?${params.toString()}`);
       } else {
         addLog("Error: Missing flow_id for authentication flow");
-        console.error("Error: Missing flow_id for authentication flow");
+        setErrorMessage("認証フローの開始に失敗しました。");
       }
-    } catch (error) {
+    } catch (error: unknown) {
       addLog("Error checking email status");
-      console.error(error);
+      setErrorMessage(
+        getErrorMessage(error) || "認証フローの開始に失敗しました。",
+      );
     } finally {
       setIsLoading(false);
     }
@@ -69,6 +75,7 @@ export function useEmailEntry({
   return {
     isLoading,
     hasEmailError,
+    errorMessage,
     clearEmailError,
     onSubmit,
   };
