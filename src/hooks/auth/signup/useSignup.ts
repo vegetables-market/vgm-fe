@@ -103,7 +103,7 @@ export function useSignup(initial?: SignupInitialParams) {
         username: formData.username,
         email: formData.email,
         password: formData.password,
-        display_name: formData.username, // display_name繧置sername縺ｧ蛻晄悄蛹・
+        display_name: formData.name, // display_name繧置sername縺ｧ蛻晄悄蛹・
         flow_id: formData.flow_id,
         // 繝励Ο繝輔ぅ繝ｼ繝ｫ髢｢騾｣縺ｯ逵∫払・医ヰ繝・け繧ｨ繝ｳ繝峨′Nullable縺ｾ縺溘・繝・ヵ繧ｩ繝ｫ繝亥､繧呈戟縺､蜑肴署・・
         oauth_token: formData.oauth_token, // OAuth Tokenを含める

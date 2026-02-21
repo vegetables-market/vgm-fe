@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 import { VerificationMode } from "@/types/auth/core";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
 function ChallengeContainerInner() {
   const searchParams = useSearchParams();
@@ -68,9 +69,11 @@ function ChallengeContainerInner() {
   const handleReturn = () => {
       // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
       if (returnTo) {
-          const target = decodeURIComponent(returnTo);
-          router.push(target);
-          return;
+          const target = safeRedirectTo(returnTo);
+          if (target) {
+            router.push(target);
+            return;
+          }
       }
       
       // Default behavior: go back in history
