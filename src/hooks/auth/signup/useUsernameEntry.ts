@@ -1,9 +1,9 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { checkUsername } from "@/services/auth/check-username";
-import { getInitialUsernameSuggestions } from "@/services/auth/get-initial-username-suggestions";
-import { isValidUsernameFormat } from "@/services/auth/username-validation";
+import { checkUsername } from "@/service/auth/check-username";
+import { getInitialUsernameSuggestions } from "@/service/auth/get-initial-username-suggestions";
+import { isValidUsernameFormat } from "@/service/auth/username-validation";
 
 import type { CheckUsernameResult } from "@/types/auth/service";
 

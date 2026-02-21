@@ -8,7 +8,7 @@ import {
   ReactNode,
 } from "react";
 import { UserInfo } from "@/types/auth/core";
-import { logout as logoutApi } from "@/services/auth/logout";
+import { logout as logoutApi } from "@/service/auth/logout";
 
 type AuthContextType = {
   user: UserInfo | null;

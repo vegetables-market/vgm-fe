@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkUser } from "@/services/auth/check-user";
+import { checkUser } from "@/service/auth/check-user";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 

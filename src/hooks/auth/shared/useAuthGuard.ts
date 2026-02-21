@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { getRedirectToFromLocation } from "@/lib/next/getRedirectToFromLocation";
 import type { AuthGuardMode } from "@/types/auth/guard";
-import { resolveAuthGuardView } from "@/services/auth/auth-guard";
+import { resolveAuthGuardView } from "@/service/auth/auth-guard";
 
 type UseAuthGuardParams = {
   mode: AuthGuardMode;

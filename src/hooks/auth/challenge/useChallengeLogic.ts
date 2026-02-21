@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { verifyLogin, AuthMethod } from "@/services/auth/verify-login";
-import { verifyAuthCode } from "@/services/auth/verify-auth-code";
+import { verifyLogin, AuthMethod } from "@/service/auth/verify-login";
+import { verifyAuthCode } from "@/service/auth/verify-auth-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
@@ -10,8 +10,8 @@ import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 import { VerificationMode } from "@/types/auth/core";
-import { verifyAction } from "@/services/auth/verify-action";
-import { login } from "@/services/auth/login";
+import { verifyAction } from "@/service/auth/verify-action";
+import { login } from "@/service/auth/login";
 
 export type UseChallengeLogicParams = {
   mode: VerificationMode;
