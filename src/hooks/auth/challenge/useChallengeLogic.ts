@@ -12,6 +12,7 @@ import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { verifyAction } from "@/service/auth/verify-action";
 import { login } from "@/service/auth/login";
+import { startPasswordRecovery } from "@/service/auth/recovery/start-password-recovery";
 
 export type UseChallengeLogicParams = {
   mode: VerificationMode;
@@ -262,9 +263,7 @@ export function useChallengeLogic({
     if (isLoading) return;
     setIsLoading(true);
     try {
-      // Lazy import to avoid circular dependency if any (though recoveryApi should be fine)
-      const { recoveryApi } = await import("@/lib/api/auth/recovery");
-      const { state } = await recoveryApi.start(identifier);
+      const { state } = await startPasswordRecovery(identifier);
       router.push(`/account-recovery/password?state=${state}`);
     } catch (err: any) {
       const message = getErrorMessage(err);
