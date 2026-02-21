@@ -1,14 +1,15 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { RegisterRequest, RegisterResponse } from "@/types/auth/register";
+import type { RegisterRequestDto } from "@/service/auth/dto/register-request-dto";
+import type { RegisterResponseDto } from "@/service/auth/dto/register-response-dto";
 
 /**
  * 新規登録
  */
 export const register = async (
-  registerRequest: RegisterRequest,
-): Promise<RegisterResponse> => {
-  return fetchApi<RegisterResponse>(API_ENDPOINTS.REGISTER, {
+  registerRequest: RegisterRequestDto,
+): Promise<RegisterResponseDto> => {
+  return fetchApi<RegisterResponseDto>(API_ENDPOINTS.REGISTER, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

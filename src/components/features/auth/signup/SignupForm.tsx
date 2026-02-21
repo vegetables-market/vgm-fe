@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import EmailEntry from "@/components/features/auth/signup/entry/EmailEntry";
@@ -8,7 +8,7 @@ import PasswordEntry from "@/components/features/auth/signup/entry/PasswordEntry
 import TermsAgreement from "@/components/features/auth/signup/entry/TermsAgreement";
 
 import ProgressBar from "@/components/ui/auth/ProgressBar";
-import { SignupFormData } from "@/types/auth/core";
+import { SignupFormData } from "@/lib/auth/signup/types/signup-form-data";
 import { SignupStepProvider } from "@/context/auth/SignupStepContext";
 
 const SIGNUP_STEPS = [
@@ -123,3 +123,4 @@ export default function SignupForm({ state, actions }: SignupFormProps) {
     </>
   );
 }
+

@@ -1,4 +1,4 @@
-import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
+﻿import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
@@ -6,7 +6,7 @@ import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
 import Divider from "@/components/ui/auth/Divider";
 import OrDivider from "@/components/ui/auth/OrDivider";
 import { useEmailEntry } from "@/hooks/auth/signup/useEmailEntry";
-import type { EmailEntryProps } from "@/types/auth/signup-components";
+import type { EmailEntryProps } from "@/components/features/auth/signup/types/entry-props";
 import SignupStepHeader from "@/components/ui/auth/SignupStepHeader";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 
@@ -81,3 +81,4 @@ export default function EmailEntry({
     </>
   );
 }
+

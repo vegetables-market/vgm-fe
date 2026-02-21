@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+﻿import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { verifyLogin, AuthMethod } from "@/service/auth/verify-login";
 import { verifyAuthCode } from "@/service/auth/verify-auth-code";
@@ -9,7 +9,7 @@ import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
-import { VerificationMode } from "@/types/auth/core";
+import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { verifyAction } from "@/service/auth/verify-action";
 import { login } from "@/service/auth/login";
 
@@ -290,3 +290,4 @@ export function useChallengeLogic({
     handleForgotPassword,
   };
 }
+

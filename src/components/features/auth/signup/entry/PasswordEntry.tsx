@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { usePasswordEntry } from "@/hooks/auth/signup/usePasswordEntry";
-import type { PasswordEntryProps } from "@/types/auth/signup-components";
+import type { PasswordEntryProps } from "@/components/features/auth/signup/types/entry-props";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import SignupStepHeader from "@/components/ui/auth/SignupStepHeader";
@@ -86,3 +86,4 @@ export default function PasswordEntry({
     </form>
   );
 }
+

@@ -1,20 +1,20 @@
 import type { FormEvent } from "react";
 
-export interface LoginState {
+export type LoginState = {
   emailOrUsername: string;
   error: string;
   isLoading: boolean;
   redirectTo: string | null;
-}
+};
 
-export interface LoginActions {
+export type LoginActions = {
   setEmailOrUsername: (value: string) => void;
   onSubmit: (e: FormEvent) => void;
   addLog: (msg: string) => void;
-}
+};
 
-export interface LoginFormProps {
+export type LoginFormProps = {
   state: LoginState;
   actions: LoginActions;
   connectProvider?: "google" | "microsoft" | "github" | null;
-}
+};

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import type { CreateOrderInput } from "@/lib/market/orders/types/create-order-input";
+import { resolvePaymentMethod } from "@/lib/market/orders/resolve-payment-method";
 import type { StockDetail } from "@/lib/market/stocks/types/stock-detail";
-import { createOrder } from "@/service/market/orders/create-order";
-import { payOrder } from "@/service/market/orders/pay-order";
+import { confirmPurchase } from "@/service/market/orders/confirm-purchase";
 import { getStockDetail } from "@/service/market/stocks/get-stock-detail";
 import {
   DEFAULT_DELIVERY_PLACE,
@@ -101,10 +100,7 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
 
     setIsProcessing(true);
     try {
-      const paymentMethod =
-        selectedPayment.type === "credit_card" ? "card" : selectedPayment.type;
-
-      const orderInput: CreateOrderInput = {
+      await confirmPurchase({
         itemId: stock.item.itemId,
         quantity: 1,
         shippingName: selectedAddress.name,
@@ -113,11 +109,8 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
         shippingCity: selectedAddress.city,
         shippingAddressLine1: selectedAddress.address1,
         shippingAddressLine2: selectedAddress.address2 || null,
-        paymentMethod,
-      };
-
-      const order = await createOrder(orderInput);
-      await payOrder(order.orderId, { paymentMethod });
+        paymentMethod: resolvePaymentMethod(selectedPayment),
+      });
       setIsPurchased(true);
     } catch (err: unknown) {
       alert(getErrorMessage(err) || "購入処理に失敗しました");

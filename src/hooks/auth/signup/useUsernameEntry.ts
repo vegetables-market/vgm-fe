@@ -5,7 +5,7 @@ import { checkUsername } from "@/service/auth/check-username";
 import { getInitialUsernameSuggestions } from "@/service/auth/get-initial-username-suggestions";
 import { isValidUsernameFormat } from "@/service/auth/username-validation";
 
-import type { CheckUsernameResult } from "@/types/auth/service";
+import type { CheckUsernameResultDto } from "@/service/auth/dto/check-username-result-dto";
 
 type UseUsernameEntryParams = {
   username: string;
@@ -26,7 +26,7 @@ export function useUsernameEntry({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
-  const checkCache = useRef<Map<string, CheckUsernameResult>>(new Map());
+  const checkCache = useRef<Map<string, CheckUsernameResultDto>>(new Map());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const isFormatValid = useMemo(() => isValidUsernameFormat(username), [username]);

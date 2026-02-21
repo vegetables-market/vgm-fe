@@ -1,4 +1,4 @@
-import type { AuthGuardMode } from "@/types/auth/guard";
+﻿import type { AuthGuardMode } from "@/lib/auth/guard/types/auth-guard-mode";
 
 export type AuthGuardViewState = {
   showLoading: boolean;
@@ -86,3 +86,4 @@ export function resolveAuthGuardView({
     shouldRedirect: false,
   };
 }
+

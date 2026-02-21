@@ -1,9 +1,9 @@
-import { useEffect, useMemo } from "react";
+﻿import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { getRedirectToFromLocation } from "@/lib/next/getRedirectToFromLocation";
-import type { AuthGuardMode } from "@/types/auth/guard";
+import type { AuthGuardMode } from "@/lib/auth/guard/types/auth-guard-mode";
 import { resolveAuthGuardView } from "@/service/auth/auth-guard";
 
 type UseAuthGuardParams = {
@@ -38,3 +38,4 @@ export function useAuthGuard({ mode, hasFallback }: UseAuthGuardParams) {
     loginHref,
   };
 }
+

@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
-import { VerificationMode } from "@/types/auth/core";
+import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
 
 const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
@@ -122,3 +122,4 @@ export function ChallengeContainer() {
     </Suspense>
   );
 }
+

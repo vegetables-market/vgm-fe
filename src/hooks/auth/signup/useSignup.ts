@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { register } from "@/service/auth/register";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { SignupFormData } from "@/types/auth/core";
+import { SignupFormData } from "@/lib/auth/signup/types/signup-form-data";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
@@ -170,3 +170,4 @@ export function useSignup(initial?: SignupInitialParams) {
     },
   };
 }
+

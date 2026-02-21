@@ -1,7 +1,7 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
-import { VerificationMode } from "@/types/auth/core";
+import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import VerificationInput from "@/components/ui/auth/verification/VerificationInput";
 import VerificationResend from "@/components/ui/auth/verification/VerificationResend";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
@@ -190,3 +190,4 @@ export default function ChallengeForm({
     </>
   );
 }
+

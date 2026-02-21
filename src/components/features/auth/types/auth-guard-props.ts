@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
-
-export type AuthGuardMode = "redirect" | "content";
+import type { AuthGuardMode } from "@/lib/auth/guard/types/auth-guard-mode";
 
 export type AuthGuardProps = {
   children: ReactNode;
@@ -8,4 +7,3 @@ export type AuthGuardProps = {
   mode?: AuthGuardMode;
   showLoginLink?: boolean;
 };
-

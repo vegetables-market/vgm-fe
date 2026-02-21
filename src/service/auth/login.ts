@@ -1,6 +1,6 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { LoginResponse } from "@/types/auth/login";
+import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
 
 /**
  * ログイン
@@ -8,8 +8,8 @@ import type { LoginResponse } from "@/types/auth/login";
 export const login = async (loginRequest: {
   username: string;
   password: string;
-}): Promise<LoginResponse> => {
-  return fetchApi<LoginResponse>(API_ENDPOINTS.LOGIN, {
+}): Promise<LoginResponseDto> => {
+  return fetchApi<LoginResponseDto>(API_ENDPOINTS.LOGIN, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

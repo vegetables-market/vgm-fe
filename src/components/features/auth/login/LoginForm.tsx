@@ -1,11 +1,11 @@
-import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
+﻿import AuthSocialButtons from "@/components/ui/auth/AuthSocialButtons";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import AuthSwitchLink from "@/components/ui/auth/AuthSwitchLink";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import OrDivider from "@/components/ui/auth/OrDivider";
-import type { LoginFormProps } from "@/types/auth/login-components";
+import type { LoginFormProps } from "@/components/features/auth/login/types/login-form-props";
 import AuthRecoveryText from "@/components/ui/auth/AuthRecoveryText";
 
 export default function LoginForm({
@@ -58,3 +58,4 @@ export default function LoginForm({
     </div>
   );
 }
+

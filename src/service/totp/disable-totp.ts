@@ -1,14 +1,15 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { DisableTotpRequest, DisableTotpResponse } from "@/types/auth/totp";
+import type { DisableTotpRequestDto } from "@/service/totp/dto/disable-totp-request-dto";
+import type { DisableTotpResponseDto } from "@/service/totp/dto/disable-totp-response-dto";
 
 /**
  * TOTP無効化
  */
 export const disableTotp = async (
-  request: DisableTotpRequest,
-): Promise<DisableTotpResponse> => {
-  return fetchApi<DisableTotpResponse>(API_ENDPOINTS.TOTP_DISABLE, {
+  request: DisableTotpRequestDto,
+): Promise<DisableTotpResponseDto> => {
+  return fetchApi<DisableTotpResponseDto>(API_ENDPOINTS.TOTP_DISABLE, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

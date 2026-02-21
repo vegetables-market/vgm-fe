@@ -1,5 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
-import type { LoginResponse } from "@/types/auth/login";
+import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
 
 /**
  * 認証方式
@@ -23,8 +23,8 @@ export interface VerifyAuthRequest {
  */
 export const verifyLogin = async (
   request: VerifyAuthRequest,
-): Promise<LoginResponse> => {
-  return fetchApi<LoginResponse>("/v1/auth/verify-login", {
+): Promise<LoginResponseDto> => {
+  return fetchApi<LoginResponseDto>("/v1/auth/verify-login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
