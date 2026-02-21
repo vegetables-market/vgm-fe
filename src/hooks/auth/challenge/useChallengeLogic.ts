@@ -1,6 +1,5 @@
 ﻿import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { verifyAuthCode } from "@/service/auth/verify-auth-code";
 import { useOtpInput } from "@/hooks/auth/shared/useOtpInput";
 import { getErrorMessage, handleGlobalError } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
@@ -9,13 +8,10 @@ import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
-import { loginWithPasswordChallenge } from "@/service/auth/challenge/login-with-password-challenge";
-import { verifyActionChallenge } from "@/service/auth/challenge/verify-action-challenge";
-import { verifyEmailChallengeLogin } from "@/service/auth/challenge/verify-email-challenge-login";
-import { verifyEmailMfaChallengeLogin } from "@/service/auth/challenge/verify-email-mfa-challenge-login";
-import { verifyTotpChallengeLogin } from "@/service/auth/challenge/verify-totp-challenge-login";
+import { submitChallenge } from "@/service/auth/challenge/submit-challenge";
+import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
 import { startPasswordRecovery } from "@/service/auth/recovery/start-password-recovery";
-import { buildNextChallengeUrl } from "@/lib/auth/challenge/build-next-challenge-url";
 
 export type UseChallengeLogicParams = {
   mode: VerificationMode;
@@ -27,7 +23,7 @@ export type UseChallengeLogicParams = {
   redirectTo?: string | null;
   expiresAt?: string | null;
   nextResendAt?: string | null;
-  onVerifiedAction?: (data?: any) => void;
+  onVerifiedAction?: (data?: VerifyAuthCodeResponseDto) => void;
 };
 
 export function useChallengeLogic({
@@ -83,7 +79,7 @@ export function useChallengeLogic({
   const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
 
   // --- Submit Logic ---
-  const handleLoginSuccess = (data: any) => {
+  const handleLoginSuccess = (data: LoginResponseDto) => {
     if (data.user) {
       authLogin(data.user);
       localStorage.removeItem("vgm_masked_email");
@@ -120,70 +116,36 @@ export function useChallengeLogic({
     setSuccessMsg("");
 
     try {
-      if (action) {
-        const res = await verifyActionChallenge({
-          mode,
-          flowId,
-          mfaToken,
-          action,
-          identifier,
-          code,
-        });
+      const result = await submitChallenge({
+        mode,
+        code,
+        flowId,
+        mfaToken,
+        action,
+        identifier,
+        redirectTo,
+        shouldVerifySignupEmail: Boolean(onVerifiedAction && flowId),
+      });
 
-        setSuccessMsg("認証に成功しました。");
-
-        if (redirectTo) {
-          let finalRedirectUrl = redirectTo;
-          if (res.action_token) {
-            const separator = finalRedirectUrl.includes("?") ? "&" : "?";
-            finalRedirectUrl = `${finalRedirectUrl}${separator}action_token=${encodeURIComponent(res.action_token)}`;
-          }
-          pushRedirect(finalRedirectUrl);
-        }
+      if (result.kind === "signup_verified") {
+        onVerifiedAction?.(result.data);
         return;
       }
-
-      if (mode === "email") {
-        // 1. Email Verification (Signup or Login)
-        if (onVerifiedAction && flowId) {
-          // Signup flow: verifyAuthCode で検証し、コールバックで次のステップへ
-          const codeResult = await verifyAuthCode(flowId, code);
-          if (codeResult.verified) {
-            onVerifiedAction(codeResult);
-            return;
-          }
-        } else if (flowId) {
-          const data = await verifyEmailChallengeLogin(flowId, code);
-          handleLoginSuccess(data);
-        } else {
-          throw new Error("フローIDが見つかりません。");
-        }
-      } else if (mode === "totp") {
-        // 2. TOTP Verification
-        if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-        const data = await verifyTotpChallengeLogin(mfaToken, code);
-        handleLoginSuccess(data);
-      } else if (mode === "password") {
-        if (!identifier) throw new Error("ユーザーIDが見つかりません。");
-
-        const data = await loginWithPasswordChallenge(identifier, code);
-        const nextUrl = buildNextChallengeUrl(data, redirectTo);
-        if (nextUrl) {
-          router.push(nextUrl);
-          return;
-        }
-        if (data.user) {
-          // Login Success
-          handleLoginSuccess(data);
-          return;
-        }
-        // Fallback error
-        setError("ユーザー名またはパスワードが間違っています。");
-      } else if (mode === "email_mfa") {
-        // 3. Email MFA (Login Known Device)
-        if (!mfaToken) throw new Error("MFAトークンが見つかりません。");
-        const data = await verifyEmailMfaChallengeLogin(mfaToken, code);
-        handleLoginSuccess(data);
+      if (result.kind === "next_challenge") {
+        router.push(result.url);
+        return;
+      }
+      if (result.kind === "login_success") {
+        handleLoginSuccess(result.data);
+        return;
+      }
+      if (result.kind === "action_success") {
+        setSuccessMsg("認証に成功しました。");
+        if (result.redirectUrl) pushRedirect(result.redirectUrl);
+        return;
+      }
+      if (result.kind === "error") {
+        setError(result.message);
       }
     } catch (err: any) {
       const message = getErrorMessage(err);
@@ -229,4 +191,7 @@ export function useChallengeLogic({
     handleForgotPassword,
   };
 }
+
+
+
 

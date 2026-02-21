@@ -1,3 +1,4 @@
+﻿import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 
@@ -5,7 +6,7 @@ type SignupEmailVerificationProps = {
   flowId: string | null;
   displayEmail?: string | null;
   expiresAt?: string | null;
-  onVerifiedAction?: (data?: any) => void;
+  onVerifiedAction?: (data?: VerifyAuthCodeResponseDto) => void;
   redirectTo?: string | null;
 };
 
@@ -35,3 +36,6 @@ export default function SignupEmailVerification({
     />
   );
 }
+
+
+

@@ -1,5 +1,6 @@
 import { fetchApi } from "@/lib/api/fetch";
 import type { VerifyAuthRequest } from "./verify-login";
+import type { VerifyActionResponseDto } from "@/service/auth/dto/verify-action-response-dto";
 
 /**
  * セキュリティ確認
@@ -7,18 +8,8 @@ import type { VerifyAuthRequest } from "./verify-login";
  */
 export const verifyAction = async (
   request: VerifyAuthRequest,
-): Promise<{
-  success: boolean;
-  action_token: string;
-  user: any;
-  action: string;
-}> => {
-  return fetchApi<{
-    success: boolean;
-    action_token: string;
-    user: any;
-    action: string;
-  }>("/v1/auth/verify-action", {
+): Promise<VerifyActionResponseDto> => {
+  return fetchApi<VerifyActionResponseDto>("/v1/auth/verify-action", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

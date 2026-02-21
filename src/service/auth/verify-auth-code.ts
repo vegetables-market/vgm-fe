@@ -1,4 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
 
 /**
  * 認証コードの検証 (事前認証フロー用)
@@ -6,8 +7,8 @@ import { fetchApi } from "@/lib/api/fetch";
 export async function verifyAuthCode(
   flow_id: string,
   code: string,
-): Promise<{ verified: boolean; email: string }> {
-  return fetchApi<{ verified: boolean; email: string }>(`/v1/auth/verify-code`, {
+): Promise<VerifyAuthCodeResponseDto> {
+  return fetchApi<VerifyAuthCodeResponseDto>(`/v1/auth/verify-code`, {
     method: "POST",
     body: JSON.stringify({ flow_id, code }),
   });
