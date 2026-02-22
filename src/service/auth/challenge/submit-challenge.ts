@@ -1,13 +1,13 @@
 import type { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { buildNextChallengeUrl } from "@/lib/auth/challenge/build-next-challenge-url";
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
-import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
-import { verifyAuthCode } from "@/service/auth/verify-auth-code";
 import { loginWithPasswordChallenge } from "@/service/auth/challenge/login-with-password-challenge";
 import { verifyActionChallenge } from "@/service/auth/challenge/verify-action-challenge";
 import { verifyEmailChallengeLogin } from "@/service/auth/challenge/verify-email-challenge-login";
 import { verifyEmailMfaChallengeLogin } from "@/service/auth/challenge/verify-email-mfa-challenge-login";
 import { verifyTotpChallengeLogin } from "@/service/auth/challenge/verify-totp-challenge-login";
+import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
+import { verifyAuthCode } from "@/service/auth/verify-auth-code";
 
 type SubmitChallengeParams = {
   mode: VerificationMode;
@@ -80,7 +80,10 @@ export async function submitChallenge({
     const nextUrl = buildNextChallengeUrl(data, redirectTo);
     if (nextUrl) return { kind: "next_challenge", url: nextUrl };
     if (data.user) return { kind: "login_success", data };
-    return { kind: "error", message: "ユーザー名またはパスワードが間違っています。" };
+    return {
+      kind: "error",
+      message: "ユーザー名またはパスワードが間違っています。",
+    };
   }
 
   if (mode === "email_mfa") {

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { checkUser } from "@/service/auth/check-user";
+import { addAuthLog } from "@/lib/auth/debug/add-auth-log";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
-import { addAuthLog } from "@/lib/auth/debug/add-auth-log";
+import { checkUser } from "@/service/auth/check-user";
 
 type LoginInitialParams = {
   redirectTo?: string | null;
@@ -31,39 +31,34 @@ export function useLogin(initial?: LoginInitialParams) {
 
     setIsLoading(true);
     try {
-      // バックエンドに問い合わせて次のステップを決定
       const checkResult = await checkUser(emailOrUsername);
 
       if (checkResult.next_step === "password") {
-          addLog(`Proceeding to password challenge for: ${checkResult.identifier}`);
-          // パスワード入力画面へ遷移
-          // ユーザーが存在しない場合でもここに来る（セキュリティ対策）
-          const params = new URLSearchParams();
-          params.set("type", "password");
-          params.set("username", checkResult.identifier);
-          if (safeRedirect) params.set("redirect_to", safeRedirect);
-          
-          router.push(`/challenge?${params.toString()}`);
-
-      } else if (checkResult.next_step === "email_otp" && checkResult.flow_id) {
-          addLog("Proceeding to email verification");
-          // メール認証画面へ遷移
-          const params = new URLSearchParams();
-          params.set("type", "email");
-          params.set("flow_id", checkResult.flow_id);
-          params.set("email", checkResult.identifier); // 表示用
-          if (safeRedirect) params.set("redirect_to", safeRedirect);
-          
-          router.push(`/challenge?${params.toString()}`);
-      } else {
-          // 想定外のレスポンス
-          throw new Error("Invalid auth step");
+        addLog(`Proceeding to password challenge for: ${checkResult.identifier}`);
+        const params = new URLSearchParams();
+        params.set("type", "password");
+        params.set("username", checkResult.identifier);
+        if (safeRedirect) params.set("redirect_to", safeRedirect);
+        router.push(`/challenge?${params.toString()}`);
+        return;
       }
 
+      if (checkResult.next_step === "email_otp" && checkResult.flow_id) {
+        addLog("Proceeding to email verification");
+        const params = new URLSearchParams();
+        params.set("type", "email");
+        params.set("flow_id", checkResult.flow_id);
+        params.set("email", checkResult.identifier);
+        if (safeRedirect) params.set("redirect_to", safeRedirect);
+        router.push(`/challenge?${params.toString()}`);
+        return;
+      }
+
+      throw new Error("Invalid auth step");
     } catch (err: unknown) {
       console.error(err);
       const message = getErrorMessage(err);
-      setError(message || "認証の開始に失敗しました。");
+      setError(message || "認証フローの開始に失敗しました。");
     } finally {
       setIsLoading(false);
     }

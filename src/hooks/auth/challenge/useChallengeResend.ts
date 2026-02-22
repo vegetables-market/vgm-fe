@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 import { resendCode } from "@/service/auth/resend-code";
 import { getErrorMessage } from "@/lib/api/error-handler";
@@ -12,7 +13,7 @@ type UseChallengeResendParams = {
   redirectTo?: string | null;
   maskedEmail?: string | null;
   setError: (msg: string) => void;
-  setSuccessMsg: (msg: string) => void;
+  setSuccessMsg: Dispatch<SetStateAction<string>>;
   verificationType?: "email" | "email_mfa";
   token?: string | null;
 };

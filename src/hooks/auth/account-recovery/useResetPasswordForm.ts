@@ -25,15 +25,15 @@ export function useResetPasswordForm({ token }: UseResetPasswordFormParams) {
     event.preventDefault();
 
     if (!token) {
-      setError("辟｡蜉ｹ縺ｪ繝医・繧ｯ繝ｳ縺ｧ縺吶・");
+      setError("無効なトークンです。");
       return;
     }
     if (password !== confirmPassword) {
-      setError("繝代せ繝ｯ繝ｼ繝峨′荳閾ｴ縺励∪縺帙ｓ縲・");
+      setError("パスワードが一致しません。");
       return;
     }
     if (password.length < 8) {
-      setError("繝代せ繝ｯ繝ｼ繝峨・8譁・ｭ嶺ｻ･荳翫〒蜈･蜉帙＠縺ｦ縺上□縺輔＞縲・");
+      setError("パスワードは8文字以上で入力してください。");
       return;
     }
 
@@ -44,8 +44,7 @@ export function useResetPasswordForm({ token }: UseResetPasswordFormParams) {
       setSuccess(true);
     } catch (err) {
       setError(
-        getErrorMessage(err) ||
-          "繝代せ繝ｯ繝ｼ繝峨・繝ｪ繧ｻ繝・ヨ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲・",
+        getErrorMessage(err) || "パスワードのリセットに失敗しました。",
       );
     } finally {
       setIsLoading(false);

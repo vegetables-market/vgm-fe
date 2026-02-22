@@ -7,6 +7,7 @@ import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
+import { handleChallengeSubmitResult } from "@/hooks/auth/challenge/handle-challenge-submit-result";
 import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { submitChallenge } from "@/service/auth/challenge/submit-challenge";
 import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
@@ -71,41 +72,12 @@ export function useChallengeLogic({
     redirectTo,
     maskedEmail: displayEmail,
     setError,
-    setSuccessMsg: setSuccessMsg as (msg: string) => void,
+    setSuccessMsg,
     verificationType: mode === "email_mfa" ? "email_mfa" : "email",
     token: mfaToken,
   });
 
   const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
-
-  const handleSubmitResult = (
-    result: Awaited<ReturnType<typeof submitChallenge>>,
-  ) => {
-    switch (result.kind) {
-      case "signup_verified":
-        onVerifiedAction?.(result.data);
-        return;
-      case "next_challenge":
-        router.push(result.url);
-        return;
-      case "login_success":
-        handleLoginSuccess(result.data);
-        return;
-      case "action_success":
-        setSuccessMsg("認証に成功しました。");
-        if (result.redirectUrl) pushRedirect(result.redirectUrl);
-        return;
-      case "error":
-        setError(result.message);
-        return;
-      case "noop":
-        return;
-      default: {
-        const _exhaustive: never = result;
-        return _exhaustive;
-      }
-    }
-  };
 
   // --- Submit Logic ---
   const handleLoginSuccess = (data: LoginResponseDto) => {
@@ -155,7 +127,17 @@ export function useChallengeLogic({
         redirectTo,
         shouldVerifySignupEmail: Boolean(onVerifiedAction && flowId),
       });
-      handleSubmitResult(result);
+      handleChallengeSubmitResult({
+        result,
+        onSignupVerified: onVerifiedAction,
+        onNextChallenge: (url) => router.push(url),
+        onLoginSuccess: (loginResult) => handleLoginSuccess(loginResult.data),
+        onActionSuccess: (redirectUrl) => {
+          setSuccessMsg("認証に成功しました。");
+          if (redirectUrl) pushRedirect(redirectUrl);
+        },
+        onError: setError,
+      });
     } catch (err: unknown) {
       const message = getErrorMessage(err);
       setError(message);

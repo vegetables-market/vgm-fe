@@ -24,9 +24,7 @@ export function usePasswordRecovery({ state }: UsePasswordRecoveryParams) {
 
   useEffect(() => {
     if (!state) {
-      setError(
-        "繧ｻ繝・す繝ｧ繝ｳ縺檎┌蜉ｹ縺ｧ縺吶ゅｂ縺・ｸ蠎ｦ譛蛻昴°繧峩縺励※縺上□縺輔＞縲・",
-      );
+      setError("セッションが無効です。もう一度最初からやり直してください。");
       setStep("LOADING");
       return;
     }
@@ -37,7 +35,7 @@ export function usePasswordRecovery({ state }: UsePasswordRecoveryParams) {
         setOptions(response.options);
         setStep("OPTIONS");
       } catch {
-        setError("繧ｪ繝励す繝ｧ繝ｳ縺ｮ蜿門ｾ励↓螟ｱ謨励＠縺ｾ縺励◆縲・");
+        setError("オプションの取得に失敗しました。");
       }
     };
 
@@ -56,7 +54,7 @@ export function usePasswordRecovery({ state }: UsePasswordRecoveryParams) {
       setSelectedMethod(method);
       setStep("VERIFY");
     } catch {
-      setError("繧ｳ繝ｼ繝峨・騾∽ｿ｡縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲・");
+      setError("コード送信に失敗しました。");
     } finally {
       setIsLoading(false);
     }
@@ -71,18 +69,14 @@ export function usePasswordRecovery({ state }: UsePasswordRecoveryParams) {
       const response = await verifyRecoveryChallenge(state, selectedMethod, code);
 
       if (!response.verified) {
-        setError(
-          "隱崎ｨｼ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲ゅさ繝ｼ繝峨ｒ遒ｺ隱阪＠縺ｦ縺上□縺輔＞縲・",
-        );
+        setError("認証に失敗しました。コードを確認して再入力してください。");
         return;
       }
 
       await completePasswordRecovery(state);
       setStep("COMPLETED");
     } catch {
-      setError(
-        "隱崎ｨｼ縺ｫ螟ｱ謨励＠縺ｾ縺励◆縲ゅさ繝ｼ繝峨ｒ遒ｺ隱阪＠縺ｦ縺上□縺輔＞縲・",
-      );
+      setError("認証に失敗しました。コードを確認して再入力してください。");
     } finally {
       setIsLoading(false);
     }
