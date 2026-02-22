@@ -6,6 +6,7 @@ import { SignupFormData } from "@/lib/auth/signup/types/signup-form-data";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
+import { addAuthLog } from "@/lib/auth/debug/add-auth-log";
 
 const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
 
@@ -48,11 +49,7 @@ export function useSignup(initial?: SignupInitialParams) {
   const { login: authLogin } = useAuth();
   const { pushRedirect } = useSafeRedirect();
 
-  const addLog = (msg: string) => {
-    if (typeof window !== "undefined" && (window as any).addAuthLog) {
-      (window as any).addAuthLog(msg);
-    }
-  };
+  const addLog = (msg: string) => addAuthLog(msg);
 
   // OAuth登録フローの初期化
   useEffect(() => {
@@ -143,7 +140,7 @@ export function useSignup(initial?: SignupInitialParams) {
       } else {
         router.push(withRedirectTo("/login", redirectTo));
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message = getErrorMessage(err);
       addLog(`Signup error: ${message}`);
       setError(message);

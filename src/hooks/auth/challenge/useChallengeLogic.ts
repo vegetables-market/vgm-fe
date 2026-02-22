@@ -78,6 +78,35 @@ export function useChallengeLogic({
 
   const { timeLeft } = useVerificationCountdown(expiresAt || undefined);
 
+  const handleSubmitResult = (
+    result: Awaited<ReturnType<typeof submitChallenge>>,
+  ) => {
+    switch (result.kind) {
+      case "signup_verified":
+        onVerifiedAction?.(result.data);
+        return;
+      case "next_challenge":
+        router.push(result.url);
+        return;
+      case "login_success":
+        handleLoginSuccess(result.data);
+        return;
+      case "action_success":
+        setSuccessMsg("認証に成功しました。");
+        if (result.redirectUrl) pushRedirect(result.redirectUrl);
+        return;
+      case "error":
+        setError(result.message);
+        return;
+      case "noop":
+        return;
+      default: {
+        const _exhaustive: never = result;
+        return _exhaustive;
+      }
+    }
+  };
+
   // --- Submit Logic ---
   const handleLoginSuccess = (data: LoginResponseDto) => {
     if (data.user) {
@@ -126,28 +155,8 @@ export function useChallengeLogic({
         redirectTo,
         shouldVerifySignupEmail: Boolean(onVerifiedAction && flowId),
       });
-
-      if (result.kind === "signup_verified") {
-        onVerifiedAction?.(result.data);
-        return;
-      }
-      if (result.kind === "next_challenge") {
-        router.push(result.url);
-        return;
-      }
-      if (result.kind === "login_success") {
-        handleLoginSuccess(result.data);
-        return;
-      }
-      if (result.kind === "action_success") {
-        setSuccessMsg("認証に成功しました。");
-        if (result.redirectUrl) pushRedirect(result.redirectUrl);
-        return;
-      }
-      if (result.kind === "error") {
-        setError(result.message);
-      }
-    } catch (err: any) {
+      handleSubmitResult(result);
+    } catch (err: unknown) {
       const message = getErrorMessage(err);
       setError(message);
       handleGlobalError(err, router);
@@ -167,7 +176,7 @@ export function useChallengeLogic({
     try {
       const { state } = await startPasswordRecovery(identifier);
       router.push(`/account-recovery/password?state=${state}`);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const message = getErrorMessage(err);
       setError(message || "リカバリーの開始に失敗しました。");
     } finally {

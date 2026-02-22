@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { checkUser } from "@/service/auth/check-user";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
+import { addAuthLog } from "@/lib/auth/debug/add-auth-log";
 
 type LoginInitialParams = {
   redirectTo?: string | null;
@@ -17,11 +18,7 @@ export function useLogin(initial?: LoginInitialParams) {
   const redirectTo = initial?.redirectTo || null;
   const safeRedirect = safeRedirectTo(redirectTo);
 
-  const addLog = (msg: string) => {
-    if (typeof window !== "undefined" && (window as any).addAuthLog) {
-      (window as any).addAuthLog(msg);
-    }
-  };
+  const addLog = (msg: string) => addAuthLog(msg);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,7 +60,7 @@ export function useLogin(initial?: LoginInitialParams) {
           throw new Error("Invalid auth step");
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       const message = getErrorMessage(err);
       setError(message || "認証の開始に失敗しました。");
