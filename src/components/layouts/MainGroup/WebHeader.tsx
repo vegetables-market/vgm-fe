@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import React, { useEffect } from 'react';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,6 +19,17 @@ export default function WebHeader() {
   const [searchQuery, setSearchQuery] = useState("");
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
+  const [displayUser, setDisplayUser] = useState(user);
+
+  useEffect(() => {
+    const savedData = localStorage.getItem("userData");
+    if (savedData) {
+      setDisplayUser(JSON.parse(savedData));
+    } else {
+      setDisplayUser(user);
+    }
+  }, [user]);
+
   const redirectTo = getRedirectToFromLocation();
 
   const handleLogout = async () => {
@@ -105,16 +117,16 @@ export default function WebHeader() {
         </div>
 
         {/* ユーザーメニュー */}
-        {user ? (
+        {displayUser ? (
           <div className="relative">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-100 transition-all hover:ring-2 hover:ring-amber-500 dark:border-gray-700 dark:bg-gray-800"
             >
-              {user.avatarUrl ? (
+              {displayUser.avatarUrl ? (
                 <img
-                  src={user.avatarUrl}
-                  alt={user.displayName}
+                  src={displayUser.avatarUrl}
+                  alt={displayUser.displayName}
                   className="h-full w-full object-cover"
                 />
               ) : (
@@ -137,10 +149,10 @@ export default function WebHeader() {
                   >
                     <div className="border-b border-gray-100 px-4 py-3 dark:border-zinc-800">
                       <p className="truncate text-sm font-bold text-gray-900 dark:text-white">
-                        {user.displayName}
+                        {displayUser.displayName}
                       </p>
                       <p className="truncate text-xs text-gray-500 dark:text-gray-400">
-                        {user.email}
+                        {user?.email}
                       </p>
                     </div>
 
