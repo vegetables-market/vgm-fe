@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { initAuthFlow } from "@/service/auth/init-auth-flow";
+import { initAuthFlow } from "@/service/auth/challenge/init-auth-flow";
 import { getErrorMessage } from "@/lib/api/error-handler";
 
 type UseEmailEntryParams = {

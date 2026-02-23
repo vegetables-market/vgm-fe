@@ -1,5 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
-import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
 
 /**
  * 認証コードの検証 (事前認証フロー用)

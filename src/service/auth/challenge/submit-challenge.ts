@@ -6,8 +6,8 @@ import { verifyEmailChallengeLogin } from "@/service/auth/challenge/verify-email
 import { verifyEmailMfaChallengeLogin } from "@/service/auth/challenge/verify-email-mfa-challenge-login";
 import { verifyTotpChallengeLogin } from "@/service/auth/challenge/verify-totp-challenge-login";
 import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
-import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
-import { verifyAuthCode } from "@/service/auth/verify-auth-code";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
+import { verifyAuthCode } from "@/service/auth/challenge/verify-auth-code";
 
 type SubmitChallengeParams = {
   mode: VerificationMode;

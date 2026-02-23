@@ -1,4 +1,4 @@
-import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
+import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
 import type { SubmitChallengeResult } from "@/service/auth/challenge/submit-challenge";
 
 type HandleChallengeSubmitResultParams = {

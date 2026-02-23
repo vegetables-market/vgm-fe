@@ -1,4 +1,4 @@
-﻿import type { VerifyAuthCodeResponseDto } from "@/service/auth/dto/verify-auth-code-response-dto";
+﻿import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
 
@@ -36,6 +36,7 @@ export default function SignupVerifyEmail({
     />
   );
 }
+
 
 
 

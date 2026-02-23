@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { useRouter } from "next/navigation";
-import { resendCode } from "@/service/auth/resend-code";
+import { resendCode } from "@/service/auth/challenge/resend-code";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { useResendCooldown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";

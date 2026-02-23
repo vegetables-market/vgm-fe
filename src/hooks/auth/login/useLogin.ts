@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { addAuthLog } from "@/lib/auth/debug/add-auth-log";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
-import { checkUser } from "@/service/auth/check-user";
+import { checkUser } from "@/service/auth/challenge/check-user";
 
 type LoginInitialParams = {
   redirectTo?: string | null;
