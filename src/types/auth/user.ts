@@ -23,4 +23,3 @@ export interface SignupFormData {
   flow_id?: string;
   expiresAt?: string;
 }
-

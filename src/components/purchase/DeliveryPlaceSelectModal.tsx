@@ -41,7 +41,7 @@ export function DeliveryPlaceSelectModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-40"
+            className="fixed inset-0 z-40 bg-black/60"
           />
 
           {/* モーダル本体 */}
@@ -49,16 +49,16 @@ export function DeliveryPlaceSelectModal({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed inset-x-0 bottom-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-gray-900 rounded-t-2xl md:rounded-2xl z-50 max-h-[90vh] overflow-y-auto md:max-w-lg md:w-full"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-2xl bg-gray-900 md:inset-auto md:top-1/2 md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl"
           >
             {/* ヘッダー */}
-            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-4 flex items-center justify-between">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-700 bg-gray-900 p-4">
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white p-2"
+                className="p-2 text-gray-400 hover:text-white"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -77,9 +77,9 @@ export function DeliveryPlaceSelectModal({
               <div className="w-10" /> {/* スペーサー */}
             </div>
 
-            <div className="p-4 space-y-2">
+            <div className="space-y-2 p-4">
               {/* 説明 */}
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="mb-4 text-sm text-gray-400">
                 ご不在時に荷物を届ける場所を指定できます。在宅時は玄関でお受け取りいただけます。
               </p>
 
@@ -87,10 +87,10 @@ export function DeliveryPlaceSelectModal({
               {DELIVERY_PLACE_OPTIONS.map((place) => (
                 <label
                   key={place}
-                  className={`flex items-center gap-3 p-4 rounded-lg cursor-pointer transition-colors ${
+                  className={`flex cursor-pointer items-center gap-3 rounded-lg p-4 transition-colors ${
                     selectedPlace === place
-                      ? "bg-blue-900/20 border border-blue-500"
-                      : "hover:bg-gray-800 border border-transparent"
+                      ? "border border-blue-500 bg-blue-900/20"
+                      : "border border-transparent hover:bg-gray-800"
                   }`}
                 >
                   <input
@@ -98,7 +98,7 @@ export function DeliveryPlaceSelectModal({
                     name="delivery_place"
                     checked={selectedPlace === place}
                     onChange={() => handleSelect(place)}
-                    className="w-5 h-5 accent-blue-500"
+                    className="h-5 w-5 accent-blue-500"
                   />
                   <span className="text-white">
                     {DELIVERY_PLACE_LABELS[place]}

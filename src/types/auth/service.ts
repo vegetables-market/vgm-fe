@@ -10,7 +10,6 @@ export interface InitAuthFlowResult {
   next_resend_at?: string;
 }
 
-
 export interface CheckUsernameResult {
   available: boolean;
   message?: string;

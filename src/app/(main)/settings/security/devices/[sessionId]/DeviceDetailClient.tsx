@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FaAndroid, FaApple, FaArrowLeft, FaClock, FaDesktop, FaGlobe, FaLinux, FaShieldHalved, FaWindows } from "react-icons/fa6";
+import {
+  FaAndroid,
+  FaApple,
+  FaArrowLeft,
+  FaClock,
+  FaDesktop,
+  FaGlobe,
+  FaLinux,
+  FaShieldHalved,
+  FaWindows,
+} from "react-icons/fa6";
 
 import { fetchApi } from "@/lib/api/fetch";
 import { parseUserAgent } from "@/lib/utils/user-agent";
@@ -27,10 +37,15 @@ export default function DeviceDetailClient({ sessionId }: Props) {
 
     const run = async () => {
       try {
-        const data = await fetchApi<{ sessions: SessionResponse[] }>("/v1/user/sessions", {
-          credentials: "include",
-        });
-        const target = data.sessions.find((s) => s.sessionId.toString() === sessionId);
+        const data = await fetchApi<{ sessions: SessionResponse[] }>(
+          "/v1/user/sessions",
+          {
+            credentials: "include",
+          },
+        );
+        const target = data.sessions.find(
+          (s) => s.sessionId.toString() === sessionId,
+        );
         if (target) {
           setSession(target);
         } else {
@@ -93,35 +108,45 @@ export default function DeviceDetailClient({ sessionId }: Props) {
     }
   };
 
-  if (isLoading) return <div className="p-8 text-center text-gray-500">読み込み中...</div>;
+  if (isLoading)
+    return <div className="p-8 text-center text-gray-500">読み込み中...</div>;
   if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-  if (!session) return <div className="p-8 text-center text-gray-500">セッションが見つかりません</div>;
+  if (!session)
+    return (
+      <div className="p-8 text-center text-gray-500">
+        セッションが見つかりません
+      </div>
+    );
 
   const device = parseUserAgent(session.deviceInfo || "");
 
   return (
-    <div className="max-w-xl mx-auto pb-12">
+    <div className="mx-auto max-w-xl pb-12">
       <div className="mb-6">
         <Link
           href="/settings/security/devices"
-          className="inline-flex items-center text-sm text-gray-500 hover:text-gray-800 transition-colors"
+          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-800"
         >
           <FaArrowLeft className="mr-1" /> デバイス一覧に戻る
         </Link>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="p-8 flex flex-col items-center text-center border-b border-gray-50 bg-gray-50/50">
-          <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+        <div className="flex flex-col items-center border-b border-gray-50 bg-gray-50/50 p-8 text-center">
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm">
             {getOsIcon(device.os)}
           </div>
-          <h1 className="text-xl font-bold text-gray-800 mb-1">
+          <h1 className="mb-1 text-xl font-bold text-gray-800">
             {device.os} {device.browser}
           </h1>
-          <p className="text-sm text-gray-500">{session.isCurrent ? "現在使用中のデバイス" : "ログイン中のデバイス"}</p>
+          <p className="text-sm text-gray-500">
+            {session.isCurrent
+              ? "現在使用中のデバイス"
+              : "ログイン中のデバイス"}
+          </p>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           <div className="detail-row">
             <div className="icon-wrapper">
               <FaGlobe />
@@ -148,22 +173,25 @@ export default function DeviceDetailClient({ sessionId }: Props) {
             </div>
             <div className="detail-content">
               <label>最終アクセス</label>
-              <div className="value">{formatDate(session.lastActiveAt || session.createdAt)}</div>
+              <div className="value">
+                {formatDate(session.lastActiveAt || session.createdAt)}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="p-6 bg-gray-50 border-t border-gray-100">
+        <div className="border-t border-gray-100 bg-gray-50 p-6">
           {session.isCurrent ? (
-            <div className="text-center text-sm text-gray-500 p-2">
-              現在のデバイスはここからは削除できません。<br />
+            <div className="p-2 text-center text-sm text-gray-500">
+              現在のデバイスはここからは削除できません。
+              <br />
               ログアウト機能を使用してください。
             </div>
           ) : (
             <button
               onClick={handleRevoke}
               disabled={isRevoking}
-              className="w-full py-3 px-4 bg-white border border-red-200 text-red-600 font-semibold rounded-xl hover:bg-red-50 hover:border-red-300 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-white px-4 py-3 font-semibold text-red-600 transition-all hover:border-red-300 hover:bg-red-50 disabled:opacity-50"
             >
               {isRevoking ? "処理中..." : "ログアウト (セッションを削除)"}
             </button>
@@ -208,4 +236,3 @@ export default function DeviceDetailClient({ sessionId }: Props) {
     </div>
   );
 }
-

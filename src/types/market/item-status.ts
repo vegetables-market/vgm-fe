@@ -12,4 +12,3 @@ export const ITEM_STATUS = {
 } as const;
 
 export type ItemStatus = (typeof ITEM_STATUS)[keyof typeof ITEM_STATUS];
-

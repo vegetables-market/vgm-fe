@@ -10,5 +10,3 @@ export async function initAuthFlow(email: string): Promise<InitAuthFlowResult> {
     body: JSON.stringify({ email }),
   });
 }
-
-

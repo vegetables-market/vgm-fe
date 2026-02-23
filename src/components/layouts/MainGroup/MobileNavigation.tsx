@@ -85,7 +85,7 @@ export default function MobileNavigation() {
 
   return (
     <nav
-      className={`pb-5 fixed w-full bottom-0 block lg:hidden bg-white/80 dark:bg-black/80 backdrop-blur-md border-t border-slate-100 dark:border-slate-800 transition-colors duration-300"`}
+      className={`duration-300" fixed bottom-0 block w-full border-t border-slate-100 bg-white/80 pb-5 backdrop-blur-md transition-colors lg:hidden dark:border-slate-800 dark:bg-black/80`}
     >
       <style>{`
         @keyframes bounce-icon {
@@ -96,7 +96,7 @@ export default function MobileNavigation() {
           animation: bounce-icon 0.4s ease-in-out;
         }
       `}</style>
-      <div className="flex items-center justify-between h-18 max-w-md mx-auto ">
+      <div className="mx-auto flex h-18 max-w-md items-center justify-between">
         {navItems.map((item) => {
           const active = isActive(item.href);
           const Icon = active ? item.iconOn : item.iconOff;
@@ -106,14 +106,14 @@ export default function MobileNavigation() {
             <button
               key={item.href}
               onClick={() => handleNavClick(item)}
-              className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
+              className={`flex h-full w-full flex-col items-center justify-center transition-colors ${
                 active ? "text-emerald-600" : "text-slate-400"
               }`}
             >
               <div
                 className={`relative ${isAnimating ? "animate-bounce-icon" : ""}`}
               >
-                <Icon className=" text-2xl mb-0.5" />
+                <Icon className="mb-0.5 text-2xl" />
               </div>
               <span className="text-[10px] font-medium">{item.label}</span>
             </button>

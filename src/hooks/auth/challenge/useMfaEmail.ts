@@ -5,9 +5,7 @@ import { getErrorMessage } from "@/lib/api/error-handler";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
-import {
-  useVerificationCountdown,
-} from "@/hooks/auth/verification/useVerificationCountdown";
+import { useVerificationCountdown } from "@/hooks/auth/verification/useVerificationCountdown";
 import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 
 type UseMfaEmailParams = {
@@ -23,13 +21,17 @@ export function useMfaEmail({
   flowId,
   redirectTo,
   expiresAt,
-  nextResendAt
+  nextResendAt,
 }: UseMfaEmailParams) {
   const {
-    code, setCode,
-    error, setError,
-    isLoading, setIsLoading,
-    successMsg, setSuccessMsg
+    code,
+    setCode,
+    error,
+    setError,
+    isLoading,
+    setIsLoading,
+    successMsg,
+    setSuccessMsg,
   } = useOtpInput();
 
   const { isResending, resendCooldown, onResend } = useChallengeResend({
@@ -61,12 +63,12 @@ export function useMfaEmail({
       localStorage.removeItem("vgm_masked_email");
       pushRedirect(redirectTo, "/");
     } else if (data.require_verification && data.flow_id) {
-       router.push(
-          withRedirectTo(
-            `/challenge?type=email&flow_id=${data.flow_id}`,
-            redirectTo,
-          ),
-        );
+      router.push(
+        withRedirectTo(
+          `/challenge?type=email&flow_id=${data.flow_id}`,
+          redirectTo,
+        ),
+      );
     } else {
       setError("ログインに失敗しました。");
     }
@@ -80,8 +82,8 @@ export function useMfaEmail({
     }
 
     if (!mfaToken) {
-       setError("MFAトークンが見つかりません。");
-       return;
+      setError("MFAトークンが見つかりません。");
+      return;
     }
 
     setIsLoading(true);

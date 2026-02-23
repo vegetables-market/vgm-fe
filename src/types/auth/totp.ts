@@ -32,4 +32,3 @@ export interface DisableTotpResponse {
   success: boolean;
   message: string;
 }
-

@@ -195,7 +195,10 @@ export default function StocksDetailClient({ id }: { id: string }) {
                   onClick={() => setSelectedImage(index)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.imageUrl} alt={`${item.title} ${index + 1}`} />
+                  <img
+                    src={image.imageUrl}
+                    alt={`${item.title} ${index + 1}`}
+                  />
                 </div>
               ))}
             </div>
@@ -275,10 +278,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
                     <div className="related-image">
                       {related.thumbnailUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={related.thumbnailUrl}
-                          alt={related.title}
-                        />
+                        <img src={related.thumbnailUrl} alt={related.title} />
                       ) : (
                         <div className="no-image">画像なし</div>
                       )}

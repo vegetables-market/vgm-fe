@@ -32,4 +32,3 @@ export interface ResendCodeResponse {
   expires_at: string;
   next_resend_at?: string;
 }
-

@@ -14,4 +14,3 @@ export function safeRedirectTo(raw?: string | null): string | null {
 
   return value;
 }
-

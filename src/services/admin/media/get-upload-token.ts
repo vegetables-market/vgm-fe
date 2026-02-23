@@ -14,4 +14,3 @@ export async function getAdminUploadToken(filename: string): Promise<{
     },
   );
 }
-

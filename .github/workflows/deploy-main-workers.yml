@@ -1,6 +1,5 @@
 name: Cloudflare Workers Deploy (Main)
 
-
 on:
   push:
     branches:
@@ -98,7 +97,7 @@ jobs:
         run: |
           echo "=== Checking .open-next directory ==="
           ls -la .open-next/ || echo ".open-next directory not found"
-          
+
           echo "=== Checking for worker.js ==="
           if [ -f .open-next/worker.js ]; then
             echo "worker.js found"
@@ -112,5 +111,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.jsonc --name ${{ vars.WORKERS_PROJECT_NAME }}
-
-

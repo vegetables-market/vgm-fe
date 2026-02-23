@@ -12,7 +12,8 @@ function ChallengeContainerInner() {
   const flowId = searchParams.get("flow_id");
   const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
   const action = searchParams.get("action");
-  const displayEmail = searchParams.get("email") || searchParams.get("masked_email");
+  const displayEmail =
+    searchParams.get("email") || searchParams.get("masked_email");
   const expiresAt = searchParams.get("expires_at");
   const nextResendAt = searchParams.get("next_resend_at");
   const redirectTo = searchParams.get("redirect_to");
@@ -57,7 +58,8 @@ function ChallengeContainerInner() {
     flowId,
     mfaToken,
     action,
-    identifier: mode === "totp" ? mfaToken : (mode === "password" ? username : flowId),
+    identifier:
+      mode === "totp" ? mfaToken : mode === "password" ? username : flowId,
     displayEmail,
     redirectTo,
     expiresAt,
@@ -66,15 +68,15 @@ function ChallengeContainerInner() {
   });
 
   const handleReturn = () => {
-      // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
-      if (returnTo) {
-          const target = decodeURIComponent(returnTo);
-          router.push(target);
-          return;
-      }
-      
-      // Default behavior: go back in history
-      router.back();
+    // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
+    if (returnTo) {
+      const target = decodeURIComponent(returnTo);
+      router.push(target);
+      return;
+    }
+
+    // Default behavior: go back in history
+    router.back();
   };
 
   return (
@@ -82,7 +84,13 @@ function ChallengeContainerInner() {
       key={safeMode}
       mode={safeMode}
       action={action}
-      identifier={mode === "totp" ? mfaToken : (mode === "password" ? username : displayEmail)}
+      identifier={
+        mode === "totp"
+          ? mfaToken
+          : mode === "password"
+            ? username
+            : displayEmail
+      }
       logic={logic}
       onBack={handleReturn}
     />

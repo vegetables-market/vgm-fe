@@ -15,4 +15,3 @@ export interface CategoryResponse {
   sortOrder: number;
   children: CategoryResponse[];
 }
-

@@ -12,23 +12,23 @@ export function DeliveryPlaceSection({
   onChangeClick,
 }: DeliveryPlaceSectionProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <h3 className="font-bold text-gray-900 dark:text-white">
             置き配の指定
           </h3>
-          <span className="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 text-xs px-2 py-0.5 rounded">
+          <span className="rounded bg-blue-100 px-2 py-0.5 text-xs text-blue-600 dark:bg-blue-900 dark:text-blue-300">
             任意
           </span>
         </div>
         <button
           onClick={onChangeClick}
-          className="text-blue-500 text-sm hover:underline flex items-center gap-1"
+          className="flex items-center gap-1 text-sm text-blue-500 hover:underline"
         >
           変更する
           <svg
-            className="w-4 h-4"
+            className="h-4 w-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

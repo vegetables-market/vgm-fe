@@ -20,10 +20,7 @@ export interface UsernameEntryProps {
   onNext: () => void;
 }
 
-
-
 export interface TermsAgreementProps {
   onSubmit: () => void;
   loading: boolean;
 }
-

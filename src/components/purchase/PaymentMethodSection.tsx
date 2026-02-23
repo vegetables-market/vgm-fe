@@ -23,7 +23,7 @@ function CardBrandBadge({ brand }: { brand?: PaymentMethod["cardBrand"] }) {
   const config = brandConfig[brand];
   return (
     <span
-      className={`${config.bg} text-white text-xs font-bold px-2 py-1 rounded`}
+      className={`${config.bg} rounded px-2 py-1 text-xs font-bold text-white`}
     >
       {config.text}
     </span>
@@ -37,16 +37,16 @@ export function PaymentMethodSection({
   const isCard = selectedMethod.type === "credit_card";
 
   return (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+      <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold text-gray-900 dark:text-white">支払い方法</h3>
         <button
           onClick={onChangeClick}
-          className="text-blue-500 text-sm hover:underline flex items-center gap-1"
+          className="flex items-center gap-1 text-sm text-blue-500 hover:underline"
         >
           変更する
           <svg
-            className="w-4 h-4"
+            className="h-4 w-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -92,12 +92,12 @@ export function PaymentMethodSection({
       {/* 支払回数 */}
       {isCard && (
         <div className="mt-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
             支払回数
           </p>
           <div className="relative">
             <select
-              className="w-full bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg py-3 px-4 text-gray-900 dark:text-white appearance-none cursor-pointer"
+              className="w-full cursor-pointer appearance-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               defaultValue="1"
             >
               <option value="1">1回払い</option>
@@ -107,7 +107,7 @@ export function PaymentMethodSection({
               <option value="12">12回払い</option>
             </select>
             <svg
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+              className="pointer-events-none absolute top-1/2 right-3 h-5 w-5 -translate-y-1/2 text-gray-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

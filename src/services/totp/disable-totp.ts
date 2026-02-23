@@ -1,6 +1,9 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { DisableTotpRequest, DisableTotpResponse } from "@/types/auth/totp";
+import type {
+  DisableTotpRequest,
+  DisableTotpResponse,
+} from "@/types/auth/totp";
 
 /**
  * TOTP無効化

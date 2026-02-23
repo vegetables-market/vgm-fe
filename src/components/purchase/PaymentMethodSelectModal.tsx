@@ -27,7 +27,7 @@ function CardBrandIcon({ brand }: { brand?: PaymentMethod["cardBrand"] }) {
   const config = brandConfig[brand];
   return (
     <span
-      className={`${config.bg} text-white text-xs font-bold px-2 py-1 rounded min-w-[40px] text-center`}
+      className={`${config.bg} min-w-[40px] rounded px-2 py-1 text-center text-xs font-bold text-white`}
     >
       {config.text}
     </span>
@@ -60,7 +60,7 @@ export function PaymentMethodSelectModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-40"
+            className="fixed inset-0 z-40 bg-black/60"
           />
 
           {/* モーダル本体 */}
@@ -68,16 +68,16 @@ export function PaymentMethodSelectModal({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed inset-x-0 bottom-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-gray-900 rounded-t-2xl md:rounded-2xl z-50 max-h-[90vh] overflow-y-auto md:max-w-lg md:w-full"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-2xl bg-gray-900 md:inset-auto md:top-1/2 md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl"
           >
             {/* ヘッダー */}
-            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-4 flex items-center justify-between">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-700 bg-gray-900 p-4">
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white p-2"
+                className="p-2 text-gray-400 hover:text-white"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -91,10 +91,10 @@ export function PaymentMethodSelectModal({
                 </svg>
               </button>
               <h2 className="text-lg font-bold text-white">支払い方法</h2>
-              <button className="text-blue-400 hover:underline text-sm flex items-center gap-1">
+              <button className="flex items-center gap-1 text-sm text-blue-400 hover:underline">
                 編集する
                 <svg
-                  className="w-4 h-4"
+                  className="h-4 w-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -109,35 +109,35 @@ export function PaymentMethodSelectModal({
               </button>
             </div>
 
-            <div className="p-4 space-y-6">
+            <div className="space-y-6 p-4">
               {/* クレジットカード */}
               <div className="space-y-3">
                 {creditCards.map((card) => (
                   <label
                     key={card.id}
-                    className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-800"
                   >
                     <input
                       type="radio"
                       name="payment_method"
                       checked={selectedMethodId === card.id}
                       onChange={() => handleSelect(card)}
-                      className="w-5 h-5 accent-blue-500"
+                      className="h-5 w-5 accent-blue-500"
                     />
                     <CardBrandIcon brand={card.cardBrand} />
                     <div className="flex-1">
                       <p className="text-white">
                         ************{card.cardLastFour} {card.cardExpiry}
                       </p>
-                      <p className="text-gray-400 text-xs">{card.fee}</p>
+                      <p className="text-xs text-gray-400">{card.fee}</p>
                     </div>
                   </label>
                 ))}
 
                 {/* 新しいカードを登録 */}
-                <button className="flex items-center gap-2 text-blue-400 text-sm hover:underline py-2">
+                <button className="flex items-center gap-2 py-2 text-sm text-blue-400 hover:underline">
                   <svg
-                    className="w-5 h-5"
+                    className="h-5 w-5"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -160,19 +160,19 @@ export function PaymentMethodSelectModal({
                 {otherMethods.map((method) => (
                   <label
                     key={method.id}
-                    className="flex items-center gap-3 cursor-pointer p-2 rounded-lg hover:bg-gray-800 transition-colors"
+                    className="flex cursor-pointer items-center gap-3 rounded-lg p-2 transition-colors hover:bg-gray-800"
                   >
                     <input
                       type="radio"
                       name="payment_method"
                       checked={selectedMethodId === method.id}
                       onChange={() => handleSelect(method)}
-                      className="w-5 h-5 accent-blue-500"
+                      className="h-5 w-5 accent-blue-500"
                     />
                     <div className="flex-1">
                       <p className="text-white">{method.label}</p>
                       {method.sublabel && (
-                        <p className="text-gray-400 text-xs">
+                        <p className="text-xs text-gray-400">
                           {method.sublabel}
                         </p>
                       )}
@@ -182,11 +182,11 @@ export function PaymentMethodSelectModal({
               </div>
 
               {/* フッターリンク */}
-              <div className="border-t border-gray-700 pt-4 space-y-2">
-                <button className="text-blue-400 text-sm hover:underline flex items-center gap-1 w-full justify-end">
+              <div className="space-y-2 border-t border-gray-700 pt-4">
+                <button className="flex w-full items-center justify-end gap-1 text-sm text-blue-400 hover:underline">
                   支払い方法について &gt;
                 </button>
-                <button className="text-blue-400 text-sm hover:underline flex items-center gap-1 w-full justify-end">
+                <button className="flex w-full items-center justify-end gap-1 text-sm text-blue-400 hover:underline">
                   決済手数料について &gt;
                 </button>
               </div>

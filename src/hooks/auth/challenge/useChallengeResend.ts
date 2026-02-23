@@ -62,7 +62,10 @@ export function useChallengeResend({
         params.set("token", token);
       }
 
-      const newUrl = withRedirectTo(`/challenge?${params.toString()}`, redirectTo);
+      const newUrl = withRedirectTo(
+        `/challenge?${params.toString()}`,
+        redirectTo,
+      );
       router.replace(newUrl);
     } catch (err: any) {
       if (

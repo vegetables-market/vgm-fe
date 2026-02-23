@@ -9,7 +9,7 @@ type Props = {
 export default function ImagePreview({ preview }: Props) {
   if (!preview) {
     return (
-      <div className="mb-4 text-gray-400 text-center">
+      <div className="mb-4 text-center text-gray-400">
         画像を選択してください
       </div>
     );
@@ -21,7 +21,7 @@ export default function ImagePreview({ preview }: Props) {
       <img
         src={preview}
         alt="Preview"
-        className="max-h-48 object-contain rounded shadow-sm"
+        className="max-h-48 rounded object-contain shadow-sm"
       />
     </div>
   );

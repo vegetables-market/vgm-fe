@@ -8,4 +8,3 @@ export type AuthGuardProps = {
   mode?: AuthGuardMode;
   showLoginLink?: boolean;
 };
-

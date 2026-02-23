@@ -25,4 +25,3 @@ export interface RegisterResponse {
   flow_id?: string;
   masked_email?: string;
 }
-

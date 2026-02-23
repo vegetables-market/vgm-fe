@@ -28,7 +28,7 @@ export default function PasswordChangePage() {
   const fetchProfileInfo = async () => {
     try {
       const data = await fetchApi<ProfileInfo>("/v1/user/account/me", {
-        credentials: "include"
+        credentials: "include",
       });
       setProfileInfo(data);
     } catch (err) {
@@ -62,16 +62,16 @@ export default function PasswordChangePage() {
           credentials: "include",
           body: JSON.stringify({
             currentPassword: profileInfo?.hasPassword ? currentPassword : null,
-            newPassword
-          })
-        }
+            newPassword,
+          }),
+        },
       );
 
       setSuccess("パスワードを変更しました");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      
+
       // プロフィール情報を更新
       fetchProfileInfo();
     } catch (err: any) {
@@ -85,8 +85,8 @@ export default function PasswordChangePage() {
     <div className="password-page">
       <h1 className="page-title">パスワード変更</h1>
       <p className="page-subtitle">
-        {profileInfo?.hasPassword 
-          ? "新しいパスワードを設定できます" 
+        {profileInfo?.hasPassword
+          ? "新しいパスワードを設定できます"
           : "パスワードを設定すると、メールアドレスとパスワードでもログインできるようになります"}
       </p>
 
@@ -142,11 +142,7 @@ export default function PasswordChangePage() {
           >
             キャンセル
           </button>
-          <button
-            type="submit"
-            className="btn-submit"
-            disabled={isLoading}
-          >
+          <button type="submit" className="btn-submit" disabled={isLoading}>
             {isLoading ? "処理中..." : "変更する"}
           </button>
         </div>

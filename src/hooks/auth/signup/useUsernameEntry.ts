@@ -29,7 +29,10 @@ export function useUsernameEntry({
   const checkCache = useRef<Map<string, CheckUsernameResult>>(new Map());
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const isFormatValid = useMemo(() => isValidUsernameFormat(username), [username]);
+  const isFormatValid = useMemo(
+    () => isValidUsernameFormat(username),
+    [username],
+  );
 
   useEffect(() => {
     if (username || suggestions.length > 0) return;
@@ -56,7 +59,7 @@ export function useUsernameEntry({
     };
   }, []);
 
-    async function checkAvailability(value: string) {
+  async function checkAvailability(value: string) {
     if (!value || value.length < 3) {
       setChecking(false);
       setIsAvailable(null);

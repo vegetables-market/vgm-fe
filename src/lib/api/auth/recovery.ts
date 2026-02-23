@@ -22,7 +22,9 @@ export const recoveryApi = {
   },
 
   getOptions: async (state: string): Promise<GetOptionsResponse> => {
-    return fetchApi<GetOptionsResponse>(`${API_ENDPOINTS.RECOVERY_OPTIONS}?state=${state}`);
+    return fetchApi<GetOptionsResponse>(
+      `${API_ENDPOINTS.RECOVERY_OPTIONS}?state=${state}`,
+    );
   },
 
   sendChallenge: async (state: string, method: string): Promise<void> => {
@@ -32,7 +34,11 @@ export const recoveryApi = {
     });
   },
 
-  verifyChallenge: async (state: string, method: string, code: string): Promise<VerifyChallengeResponse> => {
+  verifyChallenge: async (
+    state: string,
+    method: string,
+    code: string,
+  ): Promise<VerifyChallengeResponse> => {
     return fetchApi<VerifyChallengeResponse>(API_ENDPOINTS.RECOVERY_VERIFY, {
       method: "POST",
       body: JSON.stringify({ state, method, code }),

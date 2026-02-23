@@ -233,7 +233,7 @@ export function AddAddressModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-50"
+            className="fixed inset-0 z-50 bg-black/60"
           />
 
           {/* モーダル本体 */}
@@ -241,16 +241,16 @@ export function AddAddressModal({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed inset-x-0 bottom-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-gray-900 rounded-t-2xl md:rounded-2xl z-50 max-h-[90vh] overflow-y-auto md:max-w-lg md:w-full"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-2xl bg-gray-900 md:inset-auto md:top-1/2 md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl"
           >
             {/* ヘッダー */}
-            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-4 flex items-center justify-between">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-700 bg-gray-900 p-4">
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white p-2"
+                className="p-2 text-gray-400 hover:text-white"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -269,10 +269,10 @@ export function AddAddressModal({
               <div className="w-10" />
             </div>
 
-            <form onSubmit={handleSubmit} className="p-4 space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 p-4">
               {/* 氏名 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   氏名 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -284,13 +284,13 @@ export function AddAddressModal({
                   className={inputClass("name")}
                 />
                 {errors.name && (
-                  <p className="text-red-400 text-xs mt-1">{errors.name}</p>
+                  <p className="mt-1 text-xs text-red-400">{errors.name}</p>
                 )}
               </div>
 
               {/* フリガナ */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   フリガナ <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -302,13 +302,13 @@ export function AddAddressModal({
                   className={inputClass("nameKana")}
                 />
                 {errors.nameKana && (
-                  <p className="text-red-400 text-xs mt-1">{errors.nameKana}</p>
+                  <p className="mt-1 text-xs text-red-400">{errors.nameKana}</p>
                 )}
               </div>
 
               {/* 郵便番号 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   郵便番号 <span className="text-red-400">*</span>
                 </label>
                 <div className="flex gap-2">
@@ -324,12 +324,12 @@ export function AddAddressModal({
                     type="button"
                     onClick={handleSearchAddress}
                     disabled={isSearchingAddress}
-                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap"
+                    className="rounded-lg bg-blue-600 px-4 py-3 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-600"
                   >
                     {isSearchingAddress ? (
                       <span className="flex items-center gap-2">
                         <svg
-                          className="animate-spin w-4 h-4"
+                          className="h-4 w-4 animate-spin"
                           fill="none"
                           viewBox="0 0 24 24"
                         >
@@ -355,30 +355,30 @@ export function AddAddressModal({
                   </button>
                 </div>
                 {errors.postalCode && (
-                  <p className="text-red-400 text-xs mt-1">
+                  <p className="mt-1 text-xs text-red-400">
                     {errors.postalCode}
                   </p>
                 )}
                 {addressSearchError && (
-                  <p className="text-yellow-400 text-xs mt-1">
+                  <p className="mt-1 text-xs text-yellow-400">
                     {addressSearchError}
                   </p>
                 )}
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="mt-1 text-xs text-gray-500">
                   ※ 郵便番号7桁入力で自動検索します
                 </p>
               </div>
 
               {/* 都道府県 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   都道府県 <span className="text-red-400">*</span>
                 </label>
                 <select
                   name="prefecture"
                   value={formData.prefecture}
                   onChange={handleChange}
-                  className={`${inputClass("prefecture")} appearance-none cursor-pointer`}
+                  className={`${inputClass("prefecture")} cursor-pointer appearance-none`}
                 >
                   <option value="">選択してください</option>
                   {prefectures.map((pref) => (
@@ -388,7 +388,7 @@ export function AddAddressModal({
                   ))}
                 </select>
                 {errors.prefecture && (
-                  <p className="text-red-400 text-xs mt-1">
+                  <p className="mt-1 text-xs text-red-400">
                     {errors.prefecture}
                   </p>
                 )}
@@ -396,7 +396,7 @@ export function AddAddressModal({
 
               {/* 市区町村 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   市区町村 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -408,13 +408,13 @@ export function AddAddressModal({
                   className={inputClass("city")}
                 />
                 {errors.city && (
-                  <p className="text-red-400 text-xs mt-1">{errors.city}</p>
+                  <p className="mt-1 text-xs text-red-400">{errors.city}</p>
                 )}
               </div>
 
               {/* 町名・番地 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   町名・番地 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -426,13 +426,13 @@ export function AddAddressModal({
                   className={inputClass("address1")}
                 />
                 {errors.address1 && (
-                  <p className="text-red-400 text-xs mt-1">{errors.address1}</p>
+                  <p className="mt-1 text-xs text-red-400">{errors.address1}</p>
                 )}
               </div>
 
               {/* 建物名・部屋番号 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   建物名・部屋番号
                 </label>
                 <input
@@ -447,7 +447,7 @@ export function AddAddressModal({
 
               {/* 電話番号 */}
               <div>
-                <label className="block text-sm text-gray-400 mb-1">
+                <label className="mb-1 block text-sm text-gray-400">
                   電話番号 <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -459,14 +459,14 @@ export function AddAddressModal({
                   className={inputClass("phone")}
                 />
                 {errors.phone && (
-                  <p className="text-red-400 text-xs mt-1">{errors.phone}</p>
+                  <p className="mt-1 text-xs text-red-400">{errors.phone}</p>
                 )}
               </div>
 
               {/* 送信ボタン */}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors mt-6"
+                className="mt-6 w-full rounded-lg bg-blue-600 py-4 font-bold text-white transition-colors hover:bg-blue-700"
               >
                 配送先を追加する
               </button>

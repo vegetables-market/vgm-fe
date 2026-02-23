@@ -11,8 +11,8 @@ export function useOtpInput() {
   const handleSetCode = useCallback((value: string) => {
     setCode(value);
     // Note: accessing 'error' state here in callback dependency might cause re-creation if error changes.
-    // However, setError is safe to call even if we don't depend on 'error' value, 
-    // but here we check 'if (error)'. 
+    // However, setError is safe to call even if we don't depend on 'error' value,
+    // but here we check 'if (error)'.
     // To be safe and stable, better to use functional update or just set error to empty string blindly?
     // Or just depend on [error].
     // Actually, simply clearing error blindly is fine and stable.

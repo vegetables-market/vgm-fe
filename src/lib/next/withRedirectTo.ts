@@ -10,4 +10,3 @@ export function withRedirectTo(
   const separator = url.includes("?") ? "&" : "?";
   return `${url}${separator}redirect_to=${encodeURIComponent(safe)}`;
 }
-

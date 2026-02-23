@@ -28,9 +28,7 @@ export function SignupStepProvider({
   children,
 }: SignupStepProviderProps) {
   return (
-    <SignupStepContext.Provider
-      value={{ step, totalSteps, showStepNumber }}
-    >
+    <SignupStepContext.Provider value={{ step, totalSteps, showStepNumber }}>
       {children}
     </SignupStepContext.Provider>
   );

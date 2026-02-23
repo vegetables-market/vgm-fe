@@ -37,4 +37,3 @@ export function usePasswordEntry({ password, onNext }: UsePasswordEntryParams) {
     handleSubmit,
   };
 }
-

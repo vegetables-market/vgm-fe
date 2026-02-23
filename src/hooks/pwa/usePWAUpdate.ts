@@ -51,4 +51,3 @@ export function usePWAUpdate() {
 
   return { updatePWA, isSWRegistered: !!registration };
 }
-

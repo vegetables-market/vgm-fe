@@ -36,8 +36,8 @@ export default function ResetPasswordForm() {
       return;
     }
     if (password.length < 8) {
-        setError("パスワードは8文字以上で入力してください。");
-        return;
+      setError("パスワードは8文字以上で入力してください。");
+      return;
     }
 
     setIsLoading(true);
@@ -53,26 +53,36 @@ export default function ResetPasswordForm() {
   };
 
   if (success) {
-      return (
-          <div className="flex w-75 flex-col items-center">
-              <AuthTitle>変更完了</AuthTitle>
-              <AuthStatusMessage message="パスワードを変更しました。" variant="success" className="mb-6 w-full" />
-              <AuthSubmitButton onClick={() => router.push("/login")}>
-                  ログイン画面へ進む
-              </AuthSubmitButton>
-          </div>
-      );
+    return (
+      <div className="flex w-75 flex-col items-center">
+        <AuthTitle>変更完了</AuthTitle>
+        <AuthStatusMessage
+          message="パスワードを変更しました。"
+          variant="success"
+          className="mb-6 w-full"
+        />
+        <AuthSubmitButton onClick={() => router.push("/login")}>
+          ログイン画面へ進む
+        </AuthSubmitButton>
+      </div>
+    );
   }
 
   return (
     <div className="flex w-75 flex-col items-center">
       <AuthTitle>パスワードの再設定</AuthTitle>
-      
+
       {!token && (
-           <AuthStatusMessage message="トークンが見つかりません。" variant="error" className="mb-4" />
+        <AuthStatusMessage
+          message="トークンが見つかりません。"
+          variant="error"
+          className="mb-4"
+        />
       )}
 
-      {error && <AuthStatusMessage message={error} variant="error" className="mb-4" />}
+      {error && (
+        <AuthStatusMessage message={error} variant="error" className="mb-4" />
+      )}
 
       <form onSubmit={handleSubmit} className="w-full">
         <AuthInput
@@ -96,7 +106,10 @@ export default function ResetPasswordForm() {
           placeholder="もう一度入力してください"
         />
 
-        <AuthSubmitButton isLoading={isLoading} disabled={!token || !password || !confirmPassword}>
+        <AuthSubmitButton
+          isLoading={isLoading}
+          disabled={!token || !password || !confirmPassword}
+        >
           変更する
         </AuthSubmitButton>
       </form>

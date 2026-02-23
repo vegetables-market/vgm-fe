@@ -121,4 +121,3 @@ export interface CreateItemRequest {
   condition: number;
   stock: number;
 }
-

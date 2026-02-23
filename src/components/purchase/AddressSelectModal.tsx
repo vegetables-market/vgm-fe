@@ -40,7 +40,7 @@ export function AddressSelectModal({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 z-40"
+            className="fixed inset-0 z-40 bg-black/60"
           />
 
           {/* モーダル本体 */}
@@ -48,16 +48,16 @@ export function AddressSelectModal({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed inset-x-0 bottom-0 md:inset-auto md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 bg-gray-900 rounded-t-2xl md:rounded-2xl z-50 max-h-[90vh] overflow-y-auto md:max-w-lg md:w-full"
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-2xl bg-gray-900 md:inset-auto md:top-1/2 md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl"
           >
             {/* ヘッダー */}
-            <div className="sticky top-0 bg-gray-900 border-b border-gray-700 p-4 flex items-center justify-between">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-700 bg-gray-900 p-4">
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white p-2"
+                className="p-2 text-gray-400 hover:text-white"
               >
                 <svg
-                  className="w-6 h-6"
+                  className="h-6 w-6"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -74,12 +74,12 @@ export function AddressSelectModal({
               <div className="w-10" /> {/* スペーサー */}
             </div>
 
-            <div className="p-4 space-y-4">
+            <div className="space-y-4 p-4">
               {/* 住所リスト */}
               {addresses.map((address) => (
                 <label
                   key={address.id}
-                  className={`block p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                  className={`block cursor-pointer rounded-lg border-2 p-4 transition-colors ${
                     selectedAddressId === address.id
                       ? "border-blue-500 bg-blue-900/20"
                       : "border-gray-700 hover:border-gray-600"
@@ -91,31 +91,31 @@ export function AddressSelectModal({
                       name="address"
                       checked={selectedAddressId === address.id}
                       onChange={() => handleSelect(address)}
-                      className="w-5 h-5 accent-blue-500 mt-1"
+                      className="mt-1 h-5 w-5 accent-blue-500"
                     />
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <p className="text-white font-medium">{address.name}</p>
+                        <p className="font-medium text-white">{address.name}</p>
                         {address.isDefault && (
-                          <span className="bg-gray-700 text-gray-300 text-xs px-2 py-0.5 rounded">
+                          <span className="rounded bg-gray-700 px-2 py-0.5 text-xs text-gray-300">
                             デフォルト
                           </span>
                         )}
                       </div>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-sm text-gray-400">
                         〒{address.postalCode}
                       </p>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-sm text-gray-400">
                         {address.prefecture}
                         {address.city}
                         {address.address1}
                       </p>
                       {address.address2 && (
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-sm text-gray-400">
                           {address.address2}
                         </p>
                       )}
-                      <p className="text-gray-400 text-sm">{address.phone}</p>
+                      <p className="text-sm text-gray-400">{address.phone}</p>
                     </div>
                   </div>
                 </label>
@@ -124,10 +124,10 @@ export function AddressSelectModal({
               {/* 新しい住所を追加 */}
               <button
                 onClick={handleAddNew}
-                className="w-full flex items-center justify-center gap-2 text-blue-400 text-sm hover:underline py-4 border-2 border-dashed border-gray-700 rounded-lg hover:border-blue-500 transition-colors"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-700 py-4 text-sm text-blue-400 transition-colors hover:border-blue-500 hover:underline"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="h-5 w-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

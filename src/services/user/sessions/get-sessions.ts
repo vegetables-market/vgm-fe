@@ -9,4 +9,3 @@ export async function getSessions(): Promise<{ sessions: SessionResponse[] }> {
     method: "GET",
   });
 }
-

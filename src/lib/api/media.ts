@@ -66,4 +66,3 @@ export async function uploadImage(
     throw new Error(`画像のアップロードに失敗しました: ${String(error)}`);
   }
 }
-

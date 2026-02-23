@@ -30,4 +30,3 @@ export interface LoginResponse {
   oauth_provider?: string;
   oauth_token?: string;
 }
-

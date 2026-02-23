@@ -198,7 +198,7 @@ export function useChallengeLogic({
           if (data.next_resend_at) {
             queryParams.set("next_resend_at", data.next_resend_at);
           }
-          
+
           const nextUrl = withRedirectTo(
             `/challenge?${queryParams.toString()}`,
             redirectTo,

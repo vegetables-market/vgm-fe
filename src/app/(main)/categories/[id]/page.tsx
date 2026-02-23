@@ -24,9 +24,7 @@ export async function generateStaticParams() {
     const res = await fetch(url, { method: "GET" });
     if (!res.ok) return [{ id: "0" }];
     const data = (await res.json()) as CategoriesResponse;
-    const categories = Array.isArray(data)
-      ? data
-      : (data.categories ?? []);
+    const categories = Array.isArray(data) ? data : (data.categories ?? []);
 
     const ids: string[] = [];
     collectIds(categories, ids);

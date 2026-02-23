@@ -38,31 +38,31 @@ export function useLogin(initial?: LoginInitialParams) {
       const checkResult = await checkUser(emailOrUsername);
 
       if (checkResult.next_step === "password") {
-          addLog(`Proceeding to password challenge for: ${checkResult.identifier}`);
-          // パスワード入力画面へ遷移
-          // ユーザーが存在しない場合でもここに来る（セキュリティ対策）
-          const params = new URLSearchParams();
-          params.set("type", "password");
-          params.set("username", checkResult.identifier);
-          if (safeRedirect) params.set("redirect_to", safeRedirect);
-          
-          router.push(`/challenge?${params.toString()}`);
+        addLog(
+          `Proceeding to password challenge for: ${checkResult.identifier}`,
+        );
+        // パスワード入力画面へ遷移
+        // ユーザーが存在しない場合でもここに来る（セキュリティ対策）
+        const params = new URLSearchParams();
+        params.set("type", "password");
+        params.set("username", checkResult.identifier);
+        if (safeRedirect) params.set("redirect_to", safeRedirect);
 
+        router.push(`/challenge?${params.toString()}`);
       } else if (checkResult.next_step === "email_otp" && checkResult.flow_id) {
-          addLog("Proceeding to email verification");
-          // メール認証画面へ遷移
-          const params = new URLSearchParams();
-          params.set("type", "email");
-          params.set("flow_id", checkResult.flow_id);
-          params.set("email", checkResult.identifier); // 表示用
-          if (safeRedirect) params.set("redirect_to", safeRedirect);
-          
-          router.push(`/challenge?${params.toString()}`);
-      } else {
-          // 想定外のレスポンス
-          throw new Error("Invalid auth step");
-      }
+        addLog("Proceeding to email verification");
+        // メール認証画面へ遷移
+        const params = new URLSearchParams();
+        params.set("type", "email");
+        params.set("flow_id", checkResult.flow_id);
+        params.set("email", checkResult.identifier); // 表示用
+        if (safeRedirect) params.set("redirect_to", safeRedirect);
 
+        router.push(`/challenge?${params.toString()}`);
+      } else {
+        // 想定外のレスポンス
+        throw new Error("Invalid auth step");
+      }
     } catch (err: any) {
       console.error(err);
       const message = getErrorMessage(err);

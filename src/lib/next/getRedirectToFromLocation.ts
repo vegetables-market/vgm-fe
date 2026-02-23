@@ -17,4 +17,3 @@ export function getRedirectToFromLocation(): string | null {
 
   return safe;
 }
-

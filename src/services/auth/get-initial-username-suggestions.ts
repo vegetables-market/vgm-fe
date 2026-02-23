@@ -10,4 +10,3 @@ export async function getInitialUsernameSuggestions(): Promise<{
     method: "GET",
   });
 }
-

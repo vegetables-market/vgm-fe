@@ -37,13 +37,13 @@ interface PaginatedResponse {
 export default function StocksPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -75,7 +75,7 @@ export default function StocksPage() {
 
       const data = await fetchApi<PaginatedResponse>(
         `/v1/market/items/search?${params.toString()}`,
-        { credentials: "include" }
+        { credentials: "include" },
       );
 
       setStocks(data.items);
@@ -96,7 +96,7 @@ export default function StocksPage() {
     params.append("sort", sort);
     params.append("page", "1");
 
-    router.push(`/stocks?${params.toString()}`);  
+    router.push(`/stocks?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -108,7 +108,7 @@ export default function StocksPage() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ja-JP", {
       style: "currency",
-      currency: "JPY"
+      currency: "JPY",
     }).format(price);
   };
 
@@ -210,7 +210,9 @@ export default function StocksPage() {
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{stock.seller.displayName}</span>
+                    <span className="seller-name">
+                      {stock.seller.displayName}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -386,7 +388,9 @@ export default function StocksPage() {
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
-          transition: transform 0.2s, box-shadow 0.2s;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 

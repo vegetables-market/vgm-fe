@@ -46,7 +46,7 @@ export default function DeleteAccountPage() {
             `/challenge?type=totp&token=${data.flow_id}&${baseParams}`,
           );
         } else if (data.auth_type === "PASSWORD") {
-           router.push(
+          router.push(
             `/challenge?type=password&flow_id=${data.flow_id}&${baseParams}`,
           );
         } else {
