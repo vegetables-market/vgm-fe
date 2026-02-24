@@ -39,6 +39,7 @@ export default function WebHeader() {
           className="flex items-center gap-3 pr-3 transition-transform duration-300 hover:scale-102"
         >
           <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl font-bold">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/icons/vgm-icon.svg" alt="GrandMarket Logo" />
           </div>
           <h1 className="hidden text-xl font-bold tracking-tight sm:block">
@@ -102,11 +103,14 @@ export default function WebHeader() {
               className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-100 transition-all hover:ring-2 hover:ring-amber-500 dark:border-gray-700 dark:bg-gray-800"
             >
               {user.avatarUrl ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={user.avatarUrl}
                   alt={user.displayName}
                   className="h-full w-full object-cover"
                 />
+                </>
               ) : (
                 <FaUser className="text-gray-500 dark:text-gray-400" />
               )}

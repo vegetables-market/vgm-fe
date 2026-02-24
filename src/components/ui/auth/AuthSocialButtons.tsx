@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useFirebaseOAuthLogin } from "@/hooks/auth/firebase/useFirebaseOAuthLogin";
 
@@ -71,18 +71,19 @@ export default function AuthSocialButtons({
     useFirebaseOAuthLogin();
   const hasAutoStartedRef = useRef(false);
 
-  const handleProviderClick = (
-    providerId: "google" | "microsoft" | "github",
-  ) => {
-    handleOAuthLogin(providerId);
-    onProviderClick?.(providerId);
-  };
+  const handleProviderClick = useCallback(
+    (providerId: "google" | "microsoft" | "github") => {
+      handleOAuthLogin(providerId);
+      onProviderClick?.(providerId);
+    },
+    [handleOAuthLogin, onProviderClick],
+  );
 
   useEffect(() => {
     if (mode !== "login" || !autoProvider || hasAutoStartedRef.current) return;
     hasAutoStartedRef.current = true;
     handleProviderClick(autoProvider);
-  }, [autoProvider, mode]);
+  }, [autoProvider, mode, handleProviderClick]);
 
   return (
     <div className="mb-4 flex w-full flex-col gap-2">
