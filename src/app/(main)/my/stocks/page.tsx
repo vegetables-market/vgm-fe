@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getMyItems } from "@/service/market/stocks/get-my-items";
 import { deleteItem } from "@/service/market/stocks/delete-item";
 import { updateItemStatus } from "@/service/market/stocks/update-item-status";
+import type { StockItemRaw } from "@/service/market/stocks/dto/stock-item-raw";
 
 interface Item {
   id: number;
@@ -26,9 +27,9 @@ export default function StockPage() {
   const loadItems = () => {
     setLoading(true);
     getMyItems()
-      .then((data: any[]) => {
+      .then((data: StockItemRaw[]) => {
         const normalizedItems: Item[] = (data || []).map((item) => ({
-          id: Number(item.id ?? item.itemId ?? item.item_id ?? 0),
+          id: Number(item.itemId ?? item.item_id ?? 0),
           name: item.name ?? item.title ?? "",
           price: Number(item.price ?? 0),
           status: Number(item.status ?? 0),
