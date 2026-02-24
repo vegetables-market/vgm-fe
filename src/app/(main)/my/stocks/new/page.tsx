@@ -1,9 +1,7 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getCategories } from "@/service/market/stocks/get-categories";
-import type { Category } from "@/service/market/stocks/get-categories";
 import {
   SHIPPING_DAYS_OPTIONS,
   SHIPPING_METHOD_OPTIONS,
@@ -14,6 +12,8 @@ import { buildNewStockPayload } from "@/lib/market/stocks/build-update-item-payl
 import { updateItem } from "@/service/market/stocks/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
+import { useImageDropInput } from "@/hooks/item/use-image-drop-input";
+import { useStockCategories } from "@/hooks/market/stocks/use-stock-categories";
 
 export default function StockNewPage() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function StockNewPage() {
   } = useMultiImageUpload(itemId, { initDraft });
 
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = useStockCategories();
   const [error, setError] = useState("");
 
   // Form State
@@ -44,41 +44,13 @@ export default function StockNewPage() {
   const [shippingPayerType, setShippingPayerType] = useState(0); // 0:送料込み
   const [itemCondition, setItemCondition] = useState(0); // 0:新品
 
-  // Fetch categories on mount (draft is created when first image is added)
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        console.log("取得したデータ:", data);
-        setCategories(data);
-      })
-      .catch((err) => console.error("Failed to fetch categories", err));
-  }, []);
-
-  // Drag & Drop Handlers
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        addFiles(Array.from(e.dataTransfer.files));
-      }
-    },
-    [addFiles],
-  );
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      addFiles(Array.from(e.target.files));
-    }
-    // file inputクリア
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  const {
+    fileInputRef,
+    handleDrop,
+    handleDragOver,
+    handleFileSelect,
+    openFileDialog,
+  } = useImageDropInput({ addFiles });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -168,7 +140,7 @@ export default function StockNewPage() {
             className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:bg-gray-50"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={openFileDialog}
           >
             <input
               type="file"

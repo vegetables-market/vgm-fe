@@ -1,9 +1,7 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getCategories } from "@/service/market/stocks/get-categories";
-import type { Category } from "@/service/market/stocks/get-categories";
 import {
   SHIPPING_DAYS_OPTIONS,
   SHIPPING_METHOD_OPTIONS,
@@ -14,6 +12,8 @@ import { buildEditStockPayload } from "@/lib/market/stocks/build-update-item-pay
 import { updateItem } from "@/service/market/stocks/update-item";
 import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
+import { useImageDropInput } from "@/hooks/item/use-image-drop-input";
+import { useStockCategories } from "@/hooks/market/stocks/use-stock-categories";
 
 interface ItemDetail {
   itemId: string;
@@ -43,7 +43,7 @@ export default function StockEditClient({ id }: { id: string }) {
 
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const categories = useStockCategories();
   const [error, setError] = useState("");
 
   // Form State
@@ -91,37 +91,15 @@ export default function StockEditClient({ id }: { id: string }) {
     };
 
     loadItemData();
-
-    // Fetch categories
-    getCategories()
-      .then((data) => setCategories(data))
-      .catch((err) => console.error("Failed to fetch categories", err));
   }, [itemId]);
 
-  // Drag & Drop Handlers
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        addFiles(Array.from(e.dataTransfer.files));
-      }
-    },
-    [addFiles],
-  );
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      addFiles(Array.from(e.target.files));
-    }
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  const {
+    fileInputRef,
+    handleDrop,
+    handleDragOver,
+    handleFileSelect,
+    openFileDialog,
+  } = useImageDropInput({ addFiles });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -192,7 +170,7 @@ export default function StockEditClient({ id }: { id: string }) {
             className="cursor-pointer rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:bg-gray-50"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={openFileDialog}
           >
             <input
               type="file"
