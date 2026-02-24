@@ -25,16 +25,6 @@ interface CategoryApiNode {
   children?: CategoryApiNode[];
 }
 
-interface CategoryApiNode {
-  categoryId?: number;
-  categoryName?: string;
-  parentId?: number | null;
-  category_id?: number;
-  category_name?: string;
-  parent_id?: number | null;
-  children?: CategoryApiNode[];
-}
-
 export const getCategories = async (): Promise<Category[]> => {
   const response = await fetchApi<CategoryApiNode[]>(
     `${API_ENDPOINTS.CATEGORIES}`,

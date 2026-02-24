@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getCategories } from "@/service/market/stocks/get-categories";
+import type { Category } from "@/service/market/stocks/get-categories";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -35,7 +36,7 @@ export default function StockEditClient({ id }: { id: string }) {
 
   const [loading, setLoading] = useState(false);
   const [dataLoading, setDataLoading] = useState(true);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [error, setError] = useState("");
 
   // Form State
