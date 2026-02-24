@@ -10,6 +10,7 @@ import {
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
 import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
+import { buildEditStockPayload } from "@/lib/market/stocks/build-update-item-payload";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -143,18 +144,18 @@ export default function StockEditClient({ id }: { id: string }) {
 
     setLoading(true);
     try {
-      const payload = {
+      const payload = buildEditStockPayload({
         name,
         description,
-        categoryId: Number(categoryId),
-        price: Number(price),
-        quantity: Number(quantity),
-        shippingPayerType: shippingPayerType,
-        shippingOriginArea: prefectureId,
-        shippingDaysId: shippingDaysId,
-        shippingMethodId: shippingMethodId,
-        itemCondition: itemCondition,
-      };
+        categoryId,
+        price,
+        quantity,
+        shippingPayerType,
+        prefectureId,
+        shippingDaysId,
+        shippingMethodId,
+        itemCondition,
+      });
 
       await updateItem(itemId, payload);
       router.push("/my/stocks");

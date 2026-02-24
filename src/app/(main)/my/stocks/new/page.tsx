@@ -10,6 +10,7 @@ import {
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
 import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
+import { buildNewStockPayload } from "@/lib/market/stocks/build-update-item-payload";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -119,18 +120,18 @@ export default function StockNewPage() {
 
     setLoading(true);
     try {
-      const payload = {
+      const payload = buildNewStockPayload({
         name,
         description,
-        category_id: Number(categoryId),
-        price: Number(price),
-        quantity: Number(quantity),
-        shipping_payer_type: shippingPayerType,
-        shipping_origin_area: prefectureId,
-        shipping_days_id: shippingDaysId,
-        shipping_method_id: shippingMethodId,
-        item_condition: itemCondition,
-      };
+        categoryId,
+        price,
+        quantity,
+        shippingPayerType,
+        prefectureId,
+        shippingDaysId,
+        shippingMethodId,
+        itemCondition,
+      });
 
       await updateItem(currentItemId, payload);
       router.push("/my/stocks"); // 一覧へ遷移
