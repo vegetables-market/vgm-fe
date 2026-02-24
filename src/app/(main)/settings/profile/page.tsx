@@ -1,4 +1,5 @@
 ﻿"use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/lib/api/fetch";
@@ -467,3 +468,6 @@ export default function ProfileEditPage() {
     </div>
   );
 }
+
+
+

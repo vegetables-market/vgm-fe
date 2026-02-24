@@ -555,6 +555,7 @@ export default function Home() {
                   onClick={() => router.push(`/stocks/${item.id}`)}
                 >
                   <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-gray-200 shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.imageUrl}
                       alt={item.name}

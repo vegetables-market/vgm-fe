@@ -68,6 +68,7 @@ function ItemCard({
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition">
                     {/* 商品画像 */}
                     <div className="relative aspect-square">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={item.images[0]}
                             alt={item.name}
@@ -219,6 +220,7 @@ export default function ProfilePage() {
                 <div className="bg-white rounded-xl shadow-md p-6 mb-6">
                     <div className="flex items-start gap-4">
                         {/* アバター */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="https://api.dicebear.com/7.x/avataaars/svg?seed=hanako"
                             alt="ユーザー"
