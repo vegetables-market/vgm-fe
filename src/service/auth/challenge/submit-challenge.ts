@@ -5,7 +5,7 @@ import { verifyActionChallenge } from "@/service/auth/challenge/verify-action-ch
 import { verifyEmailChallengeLogin } from "@/service/auth/challenge/verify-email-challenge-login";
 import { verifyEmailMfaChallengeLogin } from "@/service/auth/challenge/verify-email-mfa-challenge-login";
 import { verifyTotpChallengeLogin } from "@/service/auth/challenge/verify-totp-challenge-login";
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { LoginResponseDto } from "@/service/auth/flow/dto/login-response-dto";
 import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
 import { verifyAuthCode } from "@/service/auth/challenge/verify-auth-code";
 

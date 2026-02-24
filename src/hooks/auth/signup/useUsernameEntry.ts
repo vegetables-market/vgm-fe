@@ -5,7 +5,7 @@ import { checkUsername } from "@/service/auth/flow/check-username";
 import { getInitialUsernameSuggestions } from "@/service/auth/user/get-initial-username-suggestions";
 import { isValidUsernameFormat } from "@/service/auth/policy/username-validation";
 
-import type { CheckUsernameResultDto } from "@/service/auth/dto/check-username-result-dto";
+import type { CheckUsernameResultDto } from "@/service/auth/flow/dto/check-username-result-dto";
 
 type UseUsernameEntryParams = {
   username: string;

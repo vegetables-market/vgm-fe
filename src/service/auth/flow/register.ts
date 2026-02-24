@@ -1,7 +1,7 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { RegisterRequestDto } from "@/service/auth/dto/register-request-dto";
-import type { RegisterResponseDto } from "@/service/auth/dto/register-response-dto";
+import type { RegisterRequestDto } from "@/service/auth/flow/dto/register-request-dto";
+import type { RegisterResponseDto } from "@/service/auth/flow/dto/register-response-dto";
 
 /**
  * 新規登録

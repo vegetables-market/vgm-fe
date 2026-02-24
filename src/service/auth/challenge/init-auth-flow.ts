@@ -1,5 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
-import type { InitAuthFlowResultDto } from "@/service/auth/dto/init-auth-flow-result-dto";
+import type { InitAuthFlowResultDto } from "@/service/auth/challenge/dto/init-auth-flow-result-dto";
 
 /**
  * 認証フロー開始 (Login or Register判定)

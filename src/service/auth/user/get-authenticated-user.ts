@@ -1,7 +1,7 @@
 ﻿import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
 import { ApiError, fetchApi } from "@/lib/api/fetch";
 import type { UserInfo } from "@/lib/auth/shared/types/user-info";
-import { mapAuthenticatedUser } from "@/service/auth/mappers/authenticated-user";
+import { mapAuthenticatedUser } from "@/service/auth/user/mappers/authenticated-user";
 
 export async function getAuthenticatedUser(): Promise<UserInfo | null> {
   try {

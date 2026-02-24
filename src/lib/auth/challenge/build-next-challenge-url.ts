@@ -1,4 +1,4 @@
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { LoginResponseDto } from "@/service/auth/flow/dto/login-response-dto";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 
 export function buildNextChallengeUrl(

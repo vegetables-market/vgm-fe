@@ -1,5 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
-import type { CheckUsernameResultDto } from "@/service/auth/dto/check-username-result-dto";
+import type { CheckUsernameResultDto } from "@/service/auth/flow/dto/check-username-result-dto";
 
 /**
  * ユーザー名の重複チェック

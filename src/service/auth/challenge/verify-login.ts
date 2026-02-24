@@ -1,5 +1,5 @@
 import { fetchApi } from "@/lib/api/fetch";
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { LoginResponseDto } from "@/service/auth/flow/dto/login-response-dto";
 import type { VerifyLoginRequestDto } from "@/service/auth/challenge/dto/verify-login-request-dto";
 
 export async function verifyLogin(

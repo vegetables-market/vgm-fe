@@ -1,7 +1,7 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type { TotpLoginRequestDto } from "@/service/auth/dto/totp-login-request-dto";
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { TotpLoginRequestDto } from "@/service/totp/dto/totp-login-request-dto";
+import type { LoginResponseDto } from "@/service/auth/flow/dto/login-response-dto";
 
 /**
  * TOTPログイン

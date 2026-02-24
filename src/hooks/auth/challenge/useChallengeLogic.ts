@@ -10,7 +10,7 @@ import { useChallengeResend } from "@/hooks/auth/challenge/useChallengeResend";
 import { handleChallengeSubmitResult } from "@/hooks/auth/challenge/handle-challenge-submit-result";
 import { VerificationMode } from "@/lib/auth/shared/types/verification-mode";
 import { submitChallenge } from "@/service/auth/challenge/submit-challenge";
-import type { LoginResponseDto } from "@/service/auth/dto/login-response-dto";
+import type { LoginResponseDto } from "@/service/auth/flow/dto/login-response-dto";
 import type { VerifyAuthCodeResponseDto } from "@/service/auth/challenge/dto/verify-auth-code-response-dto";
 import { startPasswordRecovery } from "@/service/auth/recovery/start-password-recovery";
 
