@@ -41,7 +41,7 @@ interface PaginatedResponse {
 export default function StocksPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -130,7 +130,7 @@ export default function StocksPage() {
     params.append("sort", sort);
     params.append("page", "1");
 
-    router.push(`/stocks?${params.toString()}`);  
+    router.push(`/stocks?${params.toString()}`);
   };
 
   const handlePageChange = (page: number) => {
@@ -245,9 +245,9 @@ export default function StocksPage() {
                   <img
                     src={getImageUrl(
                       stock.thumbnail_url ??
-                        stock.thumbnailUrl ??
-                        stock.image_url ??
-                        stock.imageUrl,
+                      stock.thumbnailUrl ??
+                      stock.image_url ??
+                      stock.imageUrl,
                     )}
                     alt={stock.title}
                     onError={(e) => {
@@ -317,46 +317,65 @@ export default function StocksPage() {
         .page-title {
           font-size: 28px;
           font-weight: 700;
-          color: #333;
+          color: #1c1c1c;
           margin: 0;
         }
+        :global(.dark) .page-title { color: #f4f4f5; }
 
         .search-section {
           background: #fff;
+          border: 1px solid #e5e7eb;
           border-radius: 12px;
           padding: 24px;
           margin-bottom: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
-
+        :global(.dark) .search-section {
+          background: #18181b;
+          border-color: #27272a;
+          box-shadow: none;
+        }
         .search-bar {
           display: flex;
           gap: 12px;
           margin-bottom: 20px;
         }
 
-        .search-input {
+        .search-input, .price-input, .sort-select {
           flex: 1;
           padding: 12px 16px;
-          border: 1px solid #ddd;
+          background: #fff;
+          border: 1px solid #d1d5db;
           border-radius: 8px;
           font-size: 14px;
+          color: #1c1c1c; /* ライトモード時の文字色 */
         }
-
+        :global(.dark) .search-input,
+        :global(.dark) .price-input,
+        :global(.dark) .sort-select {
+          background: #27272a;
+          border-color: #3f3f46;
+          color: #f4f4f5; /* ダークモード時の文字色 */
+        }
         .search-button {
           padding: 12px 32px;
-          background: #333;
+          background: #18181b;
           color: #fff;
           border: none;
           border-radius: 8px;
           font-size: 14px;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.2s;
+          transition: opacity 0.2s;
+        }
+        :global(.dark) .search-button {
+          background: #f4f4f5;
+          color: #18181b;
         }
 
-        .search-button:hover {
-          background: #555;
+        :global(.dark) .search-button:hover {
+          background: #e4e4e7;
+          opacity: 0.9;
         }
 
         .filters {
@@ -404,6 +423,7 @@ export default function StocksPage() {
           padding: 8px 24px;
           background: #f5f5f5;
           border: 1px solid #ddd;
+          color: #18181b;
           border-radius: 6px;
           font-size: 14px;
           font-weight: 600;
@@ -438,11 +458,15 @@ export default function StocksPage() {
 
         .stock-card {
           background: #fff;
+          border: 1px solid #e5e7eb;
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        :global(.dark) .stock-card {
+          background: #18181b;
+          border-color: #27272a;
         }
 
         .stock-card:hover {
@@ -477,19 +501,18 @@ export default function StocksPage() {
         .stock-title {
           font-size: 16px;
           font-weight: 600;
-          color: #333;
+          color: #1c1c1c;
           margin: 0 0 8px 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
         }
+        :global(.dark) .stock-title { color: #f4f4f5; }
 
         .stock-price {
           font-size: 20px;
           font-weight: 700;
-          color: #333;
+          color: #dc2626;
           margin: 0 0 12px 0;
         }
+        :global(.dark) .stock-price { color: #ef4444; }
 
         .stock-meta {
           display: flex;

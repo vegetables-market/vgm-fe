@@ -47,7 +47,7 @@ export default function WebHeader() {
     <header className="border-border sticky top-0 z-50 flex h-16 w-full items-center justify-between border-b px-6 shadow-sm backdrop-blur-sm">
       <div className="flex items-center">
         <Link
-          href="/vgm-fe/public"
+          href="/"
           className="flex items-center gap-3 pr-3 transition-transform duration-300 hover:scale-102"
         >
           <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl font-bold">

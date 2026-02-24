@@ -8,13 +8,12 @@ export default function ProfileEditPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
 
-  // 1. 既存のデータを読み込む
   useEffect(() => {
     const savedData = localStorage.getItem("userData");
     if (savedData) {
       setUserData(JSON.parse(savedData));
     } else {
-      // 初期データ（今の page.tsx にあるモックと同じもの）
+
       setUserData({
         displayName: "田中 花子",
         avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=hanako",
@@ -23,10 +22,8 @@ export default function ProfileEditPage() {
     }
   }, []);
 
-  // 2. データを保存して戻る
   const handleSave = (updatedUser: any) => {
     localStorage.setItem("userData", JSON.stringify(updatedUser));
-    // 保存したことを知らせてから戻る
     alert("プロフィールを更新しました！");
     router.push("/profile");
   };

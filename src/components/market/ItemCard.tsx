@@ -20,7 +20,7 @@ export function ItemCard({ item }: ItemCardProps) {
       {/* 画像エリア*/}
       <div className="relative aspect-square w-full bg-gray-100">
         <Image
-          src={item.images[0] || "/images/no-image.png"}
+          src={item.images?.[0] || "/images/no-image.png"}
           alt={item.name}
           fill
           className="object-cover transition group-hover:scale-105"
