@@ -309,11 +309,11 @@ export default function StockEditClient({ id }: { id: string }) {
             </option>
             {categories.map((cat) => (
               <option
-                key={cat.categoryId}
-                value={cat.categoryId}
+                key={cat.category_id}
+                value={cat.category_id}
                 className="text-gray-900"
               >
-                {cat.name}
+                {cat.category_name}
               </option>
             ))}
           </select>

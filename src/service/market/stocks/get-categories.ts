@@ -8,11 +8,6 @@ export interface Category {
   category_id: number;
   category_name: string;
   parent_category_id: number | null;
-  categoryId?: number;
-  categoryName?: string;
-  name?: string;
-  parentId?: number | null;
-  parentCategoryId?: number | null;
 }
 
 interface CategoryApiNode {
@@ -55,11 +50,6 @@ export const getCategories = async (): Promise<Category[]> => {
       category_id: categoryId,
       category_name: categoryName,
       parent_category_id: parentCategoryId,
-      categoryId,
-      categoryName,
-      name: categoryName,
-      parentId: parentCategoryId,
-      parentCategoryId,
     });
     node.children?.forEach(visit);
   };
