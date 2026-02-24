@@ -11,7 +11,33 @@ export type StockFormPayloadInput = {
   itemCondition: number;
 };
 
-export function buildNewStockPayload(input: StockFormPayloadInput) {
+export type NewStockPayload = {
+  name: string;
+  description: string;
+  category_id: number;
+  price: number;
+  quantity: number;
+  shipping_payer_type: number;
+  shipping_origin_area: number;
+  shipping_days_id: number;
+  shipping_method_id: number;
+  item_condition: number;
+};
+
+export type EditStockPayload = {
+  name: string;
+  description: string;
+  categoryId: number;
+  price: number;
+  quantity: number;
+  shippingPayerType: number;
+  shippingOriginArea: number;
+  shippingDaysId: number;
+  shippingMethodId: number;
+  itemCondition: number;
+};
+
+export function buildNewStockPayload(input: StockFormPayloadInput): NewStockPayload {
   return {
     name: input.name,
     description: input.description,
@@ -26,7 +52,7 @@ export function buildNewStockPayload(input: StockFormPayloadInput) {
   };
 }
 
-export function buildEditStockPayload(input: StockFormPayloadInput) {
+export function buildEditStockPayload(input: StockFormPayloadInput): EditStockPayload {
   return {
     name: input.name,
     description: input.description,
