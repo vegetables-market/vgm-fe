@@ -8,8 +8,8 @@ import {
   ReactNode,
 } from "react";
 import { UserInfo } from "@/lib/auth/shared/types/user-info";
-import { logout as logoutApi } from "@/service/auth/logout";
-import { getAuthenticatedUser } from "@/service/auth/get-authenticated-user";
+import { logout as logoutApi } from "@/service/auth/flow/logout";
+import { getAuthenticatedUser } from "@/service/auth/user/get-authenticated-user";
 
 type AuthContextType = {
   user: UserInfo | null;

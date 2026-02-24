@@ -1,4 +1,4 @@
-import { login } from "@/service/auth/login";
+import { login } from "@/service/auth/flow/login";
 
 export async function loginWithPasswordChallenge(
   username: string,

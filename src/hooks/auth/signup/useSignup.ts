@@ -6,7 +6,7 @@ import { getErrorMessage } from "@/lib/api/error-handler";
 import { withRedirectTo } from "@/lib/next/withRedirectTo";
 import { useAuth } from "@/context/AuthContext";
 import { useSafeRedirect } from "@/hooks/navigation/useSafeRedirect";
-import { register } from "@/service/auth/register";
+import { register } from "@/service/auth/flow/register";
 
 const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
 
