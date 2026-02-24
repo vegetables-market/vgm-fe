@@ -4,6 +4,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getCategories } from "@/service/market/stocks/get-categories";
 import type { Category } from "@/service/market/stocks/get-categories";
+import {
+  SHIPPING_DAYS_OPTIONS,
+  SHIPPING_METHOD_OPTIONS,
+  PREFECTURE_OPTIONS,
+} from "@/lib/market/stocks/form-options";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -45,21 +50,6 @@ export default function StockEditClient({ id }: { id: string }) {
   const [categoryId, setCategoryId] = useState<number | "">("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("1");
-
-  // Constants (Mock Masters for now)
-  const shippingDaysOptions = [
-    { id: 1, name: "1~2日で発送" },
-    { id: 2, name: "2~3日で発送" },
-    { id: 3, name: "4~7日で発送" },
-  ];
-  const shippingMethodOptions = [
-    { id: 1, name: "未定" },
-    { id: 2, name: "らくらくメルカリ便" },
-  ];
-  const prefectureOptions = [
-    { id: 13, name: "東京都" },
-    { id: 27, name: "大阪府" },
-  ];
 
   const [shippingDaysId, setShippingDaysId] = useState(1);
   const [shippingMethodId, setShippingMethodId] = useState(1);
@@ -384,7 +374,7 @@ export default function StockEditClient({ id }: { id: string }) {
                 value={prefectureId}
                 onChange={(e) => setPrefectureId(Number(e.target.value))}
               >
-                {prefectureOptions.map((p) => (
+                {PREFECTURE_OPTIONS.map((p) => (
                   <option key={p.id} value={p.id} className="text-gray-900">
                     {p.name}
                   </option>
@@ -401,7 +391,7 @@ export default function StockEditClient({ id }: { id: string }) {
                 value={shippingDaysId}
                 onChange={(e) => setShippingDaysId(Number(e.target.value))}
               >
-                {shippingDaysOptions.map((opt) => (
+                {SHIPPING_DAYS_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id} className="text-gray-900">
                     {opt.name}
                   </option>
@@ -418,7 +408,7 @@ export default function StockEditClient({ id }: { id: string }) {
                 value={shippingMethodId}
                 onChange={(e) => setShippingMethodId(Number(e.target.value))}
               >
-                {shippingMethodOptions.map((opt) => (
+                {SHIPPING_METHOD_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id} className="text-gray-900">
                     {opt.name}
                   </option>
