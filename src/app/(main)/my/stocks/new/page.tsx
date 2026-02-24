@@ -9,6 +9,7 @@ import {
   SHIPPING_METHOD_OPTIONS,
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
+import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -99,31 +100,20 @@ export default function StockNewPage() {
       return;
     }
 
-    if (files.length === 0) {
-      setError("画像を1枚以上選択してください。");
-      return;
-    }
+    const validationError = validateStockFormInput({
+      name,
+      description,
+      price,
+      categoryId,
+      pendingCount,
+      hasError,
+      fileCount: files.length,
+      isAllCompleted,
+      requireImage: true,
+    });
 
-    if (pendingCount > 0) {
-      setError("画像のアップロード中です。完了まで待ってください。");
-      return;
-    }
-
-    if (hasError) {
-      setError(
-        "画像のアップロードでエラーが発生しています。再アップロードしてください。",
-      );
-      return;
-    }
-
-    // 既に投稿されていても、完了していなければチェック
-    if (!isAllCompleted) {
-      setError("画像アップロードの完了を待ってください。");
-      return;
-    }
-
-    if (!name || !description || !price || !categoryId) {
-      setError("必須項目を入力してください。");
+    if (validationError) {
+      setError(validationError);
       return;
     }
 

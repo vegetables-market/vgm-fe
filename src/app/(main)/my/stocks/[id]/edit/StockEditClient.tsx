@@ -9,6 +9,7 @@ import {
   SHIPPING_METHOD_OPTIONS,
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
+import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -125,20 +126,18 @@ export default function StockEditClient({ id }: { id: string }) {
     e.preventDefault();
     setError("");
 
-    if (pendingCount > 0) {
-      setError("画像のアップロード中です。完了まで待ってください。");
-      return;
-    }
+    const validationError = validateStockFormInput({
+      name,
+      description,
+      price,
+      categoryId,
+      pendingCount,
+      hasError,
+      requireImage: false,
+    });
 
-    if (hasError) {
-      setError(
-        "画像のアップロードでエラーが発生しています。再アップロードしてください。",
-      );
-      return;
-    }
-
-    if (!name || !description || !price || !categoryId) {
-      setError("必須項目を入力してください。");
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
