@@ -16,7 +16,7 @@ export function ItemCard({ item }: ItemCardProps) {
   const isSold = item.status === "sold";
 
   return (
-    <Link href={`/item/${item.id}`} className="group block overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-md">
+    <Link href={`/stocks/${item.id}`} className="group block overflow-hidden rounded-lg bg-white shadow-sm transition hover:shadow-md">
       {/* 画像エリア*/}
       <div className="relative aspect-square w-full bg-gray-100">
         <Image
