@@ -47,10 +47,7 @@ interface StockDetail {
     images: Array<{
       imageId: number;
       imageUrl: string;
-      image_id?: number;
-      image_url?: string;
       displayOrder: number;
-      display_order?: number;
     }>;
     seller: {
       userId: number;
@@ -68,8 +65,6 @@ interface StockDetail {
     title: string;
     price: number;
     thumbnailUrl: string | null;
-    item_id?: number;
-    thumbnail_url?: string | null;
   }>;
 }
 
@@ -120,65 +115,9 @@ function PurchaseContent() {
       setError("");
 
       try {
-        const raw = await fetchApi<any>(`/v1/market/items/${itemId}`, {
+        const data = await fetchApi<StockDetail>(`/v1/market/items/${itemId}`, {
           credentials: "include",
         });
-        const rawItem = raw?.item ?? {};
-        const rawRelated = raw?.relatedItems ?? raw?.related_items ?? [];
-
-        const data: StockDetail = {
-          item: {
-            itemId: Number(rawItem.itemId ?? rawItem.item_id ?? 0),
-            title: rawItem.title ?? "",
-            description: rawItem.description ?? null,
-            price: Number(rawItem.price ?? 0),
-            quantity: Number(rawItem.quantity ?? 0),
-            categoryId: rawItem.categoryId ?? rawItem.category_id ?? null,
-            categoryName: rawItem.categoryName ?? rawItem.category_name ?? null,
-            condition: Number(rawItem.condition ?? 0),
-            status: Number(rawItem.status ?? 0),
-            likesCount: Number(rawItem.likesCount ?? rawItem.likes_count ?? 0),
-            isLiked: Boolean(rawItem.isLiked ?? rawItem.is_liked ?? false),
-            brand: rawItem.brand ?? null,
-            weight: rawItem.weight ?? null,
-            shippingPayerType: Number(
-              rawItem.shippingPayerType ?? rawItem.shipping_payer_type ?? 0,
-            ),
-            images: (rawItem.images ?? []).map((img: any) => ({
-              imageId: Number(img.imageId ?? img.image_id ?? 0),
-              imageUrl: img.imageUrl ?? img.image_url ?? "",
-              image_id: img.image_id,
-              image_url: img.image_url,
-              displayOrder: Number(img.displayOrder ?? img.display_order ?? 0),
-              display_order: img.display_order,
-            })),
-            seller: {
-              userId: Number(rawItem.seller?.userId ?? rawItem.seller?.user_id ?? 0),
-              username: rawItem.seller?.username ?? "",
-              displayName:
-                rawItem.seller?.displayName ?? rawItem.seller?.display_name ?? "",
-              avatarUrl:
-                rawItem.seller?.avatarUrl ?? rawItem.seller?.avatar_url ?? null,
-              ratingAverage:
-                rawItem.seller?.ratingAverage ??
-                rawItem.seller?.rating_average ??
-                null,
-              ratingCount: Number(
-                rawItem.seller?.ratingCount ?? rawItem.seller?.rating_count ?? 0,
-              ),
-            },
-            createdAt: rawItem.createdAt ?? rawItem.created_at ?? "",
-            updatedAt: rawItem.updatedAt ?? rawItem.updated_at ?? "",
-          },
-          relatedItems: rawRelated.map((related: any) => ({
-            itemId: Number(related.itemId ?? related.item_id ?? 0),
-            title: related.title ?? "",
-            price: Number(related.price ?? 0),
-            thumbnailUrl: related.thumbnailUrl ?? related.thumbnail_url ?? null,
-            item_id: related.item_id,
-            thumbnail_url: related.thumbnail_url,
-          })),
-        };
 
         // 出品中(status=2)でない場合はエラー
         if (data.item.status !== 2) {
@@ -199,16 +138,12 @@ function PurchaseContent() {
 
   // 画像URLを構築
   const getMediaUrl = (url: string | null) => {
-    const imagePath = url?.trim();
-    if (!imagePath) return "/images/no-image.png";
-    if (imagePath.startsWith("http")) return imagePath;
+    if (!url) return "/images/no-image.png";
+    if (url.startsWith("http")) return url;
     const mediaUrl =
       process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
     const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
-    const cleanedPath = imagePath.startsWith("/")
-      ? imagePath.slice(1)
-      : imagePath;
-    return `${baseUrl}/${cleanedPath}`;
+    return `${baseUrl}/${url}`;
   };
 
   // 新しい住所を追加
@@ -335,7 +270,7 @@ function PurchaseContent() {
   const item = stock.item;
   const thumbnailUrl =
     item.images.length > 0
-      ? getMediaUrl(item.images[0].imageUrl ?? item.images[0].image_url ?? null)
+      ? getMediaUrl(item.images[0].imageUrl)
       : "/images/no-image.png";
   const shippingText = item.shippingPayerType === 0 ? "送料込み" : "着払い";
 

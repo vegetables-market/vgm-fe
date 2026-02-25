@@ -12,6 +12,7 @@ export interface CartItemResponse {
   name: string;
   price: number;
   quantity: number;
+  availableQuantity: number;
   subtotal: number;
   thumbnailUrl: string | null;
 }

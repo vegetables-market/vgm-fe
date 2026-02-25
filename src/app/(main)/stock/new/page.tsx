@@ -9,7 +9,7 @@ import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 
 export default function StockNewPage() {
   const router = useRouter();
-  const { itemId, initDraft, getItemId, loading: draftLoading } = useItemDraft();
+  const { itemId, initDraft, loading: draftLoading } = useItemDraft();
   const {
     files,
     addFiles,
@@ -91,19 +91,7 @@ export default function StockNewPage() {
     e.preventDefault();
     setError("");
 
-    // StateのitemIdまたはRefから取得（Reactの非同期State更新によるタイミングずれを回避）
-    let currentItemId = itemId ?? getItemId();
-    if (!currentItemId) {
-      // まだDraftが作られていない場合は作成を試みる
-      try {
-        currentItemId = await initDraft();
-      } catch {
-        setError("Draft Item initialization failed. Please reload.");
-        return;
-      }
-    }
-
-    if (!currentItemId) {
+    if (!itemId) {
       setError("Draft Item initialization failed. Please reload.");
       return;
     }
@@ -131,7 +119,12 @@ export default function StockNewPage() {
       return;
     }
 
-    if (!name || !description || !price || !categoryId) {
+    if (!name || !description || !price || categoryId === "") {
+      setError("必須項目を入力してください。");
+      return;
+    }
+
+    if (typeof categoryId !== "number" || Number.isNaN(categoryId) || categoryId <= 0) {
       setError("必須項目を入力してください。");
       return;
     }
@@ -141,17 +134,17 @@ export default function StockNewPage() {
       const payload = {
         name,
         description,
-        category_id: Number(categoryId),
+        categoryId,
         price: Number(price),
         quantity: Number(quantity),
-        shipping_payer_type: shippingPayerType,
-        shipping_origin_area: prefectureId,
-        shipping_days_id: shippingDaysId,
-        shipping_method_id: shippingMethodId,
-        item_condition: itemCondition,
+        shippingPayerType: shippingPayerType,
+        shippingOriginArea: prefectureId,
+        shippingDaysId: shippingDaysId,
+        shippingMethodId: shippingMethodId,
+        itemCondition: itemCondition,
       };
 
-      await updateItem(currentItemId, payload);
+      await updateItem(itemId, payload);
       router.push("/stock"); // 一覧へ遷移
     } catch (err) {
       console.error(err);
@@ -296,7 +289,10 @@ export default function StockNewPage() {
           <select
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={categoryId}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setCategoryId(nextValue === "" ? "" : Number(nextValue));
+            }}
             required
           >
             <option value="" className="text-gray-900">
