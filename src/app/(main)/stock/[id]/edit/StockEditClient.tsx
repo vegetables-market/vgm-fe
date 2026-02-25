@@ -8,20 +8,31 @@ import { fetchApi } from "@/lib/api/fetch";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 
 interface ItemDetail {
-  itemId: string;
-  name: string;
-  description: string;
-  categoryId: number;
-  price: number;
-  quantity: number;
-  shippingPayerType: number;
-  shippingOriginArea: number;
-  shippingDaysId: number;
-  shippingMethodId: number;
-  itemCondition: number;
+  itemId?: string;
+  item_id?: string;
+  title?: string;
+  name?: string;
+  description?: string | null;
+  categoryId?: number | null;
+  category_id?: number | null;
+  price?: number | null;
+  quantity?: number | null;
+  shippingPayerType?: number | null;
+  shipping_payer_type?: number | null;
+  shippingOriginArea?: number | null;
+  shipping_origin_area?: number | null;
+  shippingDaysId?: number | null;
+  shipping_days_id?: number | null;
+  shippingMethodId?: number | null;
+  shipping_method_id?: number | null;
+  itemCondition?: number | null;
+  item_condition?: number | null;
+  condition?: number | null;
   images: Array<{
-    imageId: number;
-    imageUrl: string;
+    imageId?: number;
+    image_id?: number;
+    imageUrl?: string;
+    image_url?: string;
     displayOrder: number;
   }>;
 }
@@ -78,16 +89,22 @@ export default function StockEditClient({ id }: { id: string }) {
         );
 
         const item = data.item;
-        setName(item.name);
-        setDescription(item.description || "");
-        setCategoryId(item.categoryId);
-        setPrice(item.price.toString());
-        setQuantity(item.quantity.toString());
-        setShippingPayerType(item.shippingPayerType);
-        setPrefectureId(item.shippingOriginArea);
-        setShippingDaysId(item.shippingDaysId);
-        setShippingMethodId(item.shippingMethodId);
-        setItemCondition(item.itemCondition);
+        setName(item.name ?? item.title ?? "");
+        setDescription(item.description ?? "");
+        setCategoryId(item.categoryId ?? item.category_id ?? "");
+        setPrice(item.price != null ? item.price.toString() : "");
+        setQuantity(item.quantity != null ? item.quantity.toString() : "1");
+        setShippingPayerType(
+          item.shippingPayerType ?? item.shipping_payer_type ?? 0,
+        );
+        setPrefectureId(item.shippingOriginArea ?? item.shipping_origin_area ?? 13);
+        setShippingDaysId(item.shippingDaysId ?? item.shipping_days_id ?? 1);
+        setShippingMethodId(
+          item.shippingMethodId ?? item.shipping_method_id ?? 1,
+        );
+        setItemCondition(
+          item.itemCondition ?? item.item_condition ?? item.condition ?? 0,
+        );
 
         setDataLoading(false);
       } catch (err) {
@@ -146,7 +163,12 @@ export default function StockEditClient({ id }: { id: string }) {
       return;
     }
 
-    if (!name || !description || !price || !categoryId) {
+    if (!name || !description || !price || categoryId === "") {
+      setError("必須項目を入力してください。");
+      return;
+    }
+
+    if (typeof categoryId !== "number" || Number.isNaN(categoryId) || categoryId <= 0) {
       setError("必須項目を入力してください。");
       return;
     }
@@ -156,7 +178,7 @@ export default function StockEditClient({ id }: { id: string }) {
       const payload = {
         name,
         description,
-        categoryId: Number(categoryId),
+        categoryId,
         price: Number(price),
         quantity: Number(quantity),
         shippingPayerType: shippingPayerType,
@@ -311,7 +333,10 @@ export default function StockEditClient({ id }: { id: string }) {
           <select
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={categoryId}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setCategoryId(nextValue === "" ? "" : Number(nextValue));
+            }}
             required
           >
             <option value="" className="text-gray-900">

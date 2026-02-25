@@ -119,7 +119,12 @@ export default function StockNewPage() {
       return;
     }
 
-    if (!name || !description || !price || !categoryId) {
+    if (!name || !description || !price || categoryId === "") {
+      setError("必須項目を入力してください。");
+      return;
+    }
+
+    if (typeof categoryId !== "number" || Number.isNaN(categoryId) || categoryId <= 0) {
       setError("必須項目を入力してください。");
       return;
     }
@@ -129,7 +134,7 @@ export default function StockNewPage() {
       const payload = {
         name,
         description,
-        category_id: Number(categoryId),
+        category_id: categoryId,
         price: Number(price),
         quantity: Number(quantity),
         shipping_payer_type: shippingPayerType,
@@ -284,7 +289,10 @@ export default function StockNewPage() {
           <select
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={categoryId}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
+            onChange={(e) => {
+              const nextValue = e.target.value;
+              setCategoryId(nextValue === "" ? "" : Number(nextValue));
+            }}
             required
           >
             <option value="" className="text-gray-900">
