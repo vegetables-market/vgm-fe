@@ -27,6 +27,9 @@ export default function BasketPage() {
           name: item.name ?? "",
           price: Number(item.price ?? 0),
           quantity: Number(item.quantity ?? 0),
+          availableQuantity: Number(
+            item.availableQuantity ?? item.available_quantity ?? 0,
+          ),
           subtotal: Number(item.subtotal ?? item.sub_total ?? 0),
           thumbnailUrl: item.thumbnailUrl ?? item.thumbnail_url ?? null,
         })),
@@ -155,12 +158,19 @@ export default function BasketPage() {
                   onClick={() =>
                     handleUpdateQuantity(item.cartItemId, item.quantity + 1)
                   }
-                  disabled={isUpdating}
+                  disabled={
+                    isUpdating ||
+                    (item.availableQuantity > 0 &&
+                      item.quantity >= item.availableQuantity)
+                  }
                   className="px-3 py-1 hover:bg-gray-100 disabled:opacity-50"
                 >
                   +
                 </button>
               </div>
+              <p className="text-xs text-gray-500">
+                在庫: {item.availableQuantity}
+              </p>
               <button
                 onClick={() => handleRemoveItem(item.cartItemId)}
                 disabled={isUpdating}

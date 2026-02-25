@@ -37,6 +37,11 @@ interface ItemDetail {
   }>;
 }
 
+interface ExistingImage {
+  id: number;
+  filename: string;
+}
+
 export default function StockEditClient({ id }: { id: string }) {
   const router = useRouter();
   const itemId = id;
@@ -55,6 +60,7 @@ export default function StockEditClient({ id }: { id: string }) {
   const [categoryId, setCategoryId] = useState<number | "">("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("1");
+  const [existingImages, setExistingImages] = useState<ExistingImage[]>([]);
 
   // Constants (Mock Masters for now)
   const shippingDaysOptions = [
@@ -77,6 +83,23 @@ export default function StockEditClient({ id }: { id: string }) {
   const [shippingPayerType, setShippingPayerType] = useState(0);
   const [itemCondition, setItemCondition] = useState(0);
 
+  const getImageUrl = (filename: string) => {
+    if (filename.startsWith("http")) return filename;
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    return `${baseUrl}/${filename}`;
+  };
+
+  const normalizeImageFilename = (value: string) => {
+    if (!value.startsWith("http")) return value;
+    try {
+      const parsed = new URL(value);
+      return parsed.pathname.replace(/^\/+/, "");
+    } catch {
+      return value;
+    }
+  };
+
   // Load existing item data
   useEffect(() => {
     const loadItemData = async () => {
@@ -91,7 +114,12 @@ export default function StockEditClient({ id }: { id: string }) {
         const item = data.item;
         setName(item.name ?? item.title ?? "");
         setDescription(item.description ?? "");
-        setCategoryId(item.categoryId ?? item.category_id ?? "");
+        const normalizedCategoryId = item.categoryId ?? item.category_id ?? null;
+        setCategoryId(
+          normalizedCategoryId != null && normalizedCategoryId > 0
+            ? normalizedCategoryId
+            : "",
+        );
         setPrice(item.price != null ? item.price.toString() : "");
         setQuantity(item.quantity != null ? item.quantity.toString() : "1");
         setShippingPayerType(
@@ -104,6 +132,16 @@ export default function StockEditClient({ id }: { id: string }) {
         );
         setItemCondition(
           item.itemCondition ?? item.item_condition ?? item.condition ?? 0,
+        );
+        setExistingImages(
+          (item.images ?? [])
+            .slice()
+            .sort((a, b) => a.displayOrder - b.displayOrder)
+            .map((img, index) => ({
+              id: img.imageId ?? img.image_id ?? index,
+              filename: normalizeImageFilename(img.imageUrl ?? img.image_url ?? ""),
+            }))
+            .filter((img) => img.filename !== ""),
         );
 
         setDataLoading(false);
@@ -147,6 +185,10 @@ export default function StockEditClient({ id }: { id: string }) {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
+  const removeExistingImage = (imageId: number) => {
+    setExistingImages((prev) => prev.filter((img) => img.id !== imageId));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -175,6 +217,15 @@ export default function StockEditClient({ id }: { id: string }) {
 
     setLoading(true);
     try {
+      const uploadedImageFilenames = files
+        .filter((f) => f.status === "completed" && !!f.serverFilename)
+        .map((f) => f.serverFilename as string);
+
+      const finalFilenames = [
+        ...existingImages.map((img) => img.filename),
+        ...uploadedImageFilenames,
+      ];
+
       const payload = {
         name,
         description,
@@ -186,6 +237,7 @@ export default function StockEditClient({ id }: { id: string }) {
         shippingDaysId: shippingDaysId,
         shippingMethodId: shippingMethodId,
         itemCondition: itemCondition,
+        imageUrls: finalFilenames,
       };
 
       await updateItem(itemId, payload);
@@ -239,8 +291,31 @@ export default function StockEditClient({ id }: { id: string }) {
           </div>
 
           {/* プレビューグリッド */}
-          {files.length > 0 && (
+          {(existingImages.length > 0 || files.length > 0) && (
             <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4">
+              {existingImages.map((img) => (
+                <div
+                  key={`existing-${img.id}`}
+                  className="group relative aspect-square overflow-hidden rounded-md border bg-gray-100"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={getImageUrl(img.filename)}
+                    alt="existing"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-black opacity-0 transition-opacity group-hover:opacity-100">
+                    <button
+                      type="button"
+                      onClick={() => removeExistingImage(img.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </div>
+              ))}
+
               {files.map((file) => (
                 <div
                   key={file.id}
@@ -293,7 +368,7 @@ export default function StockEditClient({ id }: { id: string }) {
           )}
 
           <div className="mt-2 text-right text-sm text-gray-500">
-            {files.length}枚の画像 (アップロード済み:{" "}
+            {existingImages.length + files.length}枚の画像 (アップロード済み:{" "}
             {files.filter((f) => f.status === "completed").length})
           </div>
         </div>
