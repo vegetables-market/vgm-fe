@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { ItemCard } from "@/components/market/ItemCard";
 
 interface SearchItem {
   itemId?: number;
@@ -85,33 +86,33 @@ export default function SearchPage() {
   };
 
   return (
-    <div>
-      <h1>「{query ?? ""}」の検索結果: {items.length}件</h1>
-      <div className="grid grid-cols-2 gap-4">
-        {items.map((item, index) => {
-          const itemKey =
-            item.itemId ?? item.item_id ?? item.id ?? item.f_id ?? index;
-          const itemName =
-            item.title ?? item.name ?? item.f_name ?? "名称未設定";
-          const itemPrice = item.price ?? item.f_price ?? 0;
+  <div className="min-h-screen bg-white px-4 py-8 transition-colors dark:bg-zinc-950 dark:text-zinc-100">
+    <h1 className="mb-8 text-2xl font-bold">
+      「{query ?? ""}」の検索結果: <span className="text-green-600">{items.length}</span>件
+    </h1>
 
-          return (
-            <div key={itemKey} className="rounded border p-4">
-              <div className="mb-2 w-1/2 aspect-square overflow-hidden rounded bg-gray-100">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={getImageUrl(item)}
-                  alt={itemName}
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <p>{itemName}</p>
-              <p>{itemPrice}円</p>
-            </div>
-          );
-        })}
-      </div>
+    {/* 商品グリッド*/}
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-5">
+      {items.map((item, index) => (
+        <ItemCard
+          key={item.item_id ?? item.id ?? index}
+          item={{
+            id: String(item.item_id ?? item.id),
+            name: item.title ?? item.name ?? "名称未設定",
+            price: item.price ?? 0,
+            images: [getImageUrl(item)],
+            status: "available", // 実際はデータに合わせて変更
+          }}
+        />
+      ))}
     </div>
+
+    {/* 検索結果が0件の時のフォロー */}
+    {items.length === 0 && (
+      <div className="mt-20 text-center">
+        <p className="text-stone-500">該当する商品が見つかりませんでした。</p>
+      </div>
+    )}
+  </div>
   );
 }
-

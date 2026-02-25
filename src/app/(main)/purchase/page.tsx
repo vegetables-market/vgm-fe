@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { PurchaseSuccess } from "@/components/purchase/PurchaseSuccess";
 
 import { fetchApi } from "@/lib/api/fetch";
 // TODO: Create mockData module or replace with real API
@@ -99,6 +100,8 @@ function PurchaseContent() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
 
+  const [orderId, setOrderId] = useState<number | null>(null);
+
   // 商品データを取得
   useEffect(() => {
     if (!itemId) {
@@ -165,6 +168,7 @@ function PurchaseContent() {
         headers: {
           "Content-Type": "application/json",
         },
+        
         body: JSON.stringify({
           itemId: stock.item.itemId,
           quantity: 1,
@@ -180,6 +184,7 @@ function PurchaseContent() {
               : selectedPayment.type,
         }),
       });
+      setOrderId(orderResponse.orderId);
 
       // 2. 決済を処理
       await fetchApi(`/v1/market/orders/${orderResponse.orderId}/pay`, {
@@ -253,42 +258,12 @@ function PurchaseContent() {
     );
   }
 
-  // 購入完了画面
-  if (isPurchased) {
+  if (isPurchased && stock) {
     return (
-      <div className="bg-background flex min-h-screen items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-xl dark:border-gray-700 dark:bg-gray-800">
-          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-500">
-            <svg
-              className="h-10 w-10 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="3"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h1 className="mb-2 text-2xl font-bold text-gray-900 dark:text-white">
-            購入が完了しました
-          </h1>
-          <p className="mb-6 text-gray-600 dark:text-gray-400">
-            ご注文ありがとうございます。
-            <br />
-            商品の発送まで今しばらくお待ちください。
-          </p>
-          <Link
-            href="/"
-            className="inline-block rounded-lg bg-red-500 px-8 py-3 font-bold text-white transition-colors hover:bg-red-600"
-          >
-            トップページに戻る
-          </Link>
-        </div>
-      </div>
+      <PurchaseSuccess 
+        item={stock.item} 
+        orderId={orderId ?? undefined}
+      />
     );
   }
 
