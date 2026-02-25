@@ -8,31 +8,12 @@ import {
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
 import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
-import { buildEditStockPayload } from "@/lib/market/stocks/build-update-item-payload";
+import { buildEditStockRequest } from "@/service/market/stocks/mappers/build-edit-stock-request";
 import { updateItem } from "@/service/market/stocks/update-item";
-import { fetchApi } from "@/lib/api/fetch";
+import { getStockEditDetail } from "@/service/market/stocks/get-stock-edit-detail";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 import { useImageDropInput } from "@/hooks/item/use-image-drop-input";
 import { useStockCategories } from "@/hooks/market/stocks/use-stock-categories";
-
-interface ItemDetail {
-  itemId: string;
-  name: string;
-  description: string;
-  categoryId: number;
-  price: number;
-  quantity: number;
-  shippingPayerType: number;
-  shippingOriginArea: number;
-  shippingDaysId: number;
-  shippingMethodId: number;
-  itemCondition: number;
-  images: Array<{
-    imageId: number;
-    imageUrl: string;
-    displayOrder: number;
-  }>;
-}
 
 export default function StockEditClient({ id }: { id: string }) {
   const router = useRouter();
@@ -63,16 +44,9 @@ export default function StockEditClient({ id }: { id: string }) {
   useEffect(() => {
     const loadItemData = async () => {
       try {
-        const data = await fetchApi<{ item: ItemDetail }>(
-          `/v1/market/items/${itemId}`,
-          {
-            credentials: "include",
-          },
-        );
-
-        const item = data.item;
+        const item = await getStockEditDetail(itemId);
         setName(item.name);
-        setDescription(item.description || "");
+        setDescription(item.description);
         setCategoryId(item.categoryId);
         setPrice(item.price.toString());
         setQuantity(item.quantity.toString());
@@ -122,7 +96,7 @@ export default function StockEditClient({ id }: { id: string }) {
 
     setLoading(true);
     try {
-      const payload = buildEditStockPayload({
+      const payload = buildEditStockRequest({
         name,
         description,
         categoryId,
@@ -287,11 +261,11 @@ export default function StockEditClient({ id }: { id: string }) {
             </option>
             {categories.map((cat) => (
               <option
-                key={cat.category_id}
-                value={cat.category_id}
+                key={cat.categoryId}
+                value={cat.categoryId}
                 className="text-gray-900"
               >
-                {cat.category_name}
+                {cat.name}
               </option>
             ))}
           </select>

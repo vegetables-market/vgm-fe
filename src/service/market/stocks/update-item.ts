@@ -1,13 +1,10 @@
 import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
-import type {
-  EditStockPayload,
-  NewStockPayload,
-} from "@/lib/market/stocks/build-update-item-payload";
+import type { UpdateItemRequestDto } from "@/service/market/stocks/dto/update-item-request-dto";
 
 export const updateItem = async (
   itemId: string,
-  data: NewStockPayload | EditStockPayload,
+  data: UpdateItemRequestDto,
 ): Promise<void> => {
   return fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}`, {
     method: "PUT",

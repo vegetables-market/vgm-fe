@@ -8,7 +8,7 @@ import {
   PREFECTURE_OPTIONS,
 } from "@/lib/market/stocks/form-options";
 import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
-import { buildNewStockPayload } from "@/lib/market/stocks/build-update-item-payload";
+import { buildNewStockRequest } from "@/service/market/stocks/mappers/build-new-stock-request";
 import { updateItem } from "@/service/market/stocks/update-item";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
@@ -92,7 +92,7 @@ export default function StockNewPage() {
 
     setLoading(true);
     try {
-      const payload = buildNewStockPayload({
+      const payload = buildNewStockRequest({
         name,
         description,
         categoryId,
@@ -257,11 +257,11 @@ export default function StockNewPage() {
             </option>
             {categories?.map((cat) => (
               <option
-                key={cat.category_id}
-                value={cat.category_id}
+                key={cat.categoryId}
+                value={cat.categoryId}
                 className="text-gray-900"
               >
-                {cat.category_name}
+                {cat.name}
               </option>
             ))}
           </select>

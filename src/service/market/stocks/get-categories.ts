@@ -1,16 +1,8 @@
-import { fetchApi } from "@/lib/api/fetch";
+﻿import { fetchApi } from "@/lib/api/fetch";
 import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
+import type { StockCategory } from "@/lib/market/stocks/types/stock-category";
 
-/**
- * カテゴリ一覧取得
- */
-export interface Category {
-  category_id: number;
-  category_name: string;
-  parent_category_id: number | null;
-}
-
-interface CategoryApiNode {
+type CategoryApiNode = {
   categoryId?: number;
   categoryName?: string;
   parentId?: number | null;
@@ -18,18 +10,16 @@ interface CategoryApiNode {
   category_name?: string;
   parent_id?: number | null;
   children?: CategoryApiNode[];
-}
+};
 
-export const getCategories = async (): Promise<Category[]> => {
-  const response = await fetchApi<CategoryApiNode[]>(
-    `${API_ENDPOINTS.CATEGORIES}`,
-    {
-      method: "GET",
-    },
-  );
+export const getCategories = async (): Promise<StockCategory[]> => {
+  const response = await fetchApi<CategoryApiNode[]>(`${API_ENDPOINTS.CATEGORIES}`, {
+    method: "GET",
+  });
 
-  const flat: Category[] = [];
+  const flat: StockCategory[] = [];
   const seen = new Set<number>();
+
   const visit = (node: CategoryApiNode) => {
     const categoryId = node.categoryId ?? node.category_id;
     const categoryName = node.categoryName ?? node.category_name;
@@ -44,12 +34,12 @@ export const getCategories = async (): Promise<Category[]> => {
       node.children?.forEach(visit);
       return;
     }
-    seen.add(categoryId);
 
+    seen.add(categoryId);
     flat.push({
-      category_id: categoryId,
-      category_name: categoryName,
-      parent_category_id: parentCategoryId,
+      categoryId,
+      name: categoryName,
+      parentCategoryId,
     });
     node.children?.forEach(visit);
   };

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { getCategories } from "@/service/market/stocks/get-categories";
-import type { Category } from "@/service/market/stocks/get-categories";
+import type { StockCategory } from "@/lib/market/stocks/types/stock-category";
 
 export function useStockCategories() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<StockCategory[]>([]);
 
   useEffect(() => {
     let cancelled = false;

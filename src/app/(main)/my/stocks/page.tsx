@@ -5,21 +5,10 @@ import Link from "next/link";
 import { getMyItems } from "@/service/market/stocks/get-my-items";
 import { deleteItem } from "@/service/market/stocks/delete-item";
 import { updateItemStatus } from "@/service/market/stocks/update-item-status";
-import type { StockItemRaw } from "@/service/market/stocks/dto/stock-item-raw";
-
-interface Item {
-  id: number;
-  name: string;
-  price: number;
-  status: number;
-  imageUrl: string | null;
-  image_url?: string | null;
-  createdAt: string;
-  created_at?: string;
-}
+import type { MyStockItem } from "@/lib/market/stocks/types/my-stock-item";
 
 export default function StockPage() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<MyStockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
@@ -27,18 +16,8 @@ export default function StockPage() {
   const loadItems = () => {
     setLoading(true);
     getMyItems()
-      .then((data: StockItemRaw[]) => {
-        const normalizedItems: Item[] = (data || []).map((item) => ({
-          id: Number(item.itemId ?? item.item_id ?? 0),
-          name: item.name ?? item.title ?? "",
-          price: Number(item.price ?? 0),
-          status: Number(item.status ?? 0),
-          imageUrl: item.imageUrl ?? item.image_url ?? null,
-          image_url: item.image_url ?? item.imageUrl ?? null,
-          createdAt: item.createdAt ?? item.created_at ?? "",
-          created_at: item.created_at ?? item.createdAt ?? "",
-        }));
-        setItems(normalizedItems);
+      .then((data) => {
+        setItems(data);
         setLoading(false);
       })
       .catch((err) => {
@@ -59,7 +38,7 @@ export default function StockPage() {
     setDeleting(itemId);
     try {
       await deleteItem(itemId);
-      loadItems(); // 一覧を再読み込み
+      loadItems();
     } catch (err) {
       console.error(err);
       alert("削除に失敗しました");
@@ -69,7 +48,6 @@ export default function StockPage() {
   };
 
   const handleToggleStatus = async (itemId: number, currentStatus: number) => {
-    // status 2 (出品中) と status 5 (公開停止) のみ切り替え
     const newStatus = currentStatus === 2 ? 5 : 2;
     const statusText = newStatus === 2 ? "出品中" : "公開停止";
 
@@ -80,7 +58,7 @@ export default function StockPage() {
     setUpdatingStatus(itemId);
     try {
       await updateItemStatus(itemId, newStatus);
-      loadItems(); // 一覧を再読み込み
+      loadItems();
     } catch (err) {
       console.error(err);
       alert("ステータスの更新に失敗しました");
@@ -111,14 +89,10 @@ export default function StockPage() {
     }).format(price);
   };
 
-  // 商品画像URLを構築
   const getImageUrl = (filename: string | null) => {
-    if (!filename) return "/images/no-image.png"; // プレースホルダー
-    // filename がすでに http... の場合はそのまま返す
+    if (!filename) return "/images/no-image.png";
     if (filename.startsWith("http")) return filename;
-    const mediaUrl =
-      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
-    // 末尾スラッシュを調整
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
     const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
     return `${baseUrl}/${filename}`;
   };
@@ -189,31 +163,25 @@ export default function StockPage() {
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
               {items.map((item) => (
-                <tr key={item.id}>
+                <tr key={item.itemId}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-14 w-14 flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           className="h-14 w-14 rounded border object-cover"
-                          src={getImageUrl(item.imageUrl ?? item.image_url ?? null)}
+                          src={getImageUrl(item.imageUrl)}
                           alt={item.name}
                         />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {item.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          ID: {item.id}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                        <div className="text-sm text-gray-500">ID: {item.itemId}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {formatPrice(item.price)}
-                    </div>
+                    <div className="text-sm text-gray-900">{formatPrice(item.price)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="inline-flex rounded-full bg-green-100 px-2 text-xs leading-5 font-semibold text-green-800">
@@ -221,20 +189,17 @@ export default function StockPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500">
-                    {new Date(item.createdAt || item.created_at || "").toLocaleDateString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                     <div className="flex items-center justify-end gap-2">
-                      {/* ステータス切替タンは出品中・公開停止のみ */}
                       {(item.status === 2 || item.status === 5) && (
                         <button
-                          onClick={() =>
-                            handleToggleStatus(item.id, item.status)
-                          }
-                          disabled={updatingStatus === item.id}
+                          onClick={() => handleToggleStatus(item.itemId, item.status)}
+                          disabled={updatingStatus === item.itemId}
                           className="text-xs text-blue-600 hover:text-blue-900 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {updatingStatus === item.id
+                          {updatingStatus === item.itemId
                             ? "更新中..."
                             : item.status === 2
                               ? "停止"
@@ -242,17 +207,17 @@ export default function StockPage() {
                         </button>
                       )}
                       <Link
-                        href={`/my/stocks/${item.id}/edit`}
+                        href={`/my/stocks/${item.itemId}/edit`}
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         編集
                       </Link>
                       <button
-                        onClick={() => handleDelete(item.id, item.name)}
-                        disabled={deleting === item.id}
+                        onClick={() => handleDelete(item.itemId, item.name)}
+                        disabled={deleting === item.itemId}
                         className="text-red-600 hover:text-red-900 disabled:cursor-not-allowed disabled:opacity-50"
                       >
-                        {deleting === item.id ? "削除中..." : "削除"}
+                        {deleting === item.itemId ? "削除中..." : "削除"}
                       </button>
                     </div>
                   </td>
