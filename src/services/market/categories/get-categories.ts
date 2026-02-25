@@ -25,16 +25,6 @@ interface CategoryApiNode {
   children?: CategoryApiNode[];
 }
 
-interface CategoryApiNode {
-  categoryId?: number;
-  categoryName?: string;
-  parentId?: number | null;
-  category_id?: number;
-  category_name?: string;
-  parent_id?: number | null;
-  children?: CategoryApiNode[];
-}
-
 export const getCategories = async (): Promise<Category[]> => {
   const response = await fetchApi<CategoryApiNode[]>(
     `${API_ENDPOINTS.CATEGORIES}`,
@@ -48,9 +38,16 @@ export const getCategories = async (): Promise<Category[]> => {
   const visit = (node: CategoryApiNode) => {
     const categoryId = node.categoryId ?? node.category_id;
     const categoryName = node.categoryName ?? node.category_name;
-    const parentCategoryId = node.parentId ?? node.parent_id ?? null;
+    const parentRaw = node.parentId ?? node.parent_id ?? null;
+    const parentCategoryId =
+      parentRaw != null && parentRaw > 0 ? parentRaw : null;
 
-    if (categoryId == null || !categoryName) {
+    if (
+      categoryId == null ||
+      !Number.isFinite(categoryId) ||
+      categoryId <= 0 ||
+      !categoryName
+    ) {
       node.children?.forEach(visit);
       return;
     }

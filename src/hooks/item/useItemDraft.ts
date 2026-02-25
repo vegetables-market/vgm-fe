@@ -63,6 +63,5 @@ export function useItemDraft() {
     initDraft,
     loading,
     error,
-    getItemId: () => createdIdRef.current,
   };
 }
