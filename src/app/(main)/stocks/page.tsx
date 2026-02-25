@@ -16,6 +16,8 @@ interface StockItem {
   likes_count: number;
   thumbnail_url: string | null;
   thumbnailUrl?: string | null;
+  image_url?: string | null;
+  imageUrl?: string | null;
   seller: {
     user_id: number;
     username: string;
