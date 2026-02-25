@@ -31,7 +31,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
       setStock(data);
       setIsLiked(data.item.isLiked);
     } catch (err) {
-      setError(getErrorMessage(err, "¤•i‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½"));
+      setError(getErrorMessage(err, "ï¿½ï¿½ï¿½iï¿½Ìæ“¾ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"));
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
         });
       }
     } catch (err) {
-      alert(getErrorMessage(err, "‚¨‹C‚É“ü‚è‘€ì‚É¸”s‚µ‚Ü‚µ‚½"));
+      alert(getErrorMessage(err, "ï¿½ï¿½ï¿½Cï¿½É“ï¿½ï¿½è‘€ï¿½ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"));
     }
   };
 
@@ -88,11 +88,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
         body: JSON.stringify({ item_id: stock.item.itemId, quantity: 1 }),
         credentials: "include",
       });
-      if (confirm("ƒJ[ƒg‚É’Ç‰Á‚µ‚Ü‚µ‚½BƒJ[ƒg‚ÖˆÚ“®‚µ‚Ü‚·‚©H")) {
+      if (confirm("ï¿½Jï¿½[ï¿½gï¿½É’Ç‰ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½Bï¿½Jï¿½[ï¿½gï¿½ÖˆÚ“ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½H")) {
         router.push("/basket");
       }
     } catch (err) {
-      alert(getErrorMessage(err, "ƒJ[ƒg‚Ö‚Ì’Ç‰Á‚É¸”s‚µ‚Ü‚µ‚½"));
+      alert(getErrorMessage(err, "ï¿½Jï¿½[ï¿½gï¿½Ö‚Ì’Ç‰ï¿½ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"));
     } finally {
       setIsProcessing(false);
     }
@@ -111,18 +111,18 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
   const getConditionText = (condition: number) => {
     const conditions = [
-      "V•i",
-      "–¢g—p‚É‹ß‚¢",
-      "–Ú—§‚Á‚½‚â‰˜‚ê‚È‚µ",
-      "‚â‚â‚â‰˜‚ê‚ ‚è",
-      "‚â‰˜‚ê‚ ‚è",
-      "‘S‘Ì“I‚Éó‘Ô‚ªˆ«‚¢",
+      "ï¿½Vï¿½i",
+      "ï¿½ï¿½ï¿½gï¿½pï¿½É‹ß‚ï¿½",
+      "ï¿½Ú—ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â‰˜ï¿½ï¿½È‚ï¿½",
+      "ï¿½ï¿½âï¿½â‰˜ï¿½ê‚ ï¿½ï¿½",
+      "ï¿½ï¿½ï¿½â‰˜ï¿½ê‚ ï¿½ï¿½",
+      "ï¿½Sï¿½Ì“Iï¿½Éï¿½Ô‚ï¿½ï¿½ï¿½ï¿½ï¿½",
     ];
-    return conditions[condition] || "•s–¾";
+    return conditions[condition] || "ï¿½sï¿½ï¿½";
   };
 
   const getShippingText = (type: number) => {
-    return type === 0 ? "‘——¿‚İio•iÒ•‰’Sj" : "’…•¥‚¢iw“üÒ•‰’Sj";
+    return type === 0 ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İiï¿½oï¿½iï¿½Ò•ï¿½ï¿½Sï¿½j" : "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½wï¿½ï¿½ï¿½Ò•ï¿½ï¿½Sï¿½j";
   };
 
   const getImageUrl = (raw: string | null | undefined) => {
@@ -136,15 +136,15 @@ export default function StocksDetailClient({ id }: { id: string }) {
   };
 
   if (isLoading) {
-    return <div className="loading">“Ç‚İ‚İ’†...</div>;
+    return <div className="loading">ï¿½Ç‚İï¿½ï¿½İ’ï¿½...</div>;
   }
 
   if (error || !stock) {
     return (
       <div className="error-page">
-        <p>{error || "¤•i‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½"}</p>
+        <p>{error || "ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½"}</p>
         <button onClick={() => router.push("/stocks")} className="back-button">
-          ¤•iˆê——‚É–ß‚é
+          ï¿½ï¿½ï¿½iï¿½ê——ï¿½É–ß‚ï¿½
         </button>
       </div>
     );
@@ -162,7 +162,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={getImageUrl(item.images[selectedImage].imageUrl)} alt={item.title} />
             ) : (
-              <div className="no-image">‰æ‘œ‚È‚µ</div>
+              <div className="no-image">ï¿½æ‘œï¿½È‚ï¿½</div>
             )}
           </div>
           {item.images.length > 1 && (
@@ -196,7 +196,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
               className={`purchase-button ${item.quantity <= 0 ? "sold-out" : ""}`}
               disabled={item.quantity <= 0}
             >
-              {item.quantity <= 0 ? "”„‚èØ‚ê" : "w“ü‚·‚é"}
+              {item.quantity <= 0 ? "ï¿½ï¿½ï¿½ï¿½Ø‚ï¿½" : "ï¿½wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"}
             </button>
 
             <button
@@ -204,40 +204,40 @@ export default function StocksDetailClient({ id }: { id: string }) {
               className="cart-button"
               disabled={item.quantity <= 0 || isProcessing}
             >
-              {isProcessing ? "ˆ—’†..." : "ƒJ[ƒg‚É’Ç‰Á"}
+              {isProcessing ? "ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½..." : "ï¿½Jï¿½[ï¿½gï¿½É’Ç‰ï¿½"}
             </button>
           </div>
 
           <button onClick={handleToggleFavorite} className={`favorite-button ${isLiked ? "liked" : ""}`}>
-            {isLiked ? "? ‚¨‹C‚É“ü‚è‰ğœ" : "? ‚¨‹C‚É“ü‚è"}
+            {isLiked ? "? ï¿½ï¿½ï¿½Cï¿½É“ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½" : "? ï¿½ï¿½ï¿½Cï¿½É“ï¿½ï¿½ï¿½"}
           </button>
 
           <div className="stock-description">
-            <h2>¤•ià–¾</h2>
-            <p>{item.description || "à–¾‚Í‚ ‚è‚Ü‚¹‚ñ"}</p>
+            <h2>ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½</h2>
+            <p>{item.description || "ï¿½ï¿½ï¿½ï¿½ï¿½Í‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½"}</p>
           </div>
 
           <div className="stock-details">
-            <h2>¤•iÚ×</h2>
+            <h2>ï¿½ï¿½ï¿½iï¿½Úï¿½</h2>
             <dl>
-              <dt>ƒJƒeƒSƒŠ[</dt>
-              <dd>{item.categoryName || "–¢İ’è"}</dd>
-              <dt>ó‘Ô</dt>
+              <dt>ï¿½Jï¿½eï¿½Sï¿½ï¿½ï¿½[</dt>
+              <dd>{item.categoryName || "ï¿½ï¿½ï¿½İ’ï¿½"}</dd>
+              <dt>ï¿½ï¿½ï¿½</dt>
               <dd>{getConditionText(item.condition)}</dd>
-              <dt>ƒuƒ‰ƒ“ƒh</dt>
-              <dd>{item.brand || "–¢İ’è"}</dd>
-              <dt>d—Ê</dt>
-              <dd>{item.weight ? `${item.weight}g` : "–¢İ’è"}</dd>
-              <dt>‘——¿</dt>
+              <dt>ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½h</dt>
+              <dd>{item.brand || "ï¿½ï¿½ï¿½İ’ï¿½"}</dd>
+              <dt>ï¿½dï¿½ï¿½</dt>
+              <dd>{item.weight ? `${item.weight}g` : "ï¿½ï¿½ï¿½İ’ï¿½"}</dd>
+              <dt>ï¿½ï¿½ï¿½ï¿½</dt>
               <dd>{getShippingText(item.shippingPayerType)}</dd>
-              <dt>İŒÉ</dt>
+              <dt>ï¿½İŒï¿½</dt>
               <dd>{item.quantity}</dd>
             </dl>
           </div>
 
           {relatedItems.length > 0 && (
             <div className="related-section">
-              <h2>ŠÖ˜A¤•i</h2>
+              <h2>ï¿½Ö˜Aï¿½ï¿½ï¿½i</h2>
               <div className="related-grid">
                 {relatedItems.map((related) => (
                   <div
@@ -250,7 +250,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={getImageUrl(related.thumbnailUrl)} alt={related.title} />
                       ) : (
-                        <div className="no-image">‰æ‘œ‚È‚µ</div>
+                        <div className="no-image">ï¿½æ‘œï¿½È‚ï¿½</div>
                       )}
                     </div>
                     <div className="related-info">

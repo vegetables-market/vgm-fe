@@ -37,7 +37,7 @@ export default function SearchPage() {
         console.error("Failed to fetch search results", err);
         if (!cancelled) {
           setItems([]);
-          setError("ŒŸõŒ‹‰Ê‚Ìæ“¾‚É¸”s‚µ‚Ü‚µ‚½");
+          setError("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê‚Ìæ“¾ï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½");
         }
       } finally {
         if (!cancelled) {
@@ -73,9 +73,9 @@ export default function SearchPage() {
 
   return (
     <div>
-      <h1>u{query}v‚ÌŒŸõŒ‹‰Ê: {items.length}Œ</h1>
+      <h1>ï¿½u{query}ï¿½vï¿½ÌŒï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: {items.length}ï¿½ï¿½</h1>
 
-      {isLoading && <p>“Ç‚İ‚İ’†...</p>}
+      {isLoading && <p>ï¿½Ç‚İï¿½ï¿½İ’ï¿½...</p>}
       {!isLoading && error && <p>{error}</p>}
 
       <div className="grid grid-cols-2 gap-4">
@@ -90,7 +90,7 @@ export default function SearchPage() {
               />
             </div>
             <p>{item.title}</p>
-            <p>{item.price}‰~</p>
+            <p>{item.price}ï¿½~</p>
           </div>
         ))}
       </div>
