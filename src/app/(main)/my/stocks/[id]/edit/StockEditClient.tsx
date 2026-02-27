@@ -26,6 +26,7 @@ export default function StockEditClient({ id }: { id: string }) {
   const [dataLoading, setDataLoading] = useState(true);
   const categories = useStockCategories();
   const [error, setError] = useState("");
+  const [existingImageUrls, setExistingImageUrls] = useState<string[]>([]);
 
   // Form State
   const [name, setName] = useState("");
@@ -47,6 +48,7 @@ export default function StockEditClient({ id }: { id: string }) {
         const item = await getStockEditDetail(itemId);
         setName(item.name);
         setDescription(item.description);
+        setExistingImageUrls(item.imageUrls ?? []);
         setCategoryId(item.categoryId);
         setPrice(item.price.toString());
         setQuantity(item.quantity.toString());
@@ -79,6 +81,23 @@ export default function StockEditClient({ id }: { id: string }) {
     e.preventDefault();
     setError("");
 
+    const normalizedCategoryId = Number(categoryId);
+    if (!Number.isFinite(normalizedCategoryId) || normalizedCategoryId <= 0) {
+      setError("カテゴリーを選択してください。");
+      return;
+    }
+
+    const uploadedImageUrls = files.flatMap((file) =>
+      file.status === "completed" && file.serverFilename
+        ? [file.serverFilename]
+        : [],
+    );
+    const totalImageCount = existingImageUrls.length + uploadedImageUrls.length;
+    if (totalImageCount === 0) {
+      setError("画像を1枚以上選択してください。");
+      return;
+    }
+
     const validationError = validateStockFormInput({
       name,
       description,
@@ -86,7 +105,8 @@ export default function StockEditClient({ id }: { id: string }) {
       categoryId,
       pendingCount,
       hasError,
-      requireImage: false,
+      requireImage: true,
+      fileCount: totalImageCount,
     });
 
     if (validationError) {
@@ -109,7 +129,12 @@ export default function StockEditClient({ id }: { id: string }) {
         itemCondition,
       });
 
-      await updateItem(itemId, payload);
+      const finalImageUrls = [...existingImageUrls, ...uploadedImageUrls];
+
+      await updateItem(itemId, {
+        ...payload,
+        image_urls: finalImageUrls,
+      });
       router.push("/my/stocks");
     } catch (err) {
       console.error(err);
@@ -122,6 +147,15 @@ export default function StockEditClient({ id }: { id: string }) {
   if (dataLoading) {
     return <div className="p-8 text-center">読み込み中...</div>;
   }
+
+  const getImageUrl = (raw: string) => {
+    if (!raw) return "/images/no-image.png";
+    if (raw.startsWith("http")) return raw;
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = raw.startsWith("/") ? raw.slice(1) : raw;
+    return `${baseUrl}/${cleanedPath}`;
+  };
 
   return (
     <div className="mx-auto mt-8 max-w-2xl rounded-lg bg-white p-6 shadow-md">
@@ -159,61 +193,99 @@ export default function StockEditClient({ id }: { id: string }) {
             </p>
           </div>
 
-          {/* プレビューグリッド */}
-          {files.length > 0 && (
-            <div className="mt-4 grid grid-cols-3 gap-4 sm:grid-cols-4">
-              {files.map((file) => (
-                <div
-                  key={file.id}
-                  className="group relative aspect-square overflow-hidden rounded-md border bg-gray-100"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={file.previewUrl}
-                    alt="preview"
-                    className="h-full w-full object-cover"
-                  />
-
-                  {/* Overlay for status */}
-                  <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-black opacity-0 transition-opacity group-hover:opacity-100">
-                    <button
-                      type="button"
-                      onClick={() => removeFile(file.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
-                    >
-                      ×
-                    </button>
-                  </div>
-
-                  {/* Status Indicator */}
-                  {file.status !== "completed" && (
-                    <div className="absolute right-0 bottom-0 left-0 h-1 bg-gray-200">
-                      <div
-                        className={`h-full ${file.status === "error" ? "bg-red-500" : "bg-green-500"}`}
-                        style={{ width: `${file.progress}%` }}
-                      />
+          {/* 既存画像 */}
+          {existingImageUrls.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 text-sm font-medium text-gray-700">現在の画像</p>
+              <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
+                {existingImageUrls.map((url, index) => (
+                  <div
+                    key={`existing-${url}-${index}`}
+                    className="group relative aspect-square overflow-hidden rounded-md border bg-gray-100"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getImageUrl(url)}
+                      alt={`existing-${index + 1}`}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-black opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExistingImageUrls((prev) =>
+                            prev.filter((_, i) => i !== index),
+                          )
+                        }
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                      >
+                        ×
+                      </button>
                     </div>
-                  )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-                  {file.status === "error" && (
-                    <>
-                      <div className="absolute top-0 right-0 bg-red-500 px-1 text-xs text-white">
-                        Error
+          {/* 新規追加画像 */}
+          {files.length > 0 && (
+            <div className="mt-4">
+              <p className="mb-2 text-sm font-medium text-gray-700">新規追加画像</p>
+              <div className="grid grid-cols-3 gap-4 sm:grid-cols-4">
+                {files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="group relative aspect-square overflow-hidden rounded-md border bg-gray-100"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={file.previewUrl}
+                      alt="preview"
+                      className="h-full w-full object-cover"
+                    />
+
+                    {/* Overlay for status */}
+                    <div className="bg-opacity-40 absolute inset-0 flex items-center justify-center bg-black opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => removeFile(file.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 p-1 text-white hover:bg-red-600"
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    {/* Status Indicator */}
+                    {file.status !== "completed" && (
+                      <div className="absolute right-0 bottom-0 left-0 h-1 bg-gray-200">
+                        <div
+                          className={`h-full ${file.status === "error" ? "bg-red-500" : "bg-green-500"}`}
+                          style={{ width: `${file.progress}%` }}
+                        />
                       </div>
-                      {file.error && (
-                        <div className="absolute right-0 bottom-0 left-0 bg-red-600/90 px-1 py-0.5 text-[10px] text-white">
-                          {file.error}
+                    )}
+
+                    {file.status === "error" && (
+                      <>
+                        <div className="absolute top-0 right-0 bg-red-500 px-1 text-xs text-white">
+                          Error
                         </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ))}
+                        {file.error && (
+                          <div className="absolute right-0 bottom-0 left-0 bg-red-600/90 px-1 py-0.5 text-[10px] text-white">
+                            {file.error}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           <div className="mt-2 text-right text-sm text-gray-500">
-            {files.length}枚の画像 (アップロード済み: {" "}
+            合計 {existingImageUrls.length + files.length}枚の画像 (新規アップロード済み: {" "}
             {files.filter((f) => f.status === "completed").length})
           </div>
         </div>

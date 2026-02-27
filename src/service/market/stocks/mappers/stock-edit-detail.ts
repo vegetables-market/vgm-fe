@@ -3,11 +3,15 @@ import type { StockEditDetailApiResponse } from "@/service/market/stocks/dto/sto
 
 export function mapStockEditDetail(raw: StockEditDetailApiResponse): StockEditDetail {
   const item = raw.item ?? {};
+  const imageUrls = (item.images ?? [])
+    .map((image) => image.imageUrl ?? image.image_url ?? "")
+    .filter((url) => url.length > 0);
 
   return {
     itemId: String(item.itemId ?? item.item_id ?? ""),
     name: item.name ?? item.title ?? "",
     description: item.description ?? "",
+    imageUrls,
     categoryId: Number(item.categoryId ?? item.category_id ?? 0),
     price: Number(item.price ?? 0),
     quantity: Number(item.quantity ?? 1),

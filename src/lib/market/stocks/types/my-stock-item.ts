@@ -1,5 +1,5 @@
 export type MyStockItem = {
-  itemId: number;
+  itemId: string;
   name: string;
   price: number;
   status: number;

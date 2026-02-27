@@ -3,7 +3,7 @@ import type { StockItemRaw } from "@/service/market/stocks/dto/stock-item-raw";
 
 export function mapMyStockItem(raw: StockItemRaw): MyStockItem {
   return {
-    itemId: Number(raw.itemId ?? raw.item_id ?? 0),
+    itemId: String(raw.id ?? raw.itemId ?? raw.item_id ?? ""),
     name: raw.name ?? raw.title ?? "",
     price: Number(raw.price ?? 0),
     status: Number(raw.status ?? 0),
