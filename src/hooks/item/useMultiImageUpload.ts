@@ -20,8 +20,8 @@ export type UploadFileStatus =
   | "error";
 
 export interface UploadFile {
-  id: string; // ローカル識別用ID
-  file: File | null; // 圧縮後�Eファイル
+  id: string; // ローカル識別用 ID
+  file: File | null; // 圧縮後ファイル
   originalFile: File;
   previewUrl: string;
   status: UploadFileStatus;
@@ -82,13 +82,13 @@ export function useMultiImageUpload(
     };
   }, []);
 
-  // itemIdをRefで追跡
+  // itemId を Ref で追跡
   useEffect(() => {
     itemIdRef.current = itemId;
   }, [itemId]);
 
   /**
-   * 処琁E��ューを回ぁE
+   * 処理キューを回す
    */
   const processQueue = useCallback(async () => {
     const currentItemId = itemIdRef.current;
@@ -96,7 +96,7 @@ export function useMultiImageUpload(
     if (activeUploadsRef.current >= MAX_CONCURRENCY) return;
     if (uploadQueueRef.current.size === 0) return;
 
-    // 次のタスクを取り�EぁE
+    // 次のタスクを取り出す
     const iterator = uploadQueueRef.current.entries().next();
     if (iterator.done) return;
 
@@ -111,7 +111,7 @@ export function useMultiImageUpload(
 
     activeUploadsRef.current++;
 
-    // スチE�EタスをUploadingに変更
+    // ステータスを Uploading に変更
     setFiles((prev) =>
       prev.map((f) =>
         f.id === nextId ? { ...f, status: "uploading", progress: 0 } : f,
@@ -119,7 +119,7 @@ export function useMultiImageUpload(
     );
 
     try {
-      // 1. Token取征E
+      // 1. Token 取得
       const { token, filename } = await withTimeout(
         getUploadToken(),
         TOKEN_TIMEOUT_MS,
@@ -140,7 +140,7 @@ export function useMultiImageUpload(
         "linkImages",
       );
 
-      // 完亁E
+      // 完了
       setFiles((prev) =>
         prev.map((f) =>
           f.id === nextId
@@ -173,7 +173,7 @@ export function useMultiImageUpload(
   }, []);
 
   /**
-   * itemIdが設定されたらキュー処琁E��開姁E
+   * itemId が設定されたらキュー処理を開始
    */
   useEffect(() => {
     if (itemId && uploadQueueRef.current.size > 0) {
@@ -181,7 +181,7 @@ export function useMultiImageUpload(
     }
   }, [itemId, processQueue]);
 
-  // キュー取りこぼし対筁E 定期皁E��処琁E��再駁E��
+  // キュー取りこぼし対策: 定期的に処理開始を再試行
   useEffect(() => {
     const timer = setInterval(() => {
       if (!itemIdRef.current) return;
@@ -194,11 +194,11 @@ export function useMultiImageUpload(
   }, [processQueue]);
 
   /**
-   * ファイル追加�E�ドラフトがなければ作�E�E�E
+   * ファイル追加。ドラフトがなければ作成。
    */
   const addFiles = useCallback(
     async (newFiles: File[]) => {
-      // ドラフトがなければ先に作�E�E�EnitDraftが提供されてぁE��場合�Eみ�E�E
+      // ドラフトがなければ先に作成（initDraft が提供されている場合のみ）
       if (!itemIdRef.current) {
         if (initDraft) {
           try {
@@ -206,7 +206,7 @@ export function useMultiImageUpload(
             itemIdRef.current = newItemId;
           } catch (err) {
             console.error("Failed to create draft:", err);
-            return; // ドラフト作�E失敗時は画像追加を中止
+            return; // ドラフト作成失敗時は画像追加を中止
           }
         } else {
           console.error("No itemId and no initDraft provided");
@@ -239,15 +239,15 @@ export function useMultiImageUpload(
         }),
       );
 
-      // State更新
+      // State 更新
       setFiles((prev) => [...prev, ...newEntries]);
 
-      // キューに追加�E�ファイル惁E��も一緒に保存！E
+      // キューに追加（ファイル情報も一緒に保存）
       newEntries.forEach((entry) => {
         uploadQueueRef.current.set(entry.id, entry);
       });
 
-      // 即座に処琁E��始を試みめE
+      // 即座に処理開始を試みる
       processQueue();
     },
     [processQueue, initDraft],
