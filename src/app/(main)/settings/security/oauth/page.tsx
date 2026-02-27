@@ -75,8 +75,17 @@ export default function OAuthPage() {
   };
 
   const handleConnect = (provider: string) => {
-    // OAuth連携開始（既存のログインフローを使用）
-    window.location.href = `/login?connect=${provider}`;
+    const normalized = provider.toLowerCase();
+    const supportedProviders = ["google", "microsoft", "github"];
+    if (!supportedProviders.includes(normalized)) {
+      setError(`${provider} は現在連携に対応していません`);
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set("connect", normalized);
+    params.set("redirect_to", "/settings/security/oauth");
+    window.location.href = `/login?${params.toString()}`;
   };
 
   const getProviderIcon = (provider: string) => {

@@ -29,7 +29,7 @@ export default function MainPage() {
             <Link href="/stocks" className="flex items-center gap-3 rounded-full bg-green-600 px-12 py-5 text-lg font-bold text-white shadow-xl transition hover:bg-green-700 hover:scale-105 active:scale-95 dark:bg-green-500 dark:hover:bg-green-600">
               <ShoppingBag size={24} /> 商品を見る
             </Link>
-            <Link href="/stock/new" className="flex items-center gap-3 rounded-full bg-white px-12 py-5 text-lg font-bold text-green-600 border-2 border-green-600 transition hover:bg-green-50 active:scale-95 dark:bg-transparent dark:text-green-400 dark:border-green-400 dark:hover:bg-green-400/10">
+            <Link href="/my/stocks/new" className="flex items-center gap-3 rounded-full bg-white px-12 py-5 text-lg font-bold text-green-600 border-2 border-green-600 transition hover:bg-green-50 active:scale-95 dark:bg-transparent dark:text-green-400 dark:border-green-400 dark:hover:bg-green-400/10">
               <PlusCircle size={24} /> 出品する
             </Link>
           </div>
@@ -102,7 +102,7 @@ export default function MainPage() {
           <p className="text-sm text-gray-500 dark:text-zinc-400">開発中の画面一覧です。</p>
           <div className="grid grid-cols-2 gap-3">
             <Link href="/stocks" className="rounded-xl bg-gray-50 p-4 text-center dark:bg-zinc-800">購入画面</Link>
-            <Link href="/stock/new" className="rounded-xl bg-gray-50 p-4 text-center dark:bg-zinc-800">出品画面</Link>
+            <Link href="/my/stocks/new" className="rounded-xl bg-gray-50 p-4 text-center dark:bg-zinc-800">出品画面</Link>
           </div>
         </div>
       </BottomSheet>

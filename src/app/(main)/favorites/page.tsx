@@ -95,6 +95,7 @@ export default function FavoritesPage() {
                 className="cursor-pointer overflow-hidden rounded-lg border transition-shadow hover:shadow-lg"
               >
                 <div className="relative aspect-square bg-gray-100">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={getImageUrl(stock.thumbnail_url)}
                     alt={stock.title}

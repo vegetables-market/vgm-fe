@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { validatePassword } from "@/services/auth/password-validation";
+import { validatePassword } from "@/service/auth/policy/password-validation";
 
 type UsePasswordEntryParams = {
   password: string;

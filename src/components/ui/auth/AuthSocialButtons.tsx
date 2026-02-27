@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { useFirebaseOAuthLogin } from "@/hooks/auth/firebase/useFirebaseOAuthLogin";
 
@@ -41,22 +42,48 @@ const SOCIAL_PROVIDERS: SocialProvider[] = [
 
 interface SocialLoginButtonsProps {
   mode: "login" | "signup";
+  autoProvider?: "google" | "microsoft" | "github";
   onProviderClick?: (providerId: string) => void;
+}
+
+function getMethodLabel(method: string): string {
+  switch (method) {
+    case "google.com":
+      return "Google";
+    case "github.com":
+      return "GitHub";
+    case "microsoft.com":
+      return "Microsoft";
+    case "password":
+      return "Email/Password";
+    default:
+      return method;
+  }
 }
 
 export default function AuthSocialButtons({
   mode,
+  autoProvider,
   onProviderClick,
 }: SocialLoginButtonsProps) {
   const actionText = mode === "login" ? "でログイン" : "で登録";
-  const { handleOAuthLogin, loading } = useFirebaseOAuthLogin();
+  const { handleOAuthLogin, loading, accountExistsConflict } =
+    useFirebaseOAuthLogin();
+  const hasAutoStartedRef = useRef(false);
 
-  const handleProviderClick = (
-    providerId: "google" | "microsoft" | "github",
-  ) => {
-    handleOAuthLogin(providerId);
-    onProviderClick?.(providerId);
-  };
+  const handleProviderClick = useCallback(
+    (providerId: "google" | "microsoft" | "github") => {
+      handleOAuthLogin(providerId);
+      onProviderClick?.(providerId);
+    },
+    [handleOAuthLogin, onProviderClick],
+  );
+
+  useEffect(() => {
+    if (mode !== "login" || !autoProvider || hasAutoStartedRef.current) return;
+    hasAutoStartedRef.current = true;
+    handleProviderClick(autoProvider);
+  }, [autoProvider, mode, handleProviderClick]);
 
   return (
     <div className="mb-4 flex w-full flex-col gap-2">
@@ -83,6 +110,27 @@ export default function AuthSocialButtons({
           </span>
         </button>
       ))}
+      {accountExistsConflict && (
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+          <p>
+            This email is already registered with a different sign-in method.
+          </p>
+          {accountExistsConflict.email && (
+            <p className="mt-1">Email: {accountExistsConflict.email}</p>
+          )}
+          {accountExistsConflict.existingMethods.length > 0 && (
+            <p className="mt-1">
+              Existing methods:{" "}
+              {accountExistsConflict.existingMethods
+                .map(getMethodLabel)
+                .join(", ")}
+            </p>
+          )}
+          <p className="mt-1">
+            Sign in with an existing method first, then link this provider.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

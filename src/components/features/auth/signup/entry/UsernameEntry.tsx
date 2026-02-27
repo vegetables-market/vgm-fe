@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useUsernameEntry } from "@/hooks/auth/signup/useUsernameEntry";
-import type { UsernameEntryProps } from "@/types/auth/signup-components";
+import type { UsernameEntryProps } from "@/components/features/auth/signup/types/entry-props";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthStatusMessage from "@/components/ui/auth/AuthStatusMessage";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
@@ -109,3 +109,4 @@ export default function UsernameEntry({
     </form>
   );
 }
+

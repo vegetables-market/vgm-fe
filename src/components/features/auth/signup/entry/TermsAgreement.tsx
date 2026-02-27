@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useTermsAgreement } from "@/hooks/auth/signup/useTermsAgreement";
-import type { TermsAgreementProps } from "@/types/auth/signup-components";
+import type { TermsAgreementProps } from "@/components/features/auth/signup/types/entry-props";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import SignupStepHeader from "@/components/ui/auth/SignupStepHeader";
 import AuthSubTitle from "@/components/ui/auth/AuthSubTitle";
@@ -47,7 +47,7 @@ export default function TermsAgreement({
       <p className="mb-6 text-[12px]">
         個人情報をどのように収集、利用、保護しているかの詳細は、
         <Link
-          href="/"
+          href="/privacy"
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary underline"
@@ -67,3 +67,4 @@ export default function TermsAgreement({
     </form>
   );
 }
+

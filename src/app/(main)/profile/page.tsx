@@ -6,16 +6,18 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { ProfileMenuList } from "@/components/profile/ProfileMenuList";
 import { ItemCard } from "@/components/market/ItemCard";
-import { getMyItems } from "@/services/market/items/get-my-items";
+import { getMyItems } from "@/service/market/stocks/get-my-items";
 import { getImageUrl } from "@/utils/image";
+import type { MyStockItem } from "@/lib/market/stocks/types/my-stock-item";
+import { useAuth } from "@/context/AuthContext";
 
 // APIレスポンスをItemCard用に変換
 const STATUS_MAP: Record<number, string> = { 2: "active", 3: "trading", 4: "sold", 5: "stopped" };
 
-function toCardItem(item: any) {
-    const imgUrl = item.image_url || item.imageUrl;
+function toCardItem(item: MyStockItem) {
+    const imgUrl = item.imageUrl;
     return {
-        id: item.id,
+        id: item.itemId.toString(),
         name: item.name || "",
         price: item.price || 0,
         status: STATUS_MAP[item.status] || "unknown",
@@ -26,26 +28,23 @@ function toCardItem(item: any) {
 export default function ProfilePage() {
     const [myListings, setMyListings] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { user: authUser } = useAuth();
 
-    const [user, setUser] = useState({
-        displayName: "田中 花子",
-        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=hanako",
+    const user = {
+        displayName: authUser?.displayName || "ゲスト",
+        avatarUrl: authUser?.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=guest",
         ratingAverage: 4.8,
-        location: "東京都世田谷区",
-        bio: "趣味で野菜を育てています🌱"
-    });
+        location: "未設定",
+        bio: "よろしくお願いします！"
+    };
 
     useEffect(() => {
-        const savedData = localStorage.getItem("userData");
-        if (savedData) {
-            setUser(JSON.parse(savedData));
-        }
         // APIから自分の出品商品を取得
         getMyItems()
-            .then((items) => {
+            .then((items: MyStockItem[]) => {
                 setMyListings(items.map(toCardItem));
             })
-            .catch((err) => {
+            .catch((err: unknown) => {
                 console.error("Failed to load my items:", err);
             })
             .finally(() => {
@@ -79,7 +78,7 @@ export default function ProfilePage() {
                             出品中の商品
                             <span className="ml-2 text-sm font-normal text-stone-500">({activeItems.length}件)</span>
                         </h2>
-                        <Link href="/stock/new" className="text-sm font-medium text-emerald-600 hover:underline">+ 新規出品</Link>
+                        <Link href="/my/stocks/new" className="text-sm font-medium text-emerald-600 hover:underline">+ 新規出品</Link>
                     </div>
 
                     {isLoading ? (
@@ -93,7 +92,7 @@ export default function ProfilePage() {
                     ) : (
                         <div className="rounded-lg bg-white p-8 text-center">
                             <p className="mb-4 text-stone-500">出品中の商品はありません</p>
-                            <Link href="/stock/new" className="inline-block rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white transition hover:bg-emerald-600">
+                            <Link href="/my/stocks/new" className="inline-block rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white transition hover:bg-emerald-600">
                                 出品する
                             </Link>
                         </div>

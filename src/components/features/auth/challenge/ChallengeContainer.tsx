@@ -1,48 +1,40 @@
-"use client";
+﻿"use client";
 
 import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useChallengeLogic } from "@/hooks/auth/challenge/useChallengeLogic";
 import ChallengeForm from "@/components/features/auth/challenge/ChallengeForm";
-import { VerificationMode } from "@/types/auth/core";
+import { parseChallengeQuery } from "@/lib/auth/challenge/parse-challenge-query";
+import { safeRedirectTo } from "@/lib/next/safeRedirectTo";
+
+const SIGNUP_VERIFIED_FLOW_ID_KEY = "signup_verified_flow_id";
 
 function ChallengeContainerInner() {
   const searchParams = useSearchParams();
-  const typeParam = searchParams.get("type");
-  const flowId = searchParams.get("flow_id");
-  const mfaToken = searchParams.get("token") || searchParams.get("mfa_token");
-  const action = searchParams.get("action");
-  const displayEmail = searchParams.get("email") || searchParams.get("masked_email");
-  const expiresAt = searchParams.get("expires_at");
-  const nextResendAt = searchParams.get("next_resend_at");
-  const redirectTo = searchParams.get("redirect_to");
-  const returnTo = searchParams.get("return_to");
-  const username = searchParams.get("username");
-  const isSignup = searchParams.get("signup") === "true";
+  const {
+    flowId,
+    mfaToken,
+    action,
+    displayEmail,
+    expiresAt,
+    nextResendAt,
+    redirectTo,
+    returnTo,
+    isSignup,
+    mode,
+    identifierForLogic,
+    identifierForView,
+  } = parseChallengeQuery(searchParams);
 
   const router = useRouter();
-
-  // Determine Mode
-  let mode: VerificationMode | null = null;
-  if (action) {
-    if (typeParam === "totp") mode = "totp";
-    else if (typeParam === "password") mode = "password";
-    else mode = "email"; // Default check for action
-  } else if (typeParam === "totp") {
-    mode = "totp";
-  } else if (typeParam === "password") {
-    mode = "password";
-  } else if (typeParam === "email" || flowId) {
-    mode = "email";
-  }
-
-  // If no valid mode, we might want to show error or let the hook handle it
-  // For safety, default to email if flowId exists
-  const safeMode = mode || "email";
 
   // 新規登録フローの場合、検証成功後にsignupページへリダイレクト
   const handleSignupVerified = isSignup
     ? () => {
+        if (flowId) {
+          sessionStorage.setItem(SIGNUP_VERIFIED_FLOW_ID_KEY, flowId);
+        }
+
         const params = new URLSearchParams();
         if (flowId) params.set("flow_id", flowId);
         if (displayEmail) params.set("email", displayEmail);
@@ -53,11 +45,11 @@ function ChallengeContainerInner() {
     : undefined;
 
   const logic = useChallengeLogic({
-    mode: safeMode,
+    mode,
     flowId,
     mfaToken,
     action,
-    identifier: mode === "totp" ? mfaToken : (mode === "password" ? username : flowId),
+    identifier: identifierForLogic,
     displayEmail,
     redirectTo,
     expiresAt,
@@ -68,9 +60,11 @@ function ChallengeContainerInner() {
   const handleReturn = () => {
       // If return_to is explicitly set (e.g. for "cancel" or "back" behavior), use it
       if (returnTo) {
-          const target = decodeURIComponent(returnTo);
-          router.push(target);
-          return;
+          const target = safeRedirectTo(returnTo);
+          if (target) {
+            router.push(target);
+            return;
+          }
       }
       
       // Default behavior: go back in history
@@ -79,10 +73,10 @@ function ChallengeContainerInner() {
 
   return (
     <ChallengeForm
-      key={safeMode}
-      mode={safeMode}
+      key={mode}
+      mode={mode}
       action={action}
-      identifier={mode === "totp" ? mfaToken : (mode === "password" ? username : displayEmail)}
+      identifier={identifierForView}
       logic={logic}
       onBack={handleReturn}
     />
@@ -96,3 +90,4 @@ export function ChallengeContainer() {
     </Suspense>
   );
 }
+

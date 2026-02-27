@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -138,6 +138,91 @@ export default function Home() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToFooter = () => {
+    lastInteractionTimeRef.current = Date.now();
+    lenisRef.current?.scrollTo("#site-footer", { immediate: true });
+    setIsMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    if (confirm("ログアウトしますか？")) {
+      sessionStorage.removeItem("harvest_is_logged_in");
+      setIsLoggedIn(false);
+      setIsMenuOpen(false);
+      router.push("/login");
+    }
+  };
+
+  const triggerAutoScroll = useCallback(() => {
+    if (
+      !fixedSectionRef.current ||
+      !lenisRef.current ||
+      bgImagesRef.current.length === 0
+    )
+      return;
+
+    const totalHeight =
+      fixedSectionRef.current.offsetHeight - window.innerHeight;
+    const totalSections = bgImagesRef.current.length;
+    const oneSectionHeight = totalHeight / totalSections;
+
+    const nextIndex = currentIndexRef.current + 1;
+
+    if (nextIndex >= totalSections) {
+      isAutoScrollingRef.current = true;
+      lenisRef.current.scrollTo(0, {
+        immediate: true,
+        lock: true,
+        onComplete: () => {
+          isAutoScrollingRef.current = false;
+          currentIndexRef.current = 0;
+        },
+      });
+    } else {
+      const nextScrollPos = nextIndex * oneSectionHeight;
+      const targetPos = nextScrollPos + 10;
+
+      isAutoScrollingRef.current = true;
+      lenisRef.current.scrollTo(targetPos, {
+        duration: 3.5,
+        lock: true,
+        onComplete: () => {
+          isAutoScrollingRef.current = false;
+          currentIndexRef.current = nextIndex;
+        },
+      });
+    }
+  }, []);
+
+  const startAutoScrollLoop = useCallback(() => {
+    const updateInteraction = () => {
+      lastInteractionTimeRef.current = Date.now();
+    };
+    window.addEventListener("wheel", updateInteraction);
+    window.addEventListener("touchmove", updateInteraction);
+    window.addEventListener("click", updateInteraction);
+    window.addEventListener("keydown", updateInteraction);
+
+    autoScrollTimerRef.current = setInterval(() => {
+      const now = Date.now();
+      if (
+        now - lastInteractionTimeRef.current > 7000 &&
+        !isAutoScrollingRef.current
+      ) {
+        triggerAutoScroll();
+        lastInteractionTimeRef.current = Date.now();
+      }
+    }, 1000);
+    return () => {
+      window.removeEventListener("wheel", updateInteraction);
+      window.removeEventListener("touchmove", updateInteraction);
+      window.removeEventListener("click", updateInteraction);
+      window.removeEventListener("keydown", updateInteraction);
+      if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
+      autoScrollTimerRef.current = null;
+    };
+  }, [triggerAutoScroll]);
+
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.2, smoothWheel: true });
     lenisRef.current = lenis;
@@ -149,9 +234,10 @@ export default function Home() {
       setIsLoggedIn(true);
     }
 
+    let stopAutoScroll: (() => void) | undefined;
     const startMainLogic = () => {
       initScrollAnimation();
-      startAutoScrollLoop();
+      stopAutoScroll = startAutoScrollLoop();
     };
 
     if (scrollContainerRef.current) {
@@ -193,88 +279,11 @@ export default function Home() {
     }
 
     return () => {
+      if (stopAutoScroll) stopAutoScroll();
       if (lenisRef.current) lenisRef.current.destroy();
-      if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
-  }, []);
-
-  const scrollToFooter = () => {
-    lastInteractionTimeRef.current = Date.now();
-    lenisRef.current?.scrollTo("#site-footer", { immediate: true });
-    setIsMenuOpen(false);
-  };
-
-  const handleLogout = () => {
-    if (confirm("ログアウトしますか？")) {
-      sessionStorage.removeItem("harvest_is_logged_in");
-      setIsLoggedIn(false);
-      setIsMenuOpen(false);
-      router.push("/login");
-    }
-  };
-
-  const startAutoScrollLoop = () => {
-    const updateInteraction = () => {
-      lastInteractionTimeRef.current = Date.now();
-    };
-    window.addEventListener("wheel", updateInteraction);
-    window.addEventListener("touchmove", updateInteraction);
-    window.addEventListener("click", updateInteraction);
-    window.addEventListener("keydown", updateInteraction);
-
-    autoScrollTimerRef.current = setInterval(() => {
-      const now = Date.now();
-      if (
-        now - lastInteractionTimeRef.current > 7000 &&
-        !isAutoScrollingRef.current
-      ) {
-        triggerAutoScroll();
-        lastInteractionTimeRef.current = Date.now();
-      }
-    }, 1000);
-  };
-
-  const triggerAutoScroll = () => {
-    if (
-      !fixedSectionRef.current ||
-      !lenisRef.current ||
-      bgImagesRef.current.length === 0
-    )
-      return;
-
-    const totalHeight =
-      fixedSectionRef.current.offsetHeight - window.innerHeight;
-    const totalSections = bgImagesRef.current.length;
-    const oneSectionHeight = totalHeight / totalSections;
-
-    let nextIndex = currentIndexRef.current + 1;
-
-    if (nextIndex >= totalSections) {
-      isAutoScrollingRef.current = true;
-      lenisRef.current.scrollTo(0, {
-        immediate: true,
-        lock: true,
-        onComplete: () => {
-          isAutoScrollingRef.current = false;
-          currentIndexRef.current = 0;
-        },
-      });
-    } else {
-      const nextScrollPos = nextIndex * oneSectionHeight;
-      const targetPos = nextScrollPos + 10;
-
-      isAutoScrollingRef.current = true;
-      lenisRef.current.scrollTo(targetPos, {
-        duration: 3.5,
-        lock: true,
-        onComplete: () => {
-          isAutoScrollingRef.current = false;
-          currentIndexRef.current = nextIndex;
-        },
-      });
-    }
-  };
+  }, [startAutoScrollLoop]);
 
   const initScrollAnimation = () => {
     const totalSections = bgImagesRef.current.length;
@@ -546,6 +555,7 @@ export default function Home() {
                   onClick={() => router.push(`/stocks/${item.id}`)}
                 >
                   <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-gray-200 shadow-sm">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={item.imageUrl}
                       alt={item.name}

@@ -1,0 +1,15 @@
+import { fetchApi } from "@/lib/api/fetch";
+import { API_ENDPOINTS } from "@/lib/api/api-endpoint";
+
+export const updateItemStatus = async (
+  itemId: string,
+  status: number,
+): Promise<void> => {
+  return fetchApi(`${API_ENDPOINTS.ITEMS}/${itemId}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
+};

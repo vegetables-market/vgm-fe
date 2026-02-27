@@ -14,7 +14,7 @@ export default function SmoothScroll() {
       "/welcome", // 独自のLenisインスタンスを使用
       "/basket", // カートページ（フォーム主体）
       "/purchase", // 購入ページ（フォーム主体）
-      "/stock/new", // 出品ページ（フォーム主体）
+      "/my/stocks/new", // 出品ページ（フォーム主体）
       "/login", // ログインページ
       "/register", // 登録ページ
     ];

@@ -1,11 +1,11 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { checkUsername } from "@/services/auth/check-username";
-import { getInitialUsernameSuggestions } from "@/services/auth/get-initial-username-suggestions";
-import { isValidUsernameFormat } from "@/services/auth/username-validation";
+import { checkUsername } from "@/service/auth/flow/check-username";
+import { getInitialUsernameSuggestions } from "@/service/auth/user/get-initial-username-suggestions";
+import { isValidUsernameFormat } from "@/service/auth/policy/username-validation";
 
-import type { CheckUsernameResult } from "@/types/auth/service";
+import type { CheckUsernameResultDto } from "@/service/auth/flow/dto/check-username-result-dto";
 
 type UseUsernameEntryParams = {
   username: string;
@@ -26,7 +26,7 @@ export function useUsernameEntry({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
 
-  const checkCache = useRef<Map<string, CheckUsernameResult>>(new Map());
+  const checkCache = useRef<Map<string, CheckUsernameResultDto>>(new Map());
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const isFormatValid = useMemo(() => isValidUsernameFormat(username), [username]);
@@ -125,9 +125,11 @@ export function useUsernameEntry({
     if (isValidUsernameFormat(value)) {
       setChecking(true);
       debouncedCheck(value);
-      // Clear checking state but keep previous results
-      setChecking(false);
+      return;
     }
+
+    setChecking(false);
+    setIsAvailable(null);
   };
 
   const applySuggestion = (suggestion: string) => {

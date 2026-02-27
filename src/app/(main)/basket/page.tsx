@@ -1,14 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getCart as fetchCartApi } from "@/services/market/cart/get-cart";
-import { updateCartItem } from "@/services/market/cart/update-cart-item";
-import { removeFromCart as removeCartItem } from "@/services/market/cart/remove-from-cart";
+import { getCart as fetchCartApi } from "@/service/market/cart/get-cart";
+import { updateCartItem } from "@/service/market/cart/update-cart-item";
+import { removeFromCart as removeCartItem } from "@/service/market/cart/remove-from-cart";
 import type { CartResponse } from "@/types/market/cart";
+import AuthGuard from "@/components/features/auth/AuthGuard";
 
-export default function BasketPage() {
+function BasketContent() {
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -53,7 +54,7 @@ export default function BasketPage() {
       await updateCartItem(cartItemId, newQuantity);
       await fetchCart(); // Refresh cart
     } catch (error) {
-      alert("数量の変更に失敗しました");
+      alert("数量更新に失敗しました");
       console.error(error);
     } finally {
       setIsUpdating(false);
@@ -212,5 +213,13 @@ export default function BasketPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BasketPage() {
+  return (
+    <AuthGuard mode="redirect">
+      <BasketContent />
+    </AuthGuard>
   );
 }

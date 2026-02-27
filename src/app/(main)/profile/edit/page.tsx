@@ -3,27 +3,27 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ProfileEditPage() {
   const router = useRouter();
+  const { user, updateUser } = useAuth();
   const [userData, setUserData] = useState<any>(null);
 
   useEffect(() => {
-    const savedData = localStorage.getItem("userData");
-    if (savedData) {
-      setUserData(JSON.parse(savedData));
-    } else {
-
+    if (user) {
       setUserData({
-        displayName: "田中 花子",
-        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=hanako",
+        displayName: user.displayName || "ゲスト",
+        avatarUrl: user.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=guest",
         bio: "趣味で野菜を育てています🌱"
       });
     }
-  }, []);
+  }, [user]);
 
   const handleSave = (updatedUser: any) => {
-    localStorage.setItem("userData", JSON.stringify(updatedUser));
+    if (user) {
+      updateUser({ ...user, ...updatedUser });
+    }
     alert("プロフィールを更新しました！");
     router.push("/profile");
   };

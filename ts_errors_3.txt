@@ -1,0 +1,6 @@
+src/app/(main)/my/stocks/page.tsx(198,61): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/app/(main)/my/stocks/page.tsx(199,37): error TS2367: This comparison appears to be unintentional because the types 'number | null' and 'string' have no overlap.
+src/app/(main)/my/stocks/page.tsx(202,28): error TS2367: This comparison appears to be unintentional because the types 'number | null' and 'string' have no overlap.
+src/app/(main)/my/stocks/page.tsx(216,53): error TS2345: Argument of type 'string' is not assignable to parameter of type 'number'.
+src/app/(main)/my/stocks/page.tsx(217,35): error TS2367: This comparison appears to be unintentional because the types 'number | null' and 'string' have no overlap.
+src/app/(main)/my/stocks/page.tsx(220,26): error TS2367: This comparison appears to be unintentional because the types 'number | null' and 'string' have no overlap.

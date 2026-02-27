@@ -1,129 +1,27 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { fetchApi } from "@/lib/api/fetch";
+import { useStocksPage } from "@/hooks/market/stocks/use-stocks-page";
+import { formatStockPrice } from "@/lib/market/stocks/format-price";
+import { getStockImageUrl } from "@/lib/market/stocks/get-image-url";
 
-interface StockItem {
-  item_id: string;
-  title: string;
-  description: string | null;
-  price: number;
-  category_id: number | null;
-  category_name: string | null;
-  condition: number;
-  status: number;
-  likes_count: number;
-  thumbnail_url: string | null;
-  thumbnailUrl?: string | null;
-  image_url?: string | null;
-  imageUrl?: string | null;
-  seller: {
-    user_id: number;
-    username: string;
-    display_name: string;
-    avatar_url: string | null;
-  };
-  created_at: string;
-}
-
-interface PaginatedResponse {
-  items: StockItem[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
 
 export default function StocksPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [stocks, setStocks] = useState<StockItem[]>([]);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    totalPages: 0
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  // 検索パラメータ
-  const [keyword, setKeyword] = useState(searchParams.get("q") || "");
-  const categoryId = searchParams.get("categoryId") || "";
-  const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
-  const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
-  const [sort, setSort] = useState(searchParams.get("sort") || "newest");
-
-  useEffect(() => {
-    searchStocks();
-  }, [searchParams]);
-
-  const searchStocks = async () => {
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const params = new URLSearchParams();
-      if (keyword) params.append("q", keyword);
-      if (categoryId) params.append("categoryId", categoryId);
-      if (minPrice) params.append("minPrice", minPrice);
-      if (maxPrice) params.append("maxPrice", maxPrice);
-      params.append("sort", sort);
-      params.append("page", searchParams.get("page") || "1");
-      params.append("limit", "20");
-
-      const data = await fetchApi<PaginatedResponse>(
-        `/api/v1/market/items/search?${params.toString()}`,
-        { credentials: "include" }
-      );
-
-      setStocks(data.items);
-      setPagination(data.pagination);
-    } catch (err: any) {
-      setError(err.message || "在庫の取得に失敗しました");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSearch = () => {
-    const params = new URLSearchParams();
-    if (keyword) params.append("q", keyword);
-    if (categoryId) params.append("categoryId", categoryId);
-    if (minPrice) params.append("minPrice", minPrice);
-    if (maxPrice) params.append("maxPrice", maxPrice);
-    params.append("sort", sort);
-    params.append("page", "1");
-
-    router.push(`/stocks?${params.toString()}`);
-  };
-
-  const handlePageChange = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", page.toString());
-    router.push(`/stocks?${params.toString()}`);
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("ja-JP", {
-      style: "currency",
-      currency: "JPY"
-    }).format(price);
-  };
-
-  const getImageUrl = (raw: string | null | undefined) => {
-    if (!raw) return "/images/no-image.png";
-    if (raw.startsWith("http")) return raw;
-
-    const mediaUrl =
-      process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
-    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
-    return `${baseUrl}/${raw}`;
-  };
+  const {
+    keyword,
+    setKeyword,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    sort,
+    handleSortChange,
+    result,
+    isLoading,
+    error,
+    handleSearch,
+    handlePageChange,
+    handleStockClick,
+  } = useStocksPage();
 
   return (
     <div className="stocks-page">
@@ -174,7 +72,7 @@ export default function StocksPage() {
             <label>並び替え</label>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
               className="sort-select"
             >
               <option value="newest">新着順</option>
@@ -200,34 +98,35 @@ export default function StocksPage() {
       {!isLoading && (
         <>
           <div className="stocks-grid">
-            {stocks.map((stock) => (
+            {result.items.map((stock) => (
               <div
-                key={stock.item_id}
+                key={stock.itemId}
                 className="stock-card"
-                onClick={() => router.push(`/stocks/${stock.item_id}`)}
+                onClick={() => handleStockClick(stock.itemId)}
               >
                 <div className="stock-image">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getImageUrl(
-                      stock.thumbnail_url ??
-                      stock.thumbnailUrl ??
-                      stock.image_url ??
-                      stock.imageUrl,
+                    src={getStockImageUrl(
+                      stock.thumbnailUrl ?? stock.imageUrl,
                     )}
                     alt={stock.title}
+                    onError={(e) => {
+                      e.currentTarget.src = "/images/no-image.png";
+                    }}
                   />
                 </div>
                 <div className="stock-info">
                   <h3 className="stock-title">{stock.title}</h3>
-                  <p className="stock-price">{formatPrice(stock.price)}</p>
+                  <p className="stock-price">{formatStockPrice(stock.price)}</p>
                   <div className="stock-meta">
-                    <span className="likes-count">♥ {stock.likes_count}</span>
-                    {stock.category_name && (
-                      <span className="category">{stock.category_name}</span>
+                    <span className="likes-count">♡ {stock.likesCount}</span>
+                    {stock.categoryName && (
+                      <span className="category">{stock.categoryName}</span>
                     )}
                   </div>
                   <div className="seller-info">
-                    <span className="seller-name">{stock.seller.display_name}</span>
+                    <span className="seller-name">{stock.seller.displayName}</span>
                   </div>
                 </div>
               </div>
@@ -235,21 +134,21 @@ export default function StocksPage() {
           </div>
 
           {/* ページネーション */}
-          {pagination.totalPages > 1 && (
+          {result.pagination.totalPages > 1 && (
             <div className="pagination">
               <button
-                onClick={() => handlePageChange(pagination.page - 1)}
-                disabled={pagination.page === 1}
+                onClick={() => handlePageChange(result.pagination.page - 1)}
+                disabled={result.pagination.page === 1}
                 className="pagination-button"
               >
                 前へ
               </button>
               <span className="pagination-info">
-                {pagination.page} / {pagination.totalPages}
+                {result.pagination.page} / {result.pagination.totalPages}
               </span>
               <button
-                onClick={() => handlePageChange(pagination.page + 1)}
-                disabled={pagination.page === pagination.totalPages}
+                onClick={() => handlePageChange(result.pagination.page + 1)}
+                disabled={result.pagination.page === result.pagination.totalPages}
                 className="pagination-button"
               >
                 次へ
@@ -257,7 +156,7 @@ export default function StocksPage() {
             </div>
           )}
 
-          {stocks.length === 0 && !isLoading && (
+          {result.items.length === 0 && !isLoading && (
             <div className="no-results">
               <p>在庫が見つかりませんでした</p>
             </div>
@@ -279,65 +178,46 @@ export default function StocksPage() {
         .page-title {
           font-size: 28px;
           font-weight: 700;
-          color: #1c1c1c;
+          color: #333;
           margin: 0;
         }
-        :global(.dark) .page-title { color: #f4f4f5; }
 
         .search-section {
           background: #fff;
-          border: 1px solid #e5e7eb;
           border-radius: 12px;
           padding: 24px;
           margin-bottom: 24px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        :global(.dark) .search-section {
-          background: #18181b;
-          border-color: #27272a;
-          box-shadow: none;
-        }
+
         .search-bar {
           display: flex;
           gap: 12px;
           margin-bottom: 20px;
         }
 
-        .search-input, .price-input, .sort-select {
+        .search-input {
           flex: 1;
           padding: 12px 16px;
-          background: #fff;
-          border: 1px solid #d1d5db;
+          border: 1px solid #ddd;
           border-radius: 8px;
           font-size: 14px;
-          color: #1c1c1c; /* ライトモード時の文字色 */
         }
-        :global(.dark) .search-input,
-        :global(.dark) .price-input,
-        :global(.dark) .sort-select {
-          background: #27272a;
-          border-color: #3f3f46;
-          color: #f4f4f5; /* ダークモード時の文字色 */
-        }
+
         .search-button {
           padding: 12px 32px;
-          background: #18181b;
+          background: #333;
           color: #fff;
           border: none;
           border-radius: 8px;
           font-size: 14px;
           font-weight: 600;
           cursor: pointer;
-          transition: opacity 0.2s;
-        }
-        :global(.dark) .search-button {
-          background: #f4f4f5;
-          color: #18181b;
+          transition: background 0.2s;
         }
 
-        :global(.dark) .search-button:hover {
-          background: #e4e4e7;
-          opacity: 0.9;
+        .search-button:hover {
+          background: #555;
         }
 
         .filters {
@@ -385,7 +265,6 @@ export default function StocksPage() {
           padding: 8px 24px;
           background: #f5f5f5;
           border: 1px solid #ddd;
-          color: #18181b;
           border-radius: 6px;
           font-size: 14px;
           font-weight: 600;
@@ -420,15 +299,11 @@ export default function StocksPage() {
 
         .stock-card {
           background: #fff;
-          border: 1px solid #e5e7eb;
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
-        }
-        :global(.dark) .stock-card {
-          background: #18181b;
-          border-color: #27272a;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .stock-card:hover {
@@ -463,18 +338,19 @@ export default function StocksPage() {
         .stock-title {
           font-size: 16px;
           font-weight: 600;
-          color: #1c1c1c;
+          color: #333;
           margin: 0 0 8px 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
-        :global(.dark) .stock-title { color: #f4f4f5; }
 
         .stock-price {
           font-size: 20px;
           font-weight: 700;
-          color: #dc2626;
+          color: #333;
           margin: 0 0 12px 0;
         }
-        :global(.dark) .stock-price { color: #ef4444; }
 
         .stock-meta {
           display: flex;
@@ -542,3 +418,8 @@ export default function StocksPage() {
     </div>
   );
 }
+
+
+
+
+

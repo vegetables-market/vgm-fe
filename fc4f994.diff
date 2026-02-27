@@ -1,0 +1,255 @@
+commit fc4f99412d8db8d39577a7812e3fe98e890c25c1
+Author: kobashikawa <a3681299@gmail.com>
+Date:   Fri Feb 27 15:53:20 2026 +0900
+
+    fix: 画像アップロード・表示の修正とプロフィールページのAPI連携
+    - 出品時のpayloadにimageUrlsを含めるよう修正
+    - 画像ファイル名に拡張子(.jpg)を付与してR2のキー名と一致させる
+    - 商品詳細ページのメイン画像にimage_idではなくimage_urlを使用
+    - 画像圧縮制限を300KB→2MBに引き上げ、画質を0.8→0.9に改善
+    - プロフィールページの出品一覧をlocalStorageからAPI(getMyItems)に変更
+
+diff --git a/src/app/(main)/profile/page.tsx b/src/app/(main)/profile/page.tsx
+index 64af2e7..d539cbb 100644
+--- a/src/app/(main)/profile/page.tsx
++++ b/src/app/(main)/profile/page.tsx
+@@ -6,6 +6,22 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
+ import { ProfileStats } from "@/components/profile/ProfileStats";
+ import { ProfileMenuList } from "@/components/profile/ProfileMenuList";
+ import { ItemCard } from "@/components/market/ItemCard";
++import { getMyItems } from "@/services/market/items/get-my-items";
++import { getImageUrl } from "@/utils/image";
++
++// APIレスポンスをItemCard用に変換
++const STATUS_MAP: Record<number, string> = { 2: "active", 3: "trading", 4: "sold", 5: "stopped" };
++
++function toCardItem(item: any) {
++    const imgUrl = item.image_url || item.imageUrl;
++    return {
++        id: item.id,
++        name: item.name || "",
++        price: item.price || 0,
++        status: STATUS_MAP[item.status] || "unknown",
++        images: imgUrl ? [getImageUrl(imgUrl)] : [],
++    };
++}
+ 
+ export default function ProfilePage() {
+     const [myListings, setMyListings] = useState<any[]>([]);
+@@ -24,11 +40,20 @@ export default function ProfilePage() {
+         if (savedData) {
+             setUser(JSON.parse(savedData));
+         }
+-        const items = JSON.parse(localStorage.getItem("myListings") || "[]");
+-        setMyListings(items);
+-        setIsLoading(false);
++        // APIから自分の出品商品を取得
++        getMyItems()
++            .then((items) => {
++                setMyListings(items.map(toCardItem));
++            })
++            .catch((err) => {
++                console.error("Failed to load my items:", err);
++            })
++            .finally(() => {
++                setIsLoading(false);
++            });
+     }, []);
+ 
++    // status: 2=出品中, 3=取引中, 4=売却済, 5=停止中
+     const activeItems = myListings.filter((item) => item.status === "active");
+     const soldItems = myListings.filter((item) => item.status === "sold");
+ 
+diff --git a/src/app/(main)/stock/[id]/edit/StockEditClient.tsx b/src/app/(main)/stock/[id]/edit/StockEditClient.tsx
+index 1f44f74..eddb5ba 100644
+--- a/src/app/(main)/stock/[id]/edit/StockEditClient.tsx
++++ b/src/app/(main)/stock/[id]/edit/StockEditClient.tsx
+@@ -240,6 +240,8 @@ export default function StockEditClient({ id }: { id: string }) {
+         imageUrls: finalFilenames,
+       };
+ 
++      console.log("DEBUG: 送信直前のpayload:", payload);
++
+       await updateItem(itemId, payload);
+       router.push("/stock");
+     } catch (err) {
+diff --git a/src/app/(main)/stock/new/page.tsx b/src/app/(main)/stock/new/page.tsx
+index 2949e1b..531ac6c 100644
+--- a/src/app/(main)/stock/new/page.tsx
++++ b/src/app/(main)/stock/new/page.tsx
+@@ -131,6 +131,10 @@ export default function StockNewPage() {
+ 
+     setLoading(true);
+     try {
++      const uploadedImageFilenames = files
++        .filter((f) => f.status === "completed" && !!f.serverFilename)
++        .map((f) => f.serverFilename as string);
++
+       const payload = {
+         name,
+         description,
+@@ -142,8 +146,13 @@ export default function StockNewPage() {
+         shippingDaysId: shippingDaysId,
+         shippingMethodId: shippingMethodId,
+         itemCondition: itemCondition,
++        imageUrls: uploadedImageFilenames,
+       };
+ 
++      console.log("[DEBUG] 送信直前のpayload:", JSON.stringify(payload, null, 2));
++      console.log("[DEBUG] imageUrls:", uploadedImageFilenames);
++      console.log("[DEBUG] files state:", files.map(f => ({ id: f.id, status: f.status, serverFilename: f.serverFilename })));
++
+       await updateItem(itemId, payload);
+       router.push("/stock"); // 一覧へ遷移
+     } catch (err) {
+diff --git a/src/app/(main)/stocks/[id]/StocksDetailClient.tsx b/src/app/(main)/stocks/[id]/StocksDetailClient.tsx
+index 2450d65..645c501 100644
+--- a/src/app/(main)/stocks/[id]/StocksDetailClient.tsx
++++ b/src/app/(main)/stocks/[id]/StocksDetailClient.tsx
+@@ -3,6 +3,7 @@
+ import { useState, useEffect } from "react";
+ import { useRouter } from "next/navigation";
+ import { fetchApi } from "@/lib/api/fetch";
++import { getImageUrl } from "@/utils/image";
+ 
+ interface StockDetail {
+   item: {
+@@ -21,7 +22,7 @@ interface StockDetail {
+     weight: number | null;
+     shipping_payer_type: number;
+     images: Array<{
+-      image_id: number;
++      image_id: string;
+       image_url: string;
+       display_order: number;
+     }>;
+@@ -185,7 +186,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
+           <div className="main-image">
+             {item.images.length > 0 ? (
+               // eslint-disable-next-line @next/next/no-img-element
+-              <img src={item.images[selectedImage].image_url} alt={item.title} />
++              <img 
++                src={getImageUrl(item.images[selectedImage]?.image_url)}
++                alt={item.title} 
++                className="w-full h-auto object-contain"
++              />
+             ) : (
+               <div className="no-image">画像なし</div>
+             )}
+@@ -199,7 +204,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
+                   onClick={() => setSelectedImage(index)}
+                 >
+                   {/* eslint-disable-next-line @next/next/no-img-element */}
+-                  <img src={image.image_url} alt={`${item.title} ${index + 1}`} />
++                  <img
++                    src={getImageUrl(image.image_url)}
++                    alt={item.title}
++                    className="w-full h-[400px] object-contain bg-gray-100 rounded-xl"
++                  />
+                 </div>
+               ))}
+             </div>
+diff --git a/src/hooks/item/useMultiImageUpload.ts b/src/hooks/item/useMultiImageUpload.ts
+index e18b933..961a6ff 100644
+--- a/src/hooks/item/useMultiImageUpload.ts
++++ b/src/hooks/item/useMultiImageUpload.ts
+@@ -120,25 +120,34 @@ export function useMultiImageUpload(
+ 
+     try {
+       // 1. Token取得
++      console.log("[DEBUG] Step 1: getUploadToken...");
+       const { token, filename } = await withTimeout(
+         getUploadToken(),
+         TOKEN_TIMEOUT_MS,
+         "getUploadToken",
+       );
++      console.log("[DEBUG] Step 1 OK: token取得成功, filename =", filename);
++
++      // メディアサーバーはファイルを uuid.jpg のように拡張子付きで保存する
++      const filenameWithExt = `${filename}.jpg`;
+ 
+       // 2. Direct Upload (Workers)
++      console.log("[DEBUG] Step 2: uploadImage...");
+       await withTimeout(
+         uploadImage(targetFile.file, "jpg", token, filename),
+         UPLOAD_TIMEOUT_MS,
+         "uploadImage",
+       );
++      console.log("[DEBUG] Step 2 OK: R2アップロード成功");
+ 
+-      // 3. Link (Backend)
++      // 3. Link (Backend) - 拡張子付きファイル名を使用
++      console.log("[DEBUG] Step 3: linkImages, itemId =", currentItemId, ", filename =", filenameWithExt);
+       await withTimeout(
+-        linkImages(currentItemId, [filename]),
++        linkImages(currentItemId, [filenameWithExt]),
+         LINK_TIMEOUT_MS,
+         "linkImages",
+       );
++      console.log("[DEBUG] Step 3 OK: linkImages成功");
+ 
+       // 完了
+       setFiles((prev) =>
+@@ -147,7 +156,7 @@ export function useMultiImageUpload(
+             ? {
+                 ...f,
+                 status: "completed",
+-                serverFilename: filename,
++                serverFilename: filenameWithExt,
+                 progress: 100,
+               }
+             : f,
+diff --git a/src/lib/api/media.ts b/src/lib/api/media.ts
+index 3222712..9cb78b4 100644
+--- a/src/lib/api/media.ts
++++ b/src/lib/api/media.ts
+@@ -23,9 +23,9 @@ export async function uploadImage(
+   token: string,
+   filename: string, // バックエンドから指定されたファイル名を使用
+ ): Promise<string> {
+-  const maxSize = 300 * 1024;
++  const maxSize = 2 * 1024 * 1024;
+   if (file.size > maxSize) {
+-    throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024}KB)`);
++    throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024 / 1024}MB)`);
+   }
+ 
+   if (!file.type.startsWith("image/")) {
+diff --git a/src/lib/utils/imageCompression.ts b/src/lib/utils/imageCompression.ts
+index 4c2dfb8..a4486bb 100644
+--- a/src/lib/utils/imageCompression.ts
++++ b/src/lib/utils/imageCompression.ts
+@@ -4,7 +4,7 @@
+ 
+ import imageCompression from 'browser-image-compression';
+ 
+-const MAX_SIZE_MB = 0.3; // 300KB
++const MAX_SIZE_MB = 2; // 2MB
+ 
+ /**
+  * 画像フォーマット型
+@@ -20,7 +20,7 @@ function getCompressionOptions(format: ImageFormat = 'jpeg') {
+     maxWidthOrHeight: 1920,
+     useWebWorker: true,
+     fileType: `image/${format}`,
+-    initialQuality: 0.8,
++    initialQuality: 0.9,
+   };
+ }
+ 
+diff --git a/src/utils/image.ts b/src/utils/image.ts
+new file mode 100644
+index 0000000..5028f9d
+--- /dev/null
++++ b/src/utils/image.ts
+@@ -0,0 +1,9 @@
++export const getImageUrl = (imageId: string | number | null | undefined) => {
++  if (!imageId) return "/no-image.png";
++
++  const idStr = String(imageId);
++
++  if (idStr.startsWith("http")) return idStr;
++
++  return `http://localhost:8787/${idStr}`;
++};
+\ No newline at end of file

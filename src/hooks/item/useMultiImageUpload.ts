@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 
 import { compressImage } from "@/lib/utils/imageCompression";
-import { getUploadToken } from "@/services/market/items/get-upload-token";
+import { getUploadToken } from "@/service/market/stocks/get-upload-token";
 import { uploadImage } from "@/lib/api/media";
-import { linkImages } from "@/services/market/items/link-images";
+import { linkImages } from "@/service/market/stocks/link-images";
 
 function generateId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) {
@@ -20,8 +20,8 @@ export type UploadFileStatus =
   | "error";
 
 export interface UploadFile {
-  id: string; // ローカル識別用ID
-  file: File | null; // 圧縮後のファイル
+  id: string; // ローカル識別用 ID
+  file: File | null; // 圧縮後ファイル
   originalFile: File;
   previewUrl: string;
   status: UploadFileStatus;
@@ -82,7 +82,7 @@ export function useMultiImageUpload(
     };
   }, []);
 
-  // itemIdをRefで追跡
+  // itemId を Ref で追跡
   useEffect(() => {
     itemIdRef.current = itemId;
   }, [itemId]);
@@ -111,7 +111,7 @@ export function useMultiImageUpload(
 
     activeUploadsRef.current++;
 
-    // ステータスをUploadingに変更
+    // ステータスを Uploading に変更
     setFiles((prev) =>
       prev.map((f) =>
         f.id === nextId ? { ...f, status: "uploading", progress: 0 } : f,
@@ -182,7 +182,7 @@ export function useMultiImageUpload(
   }, []);
 
   /**
-   * itemIdが設定されたらキュー処理を開始
+   * itemId が設定されたらキュー処理を開始
    */
   useEffect(() => {
     if (itemId && uploadQueueRef.current.size > 0) {
@@ -190,7 +190,7 @@ export function useMultiImageUpload(
     }
   }, [itemId, processQueue]);
 
-  // キュー取りこぼし対策: 定期的に処理を再駆動
+  // キュー取りこぼし対策: 定期的に処理開始を再試行
   useEffect(() => {
     const timer = setInterval(() => {
       if (!itemIdRef.current) return;
@@ -203,11 +203,11 @@ export function useMultiImageUpload(
   }, [processQueue]);
 
   /**
-   * ファイル追加（ドラフトがなければ作成）
+   * ファイル追加。ドラフトがなければ作成。
    */
   const addFiles = useCallback(
     async (newFiles: File[]) => {
-      // ドラフトがなければ先に作成（initDraftが提供されている場合のみ）
+      // ドラフトがなければ先に作成（initDraft が提供されている場合のみ）
       if (!itemIdRef.current) {
         if (initDraft) {
           try {
@@ -248,7 +248,7 @@ export function useMultiImageUpload(
         }),
       );
 
-      // State更新
+      // State 更新
       setFiles((prev) => [...prev, ...newEntries]);
 
       // キューに追加（ファイル情報も一緒に保存）

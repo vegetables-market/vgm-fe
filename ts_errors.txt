@@ -1,0 +1,10 @@
+.next/types/app/(main)/products/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(main)/products/page.js' or its corresponding type declarations.
+.next/types/app/(main)/products/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(main)/products/page.js' or its corresponding type declarations.
+.next/types/app/(payment)/purchase/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(payment)/purchase/page.js' or its corresponding type declarations.
+.next/types/app/(payment)/purchase/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(payment)/purchase/page.js' or its corresponding type declarations.
+.next/types/app/(temp-sorting)/test/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(temp-sorting)/test/page.js' or its corresponding type declarations.
+.next/types/app/(temp-sorting)/test/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(temp-sorting)/test/page.js' or its corresponding type declarations.
+src/app/(main)/profile/page.tsx(9,28): error TS2307: Cannot find module '@/services/market/items/get-my-items' or its corresponding type declarations.
+src/app/(main)/profile/page.tsx(45,20): error TS7006: Parameter 'items' implicitly has an 'any' type.
+src/app/(main)/profile/page.tsx(48,21): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/app/(main)/stocks/page.tsx(30,11): error TS6196: 'PaginatedResponse' is declared but never used.

@@ -9,9 +9,24 @@ const compat = new FlatCompat({ baseDirectory: __dirname });
 
 const config = [
   {
-    ignores: [".next/**", "out/**", "node_modules/**"],
+    ignores: [".next/**", ".open-next/**", "out/**", "build/**", "node_modules/**", "next-env.d.ts"],
   },
-  ...compat.extends("next/core-web-vitals"),
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-this-alias": "off",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: ["@/services/*"],
+        },
+      ],
+      "prefer-const": "warn",
+    },
+  },
 ];
 
 export default config;

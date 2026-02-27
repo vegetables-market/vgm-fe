@@ -12,10 +12,10 @@ export const categoryApi = {
 
 // Favorite API Stub
 export const favoriteApi = {
-  getFavorites: async (_page: number, _limit: number): Promise<{ items: any[]; pagination: any }> => {
+  getFavorites: async (): Promise<{ items: unknown[]; pagination: unknown }> => {
     return { items: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0 } };
   },
-  removeFavorite: async (_itemId: string) => {
+  removeFavorite: async () => {
     throw new Error('Favorite API is not implemented yet');
   },
 };

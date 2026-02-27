@@ -1,0 +1,6 @@
+.next/types/app/(main)/products/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(main)/products/page.js' or its corresponding type declarations.
+.next/types/app/(main)/products/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(main)/products/page.js' or its corresponding type declarations.
+.next/types/app/(payment)/purchase/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(payment)/purchase/page.js' or its corresponding type declarations.
+.next/types/app/(payment)/purchase/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(payment)/purchase/page.js' or its corresponding type declarations.
+.next/types/app/(temp-sorting)/test/page.ts(2,24): error TS2307: Cannot find module '../../../../../src/app/(temp-sorting)/test/page.js' or its corresponding type declarations.
+.next/types/app/(temp-sorting)/test/page.ts(5,29): error TS2307: Cannot find module '../../../../../src/app/(temp-sorting)/test/page.js' or its corresponding type declarations.

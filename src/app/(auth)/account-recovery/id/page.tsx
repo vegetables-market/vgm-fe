@@ -1,33 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import AuthTitle from "@/components/ui/auth/AuthTitle";
 import { FaCircleChevronLeft, FaEnvelope } from "react-icons/fa6";
 import AuthInput from "@/components/ui/auth/AuthInput";
 import AuthSubmitButton from "@/components/ui/auth/AuthSubmitButton";
 import Link from "next/link";
-import { recoveryApi } from "@/lib/api/auth/recovery";
+import { useForgotIdPage } from "@/hooks/auth/account-recovery/useForgotIdPage";
 
 export default function ForgotIdPage() {
-  const [email, setEmail] = useState("");
-  const [isSent, setIsSent] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-
-    setIsLoading(true);
-    try {
-      await recoveryApi.forgotId(email);
-    } catch (error) {
-      // Error is explicitly ignored for security (prevention of enumeration)
-      console.error("Forgot ID error:", error);
-    } finally {
-      setIsLoading(false);
-      setIsSent(true);
-    }
-  };
+  const { email, isSent, isLoading, setEmail, onSubmit } = useForgotIdPage();
 
   return (
     <div className="flex w-full flex-col items-center">
@@ -63,7 +44,7 @@ export default function ForgotIdPage() {
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="w-full">
+          <form onSubmit={onSubmit} className="w-full">
             <div className="mb-6 text-center">
               <p className="text-sm leading-relaxed text-gray-300">
                 再設定用のメールアドレスを入力してください

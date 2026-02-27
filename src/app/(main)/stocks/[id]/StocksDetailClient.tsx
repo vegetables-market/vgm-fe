@@ -1,49 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
-import { getImageUrl } from "@/utils/image";
+import { getStockDetail } from "@/service/market/stocks/get-stock-detail";
+import type { StockDetail } from "@/lib/market/stocks/types/stock-detail";
 
-interface StockDetail {
-  item: {
-    item_id: string;
-    title: string;
-    description: string | null;
-    price: number;
-    quantity: number;
-    category_id: number | null;
-    category_name: string | null;
-    condition: number;
-    status: number;
-    likes_count: number;
-    is_liked: boolean;
-    brand: string | null;
-    weight: number | null;
-    shipping_payer_type: number;
-    images: Array<{
-      image_id: string;
-      image_url: string;
-      display_order: number;
-    }>;
-    seller: {
-      user_id: number;
-      username: string;
-      display_name: string;
-      avatar_url: string | null;
-      rating_average: number | null;
-      rating_count: number;
-    };
-    created_at: string;
-    updated_at: string;
-  };
-  relatedItems: Array<{
-    item_id: string;
-    title: string;
-    price: number;
-    thumbnail_url: string | null;
-  }>;
-}
 
 export default function StocksDetailClient({ id }: { id: string }) {
   const router = useRouter();
@@ -54,29 +16,35 @@ export default function StocksDetailClient({ id }: { id: string }) {
   const [isLiked, setIsLiked] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
-    fetchStockDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
+  const getErrorMessage = (err: unknown, fallback: string) => {
+    if (err instanceof Error && err.message) {
+      return err.message;
+    }
+    return fallback;
+  };
 
-  const fetchStockDetail = async () => {
+  const fetchStockDetail = useCallback(async () => {
     setIsLoading(true);
     setError("");
 
     try {
-      const data = await fetchApi<StockDetail>(`/v1/market/items/${id}`, {
-        credentials: "include",
-      });
+      const data = await getStockDetail(id);
       setStock(data);
-      setIsLiked(data.item.is_liked);
-    } catch (err: any) {
-      setError(err.message || "在庫の取得に失敗しました");
+      setIsLiked(data.item.isLiked);
+    } catch (err) {
+      setError(getErrorMessage(err, "商品の取得に失敗しました"));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchStockDetail();
+  }, [fetchStockDetail]);
 
   const handleToggleFavorite = async () => {
+    if (!stock) return;
+
     try {
       if (isLiked) {
         await fetchApi(`/v1/user/favorites/${id}`, {
@@ -84,51 +52,48 @@ export default function StocksDetailClient({ id }: { id: string }) {
           credentials: "include",
         });
         setIsLiked(false);
-        if (stock) {
-          setStock({
-            ...stock,
-            item: {
-              ...stock.item,
-              likes_count: stock.item.likes_count - 1,
-            },
-          });
-        }
+        setStock({
+          ...stock,
+          item: {
+            ...stock.item,
+            likesCount: stock.item.likesCount - 1,
+          },
+        });
       } else {
         await fetchApi(`/v1/user/favorites/${id}`, {
           method: "POST",
           credentials: "include",
         });
         setIsLiked(true);
-        if (stock) {
-          setStock({
-            ...stock,
-            item: {
-              ...stock.item,
-              likes_count: stock.item.likes_count + 1,
-            },
-          });
-        }
+        setStock({
+          ...stock,
+          item: {
+            ...stock.item,
+            likesCount: stock.item.likesCount + 1,
+          },
+        });
       }
-    } catch (err: any) {
-      alert(err.message || "お気に入りの操作に失敗しました");
+    } catch (err) {
+      alert(getErrorMessage(err, "お気に入り登録/解除に失敗しました"));
     }
   };
 
   const handleAddToCart = async () => {
     if (!stock) return;
+
     setIsProcessing(true);
     try {
       await fetchApi("/v1/market/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ itemId: stock.item.item_id, quantity: 1 }),
+        body: JSON.stringify({ item_id: stock.item.itemId, quantity: 1 }),
         credentials: "include",
       });
       if (confirm("カートに追加しました。カートへ移動しますか？")) {
         router.push("/basket");
       }
-    } catch (err: any) {
-      alert(err.message || "カートへの追加に失敗しました");
+    } catch (err) {
+      alert(getErrorMessage(err, "カートへの追加に失敗しました"));
     } finally {
       setIsProcessing(false);
     }
@@ -161,6 +126,16 @@ export default function StocksDetailClient({ id }: { id: string }) {
     return type === 0 ? "送料込み（出品者負担）" : "着払い（購入者負担）";
   };
 
+  const getImageUrl = (raw: string | null | undefined) => {
+    const imagePath = raw?.trim();
+    if (!imagePath) return "/images/no-image.png";
+    if (imagePath.startsWith("http")) return imagePath;
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = imagePath.startsWith("/") ? imagePath.slice(1) : imagePath;
+    return `${baseUrl}/${cleanedPath}`;
+  };
+
   if (isLoading) {
     return <div className="loading">読み込み中...</div>;
   }
@@ -168,26 +143,26 @@ export default function StocksDetailClient({ id }: { id: string }) {
   if (error || !stock) {
     return (
       <div className="error-page">
-        <p>{error || "在庫が見つかりませんでした"}</p>
+        <p>{error || "商品が見つかりませんでした"}</p>
         <button onClick={() => router.push("/stocks")} className="back-button">
-          在庫一覧に戻る
+          商品一覧に戻る
         </button>
       </div>
     );
   }
 
-  const { item, relatedItems } = stock;
+  const { item } = stock;
+  const relatedItems = stock.relatedItems;
 
   return (
     <div className="stock-detail-page">
       <div className="stock-container">
-        {/* 画像ギャラリー */}
         <div className="image-gallery">
           <div className="main-image">
             {item.images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img 
-                src={getImageUrl(item.images[selectedImage]?.image_url)}
+                src={getImageUrl(item.images[selectedImage]?.imageUrl)}
                 alt={item.title} 
                 className="w-full h-auto object-contain"
               />
@@ -199,13 +174,13 @@ export default function StocksDetailClient({ id }: { id: string }) {
             <div className="thumbnail-list">
               {item.images.map((image, index) => (
                 <div
-                  key={image.image_id}
+                  key={image.imageId}
                   className={`thumbnail ${index === selectedImage ? "active" : ""}`}
                   onClick={() => setSelectedImage(index)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={getImageUrl(image.image_url)}
+                    src={getImageUrl(image.imageUrl)}
                     alt={item.title}
                     className="w-full h-[400px] object-contain bg-gray-100 rounded-xl"
                   />
@@ -215,16 +190,12 @@ export default function StocksDetailClient({ id }: { id: string }) {
           )}
         </div>
 
-        {/* 商品情報 */}
         <div className="stock-info">
           <h1 className="stock-title">{item.title}</h1>
           <p className="stock-price">{formatPrice(item.price)}</p>
 
           <div className="stock-meta">
-            <span className="likes-count">♥ {item.likes_count}</span>
-            {item.category_name && (
-              <span className="category">{item.category_name}</span>
-            )}
+            {item.categoryName && <span className="category">{item.categoryName}</span>}
           </div>
 
           <div className="actions">
@@ -245,11 +216,8 @@ export default function StocksDetailClient({ id }: { id: string }) {
             </button>
           </div>
 
-          <button
-            onClick={handleToggleFavorite}
-            className={`favorite-button ${isLiked ? "liked" : ""}`}
-          >
-            {isLiked ? "♥ お気に入り解除" : "♡ お気に入り"}
+          <button onClick={handleToggleFavorite} className={`favorite-button ${isLiked ? "liked" : ""}`}>
+            {isLiked ? "♥ お気に入り済み" : "♡ お気に入り"}
           </button>
 
           <div className="stock-description">
@@ -258,49 +226,44 @@ export default function StocksDetailClient({ id }: { id: string }) {
           </div>
 
           <div className="stock-details">
-            <h2>商品情報</h2>
+            <h2>商品詳細</h2>
             <dl>
-              <dt>カテゴリ</dt>
-              <dd>{item.category_name || "未設定"}</dd>
+              <dt>カテゴリー</dt>
+              <dd>{item.categoryName || "未設定"}</dd>
               <dt>状態</dt>
               <dd>{getConditionText(item.condition)}</dd>
               <dt>ブランド</dt>
               <dd>{item.brand || "未設定"}</dd>
-              <dt>重量</dt>
+              <dt>重さ</dt>
               <dd>{item.weight ? `${item.weight}g` : "未設定"}</dd>
               <dt>送料</dt>
-              <dd>{getShippingText(item.shipping_payer_type)}</dd>
+              <dd>{getShippingText(item.shippingPayerType)}</dd>
               <dt>在庫</dt>
               <dd>{item.quantity}</dd>
             </dl>
           </div>
 
-          {relatedItems?.length > 0 && (
+          {relatedItems.length > 0 && (
             <div className="related-section">
               <h2>関連商品</h2>
               <div className="related-grid">
                 {relatedItems.map((related) => (
                   <div
-                    key={related.item_id}
+                    key={related.itemId}
                     className="related-card"
-                    onClick={() => router.push(`/stocks/${related.item_id}`)}
+                    onClick={() => router.push(`/stocks/${related.itemId}`)}
                   >
                     <div className="related-image">
-                      {related.thumbnail_url ? (
+                      {related.thumbnailUrl ? (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={related.thumbnail_url}
-                          alt={related.title}
-                        />
+                        <img src={getImageUrl(related.thumbnailUrl)} alt={related.title} />
                       ) : (
                         <div className="no-image">画像なし</div>
                       )}
                     </div>
                     <div className="related-info">
                       <div className="related-title">{related.title}</div>
-                      <div className="related-price">
-                        {formatPrice(related.price)}
-                      </div>
+                      <div className="related-price">{formatPrice(related.price)}</div>
                     </div>
                   </div>
                 ))}

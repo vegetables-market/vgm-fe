@@ -1,10 +1,10 @@
-/**
+﻿/**
  * 画像アップロード用カスタムフック
  */
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { uploadImage } from "@/lib/api/media";
-import { getUploadToken } from "@/services/market/items/get-upload-token";
+import { getUploadToken } from "@/service/market/stocks/get-upload-token";
 import type { ImageFormat } from "@/lib/api/media";
 import { compressImage } from "@/lib/utils/imageCompression";
 
@@ -44,7 +44,7 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
   }, []);
 
   /**
-   * 画像処理（圧縮）を実行
+   * 画像を圧縮・変換して状態を更新する
    */
   const processFile = useCallback(
     async (targetFile: File, targetFormat: ImageFormat) => {
@@ -53,14 +53,14 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
       setUploadedFileName(null);
 
       try {
-        // 画像を圧縮（選択されたフォーマットで）
+        // 画像を圧縮して、選択されたフォーマットで変換
         const mimeFormat = targetFormat === "jpg" ? "jpeg" : targetFormat;
         const result = await compressImage(targetFile, mimeFormat);
 
         // 300KB制限チェック
         if (result.compressedSize > 300 * 1024) {
           setError(
-            "300KB以下に圧縮できませんでした。別のフォーマットを試すか、より小さな画像を使用してください。",
+            "300KB以下に圧縮できませんでした。別のフォーマットを試すか、より小さい画像を使用してください。",
           );
         }
 
@@ -85,7 +85,7 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
   );
 
   /**
-   * ファイルまたはフォーマットが変更されたら再圧縮
+   * ファイルまたはフォーマットが変わったら再圧縮
    */
   useEffect(() => {
     if (originalFile) {
@@ -105,7 +105,7 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
   };
 
   /**
-   * アップロード実行
+   * アップロード処理
    */
   const upload = async (): Promise<boolean> => {
     if (!file) {
@@ -114,7 +114,7 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
     }
 
     if (file.size > 300 * 1024) {
-      setError("ファイルサイズが300KBを超えています");
+      setError("ファイルサイズは300KBを超えています。");
       return false;
     }
 
@@ -122,15 +122,12 @@ export function useImageUpload({ fetchToken }: UseImageUploadProps = {}) {
     setError(null);
 
     try {
-      // 1. アップロード用トークンと許可済みファイル名を取得
-      // カスタム関数があればそれを使い、なければデフォルト(一般用)を使う
+      // 1. トークンと許可済みファイル名を取得
       const { token, filename } = fetchToken
         ? await fetchToken()
         : await getUploadToken();
 
       // 2. トークンを使ってアップロード
-      // uploadImage内部で Authorization: Bearer {token} が付与される
-      // filenameはBEが発行したUUIDを使用
       const uploadedName = await uploadImage(file, format, token, filename);
 
       setUploadedFileName(uploadedName);

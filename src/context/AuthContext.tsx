@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   createContext,
@@ -7,8 +7,9 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { UserInfo } from "@/types/auth/core";
-import { logout as logoutApi } from "@/services/auth/logout";
+import { UserInfo } from "@/lib/auth/shared/types/user-info";
+import { logout as logoutApi } from "@/service/auth/flow/logout";
+import { getAuthenticatedUser } from "@/service/auth/user/get-authenticated-user";
 
 type AuthContextType = {
   user: UserInfo | null;
@@ -16,7 +17,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (user: UserInfo) => void;
   logout: () => Promise<void>;
-  refreshAuth: () => void;
+  refreshAuth: () => Promise<void>;
   updateUser: (user: UserInfo) => void;
 };
 
@@ -28,7 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 初回マウント時にlocalStorageから認証情報を復元
   useEffect(() => {
-    refreshAuthInternal();
+    void refreshAuthInternal();
   }, []);
 
   // 401 Unauthorized イベントをリッスン
@@ -46,18 +47,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // 認証状態を再読み込み
-  const refreshAuthInternal = () => {
+  const refreshAuthInternal = async () => {
+    setIsLoading(true);
     try {
-      const savedUser = localStorage.getItem("vgm_user");
-      if (savedUser) {
-        const parsedUser = JSON.parse(savedUser);
-        setUser(parsedUser);
+      const authenticatedUser = await getAuthenticatedUser();
+      if (authenticatedUser) {
+        setUser(authenticatedUser);
+        localStorage.setItem("vgm_user", JSON.stringify(authenticatedUser));
       } else {
         setUser(null);
+        localStorage.removeItem("vgm_user");
       }
     } catch (error) {
-      console.error("Failed to parse user from localStorage:", error);
+      console.error("Failed to refresh authenticated user:", error);
       setUser(null);
+      localStorage.removeItem("vgm_user");
     } finally {
       setIsLoading(false);
     }
@@ -84,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   // 外部から呼ばれる認証状態更新関数
-  const refreshAuth = () => {
-    refreshAuthInternal();
+  const refreshAuth = async () => {
+    await refreshAuthInternal();
   };
 
   // ユーザー情報を更新
@@ -121,3 +125,4 @@ export function useAuth() {
   }
   return context;
 }
+

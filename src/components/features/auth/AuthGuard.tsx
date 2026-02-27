@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useAuthGuard } from "@/hooks/auth/shared/useAuthGuard";
-import type { AuthGuardProps } from "@/types/auth/guard";
+import type { AuthGuardProps } from "@/components/features/auth/types/auth-guard-props";
 
 export default function AuthGuard({
   children,
