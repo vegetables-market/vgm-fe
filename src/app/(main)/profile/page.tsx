@@ -54,7 +54,7 @@ export default function ProfilePage() {
                             出品中の商品
                             <span className="ml-2 text-sm font-normal text-stone-500">({activeItems.length}件)</span>
                         </h2>
-                        <Link href="/stock/new" className="text-sm font-medium text-emerald-600 hover:underline">+ 新規出品</Link>
+                        <Link href="/my/stocks/new" className="text-sm font-medium text-emerald-600 hover:underline">+ 新規出品</Link>
                     </div>
 
                     {isLoading ? (
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                     ) : (
                         <div className="rounded-lg bg-white p-8 text-center">
                             <p className="mb-4 text-stone-500">出品中の商品はありません</p>
-                            <Link href="/stock/new" className="inline-block rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white transition hover:bg-emerald-600">
+                            <Link href="/my/stocks/new" className="inline-block rounded-lg bg-emerald-500 px-6 py-2 font-medium text-white transition hover:bg-emerald-600">
                                 出品する
                             </Link>
                         </div>
