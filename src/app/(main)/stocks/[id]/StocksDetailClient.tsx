@@ -169,7 +169,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
             <div className="thumbnail-list">
               {item.images.map((image, index) => (
                 <div
-                  key={image.imageId}
+                  key={
+                    image.imageId > 0
+                      ? `stock-image-${image.imageId}`
+                      : `stock-image-fallback-${index}`
+                  }
                   className={`thumbnail ${index === selectedImage ? "active" : ""}`}
                   onClick={() => setSelectedImage(index)}
                 >
@@ -239,9 +243,13 @@ export default function StocksDetailClient({ id }: { id: string }) {
             <div className="related-section">
               <h2>�֘A���i</h2>
               <div className="related-grid">
-                {relatedItems.map((related) => (
+                {relatedItems.map((related, index) => (
                   <div
-                    key={related.itemId}
+                    key={
+                      related.itemId > 0
+                        ? `related-item-${related.itemId}`
+                        : `related-item-fallback-${index}`
+                    }
                     className="related-card"
                     onClick={() => router.push(`/stocks/${related.itemId}`)}
                   >

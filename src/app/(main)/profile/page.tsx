@@ -61,8 +61,11 @@ export default function ProfilePage() {
                         <div className="rounded-lg bg-white p-8 text-center text-stone-500">読み込み中...</div>
                     ) : activeItems.length > 0 ? (
                         <div className="grid grid-cols-2 gap-3">
-                            {activeItems.map((item) => (
-                                <ItemCard key={item.id} item={item} />
+                            {activeItems.map((item, index) => (
+                                <ItemCard
+                                    key={item?.id && item.id > 0 ? `listing-${item.id}` : `listing-fallback-${index}`}
+                                    item={item}
+                                />
                             ))}
                         </div>
                     ) : (

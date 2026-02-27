@@ -162,8 +162,14 @@ export default function StockPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 bg-white">
-              {items.map((item) => (
-                <tr key={item.itemId}>
+              {items.map((item, index) => (
+                <tr
+                  key={
+                    item.itemId > 0
+                      ? `stock-${item.itemId}`
+                      : `stock-fallback-${index}-${item.createdAt}`
+                  }
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="h-14 w-14 flex-shrink-0">
