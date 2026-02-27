@@ -47,7 +47,7 @@ export default function TermsAgreement({
       <p className="mb-6 text-[12px]">
         個人情報をどのように収集、利用、保護しているかの詳細は、
         <Link
-          href="/"
+          href="/privacy"
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary underline"

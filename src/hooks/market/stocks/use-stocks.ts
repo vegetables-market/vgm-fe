@@ -27,7 +27,8 @@ export function useStocks() {
       setResult(next);
       return next;
     } catch (error_: unknown) {
-      const message = error_ instanceof Error ? error_.message : "啁E��の取得に失敗しました";
+      const message =
+        error_ instanceof Error ? error_.message : "商品の取得に失敗しました";
       setError(message);
       throw error_;
     } finally {
@@ -42,4 +43,3 @@ export function useStocks() {
     searchStocks,
   };
 }
-

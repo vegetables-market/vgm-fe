@@ -9,6 +9,7 @@ export const API_ENDPOINTS = {
     AUTH_MICROSOFT: '/v1/auth/microsoft',
     AUTH_GITHUB: '/v1/auth/github',
     USER: '/auth/user',
+    USER_ME: '/v1/user/account/me',
     TOTP_ENABLE: '/auth/totp/enable',
     TOTP_VERIFY: '/auth/totp/verify-and-enable',
     TOTP_DISABLE: '/auth/totp/disable',

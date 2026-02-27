@@ -5,7 +5,7 @@ import { mapAuthenticatedUser } from "@/service/auth/user/mappers/authenticated-
 
 export async function getAuthenticatedUser(): Promise<UserInfo | null> {
   try {
-    const response = await fetchApi<unknown>(API_ENDPOINTS.USER, {
+    const response = await fetchApi<unknown>(API_ENDPOINTS.USER_ME, {
       method: "GET",
       credentials: "include",
     });
