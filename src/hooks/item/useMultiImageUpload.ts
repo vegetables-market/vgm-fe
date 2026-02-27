@@ -120,25 +120,34 @@ export function useMultiImageUpload(
 
     try {
       // 1. Token取得
+      console.log("[DEBUG] Step 1: getUploadToken...");
       const { token, filename } = await withTimeout(
         getUploadToken(),
         TOKEN_TIMEOUT_MS,
         "getUploadToken",
       );
+      console.log("[DEBUG] Step 1 OK: token取得成功, filename =", filename);
+
+      // メディアサーバーはファイルを uuid.jpg のように拡張子付きで保存する
+      const filenameWithExt = `${filename}.jpg`;
 
       // 2. Direct Upload (Workers)
+      console.log("[DEBUG] Step 2: uploadImage...");
       await withTimeout(
         uploadImage(targetFile.file, "jpg", token, filename),
         UPLOAD_TIMEOUT_MS,
         "uploadImage",
       );
+      console.log("[DEBUG] Step 2 OK: R2アップロード成功");
 
-      // 3. Link (Backend)
+      // 3. Link (Backend) - 拡張子付きファイル名を使用
+      console.log("[DEBUG] Step 3: linkImages, itemId =", currentItemId, ", filename =", filenameWithExt);
       await withTimeout(
-        linkImages(currentItemId, [filename]),
+        linkImages(currentItemId, [filenameWithExt]),
         LINK_TIMEOUT_MS,
         "linkImages",
       );
+      console.log("[DEBUG] Step 3 OK: linkImages成功");
 
       // 完了
       setFiles((prev) =>
@@ -147,7 +156,7 @@ export function useMultiImageUpload(
             ? {
                 ...f,
                 status: "completed",
-                serverFilename: filename,
+                serverFilename: filenameWithExt,
                 progress: 100,
               }
             : f,

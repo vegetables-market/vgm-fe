@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchApi } from "@/lib/api/fetch";
+import { getImageUrl } from "@/utils/image";
 
 interface StockDetail {
   item: {
@@ -21,7 +22,7 @@ interface StockDetail {
     weight: number | null;
     shipping_payer_type: number;
     images: Array<{
-      image_id: number;
+      image_id: string;
       image_url: string;
       display_order: number;
     }>;
@@ -185,7 +186,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
           <div className="main-image">
             {item.images.length > 0 ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={item.images[selectedImage].image_url} alt={item.title} />
+              <img 
+                src={getImageUrl(item.images[selectedImage]?.image_url)}
+                alt={item.title} 
+                className="w-full h-auto object-contain"
+              />
             ) : (
               <div className="no-image">画像なし</div>
             )}
@@ -199,7 +204,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
                   onClick={() => setSelectedImage(index)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.image_url} alt={`${item.title} ${index + 1}`} />
+                  <img
+                    src={getImageUrl(image.image_url)}
+                    alt={item.title}
+                    className="w-full h-[400px] object-contain bg-gray-100 rounded-xl"
+                  />
                 </div>
               ))}
             </div>

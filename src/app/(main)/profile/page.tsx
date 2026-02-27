@@ -6,6 +6,22 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { ProfileMenuList } from "@/components/profile/ProfileMenuList";
 import { ItemCard } from "@/components/market/ItemCard";
+import { getMyItems } from "@/services/market/items/get-my-items";
+import { getImageUrl } from "@/utils/image";
+
+// APIレスポンスをItemCard用に変換
+const STATUS_MAP: Record<number, string> = { 2: "active", 3: "trading", 4: "sold", 5: "stopped" };
+
+function toCardItem(item: any) {
+    const imgUrl = item.image_url || item.imageUrl;
+    return {
+        id: item.id,
+        name: item.name || "",
+        price: item.price || 0,
+        status: STATUS_MAP[item.status] || "unknown",
+        images: imgUrl ? [getImageUrl(imgUrl)] : [],
+    };
+}
 
 export default function ProfilePage() {
     const [myListings, setMyListings] = useState<any[]>([]);
@@ -24,11 +40,20 @@ export default function ProfilePage() {
         if (savedData) {
             setUser(JSON.parse(savedData));
         }
-        const items = JSON.parse(localStorage.getItem("myListings") || "[]");
-        setMyListings(items);
-        setIsLoading(false);
+        // APIから自分の出品商品を取得
+        getMyItems()
+            .then((items) => {
+                setMyListings(items.map(toCardItem));
+            })
+            .catch((err) => {
+                console.error("Failed to load my items:", err);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, []);
 
+    // status: 2=出品中, 3=取引中, 4=売却済, 5=停止中
     const activeItems = myListings.filter((item) => item.status === "active");
     const soldItems = myListings.filter((item) => item.status === "sold");
 

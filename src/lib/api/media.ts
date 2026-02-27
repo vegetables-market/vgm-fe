@@ -23,9 +23,9 @@ export async function uploadImage(
   token: string,
   filename: string, // バックエンドから指定されたファイル名を使用
 ): Promise<string> {
-  const maxSize = 300 * 1024;
+  const maxSize = 2 * 1024 * 1024;
   if (file.size > maxSize) {
-    throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024}KB)`);
+    throw new Error(`ファイルサイズが大きすぎます (最大 ${maxSize / 1024 / 1024}MB)`);
   }
 
   if (!file.type.startsWith("image/")) {

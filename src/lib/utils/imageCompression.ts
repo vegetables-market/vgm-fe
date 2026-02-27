@@ -4,7 +4,7 @@
 
 import imageCompression from 'browser-image-compression';
 
-const MAX_SIZE_MB = 0.3; // 300KB
+const MAX_SIZE_MB = 2; // 2MB
 
 /**
  * 画像フォーマット型
@@ -20,7 +20,7 @@ function getCompressionOptions(format: ImageFormat = 'jpeg') {
     maxWidthOrHeight: 1920,
     useWebWorker: true,
     fileType: `image/${format}`,
-    initialQuality: 0.8,
+    initialQuality: 0.9,
   };
 }
 

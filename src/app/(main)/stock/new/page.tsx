@@ -131,6 +131,10 @@ export default function StockNewPage() {
 
     setLoading(true);
     try {
+      const uploadedImageFilenames = files
+        .filter((f) => f.status === "completed" && !!f.serverFilename)
+        .map((f) => f.serverFilename as string);
+
       const payload = {
         name,
         description,
@@ -142,7 +146,12 @@ export default function StockNewPage() {
         shippingDaysId: shippingDaysId,
         shippingMethodId: shippingMethodId,
         itemCondition: itemCondition,
+        imageUrls: uploadedImageFilenames,
       };
+
+      console.log("[DEBUG] 送信直前のpayload:", JSON.stringify(payload, null, 2));
+      console.log("[DEBUG] imageUrls:", uploadedImageFilenames);
+      console.log("[DEBUG] files state:", files.map(f => ({ id: f.id, status: f.status, serverFilename: f.serverFilename })));
 
       await updateItem(itemId, payload);
       router.push("/stock"); // 一覧へ遷移

@@ -240,6 +240,8 @@ export default function StockEditClient({ id }: { id: string }) {
         imageUrls: finalFilenames,
       };
 
+      console.log("DEBUG: 送信直前のpayload:", payload);
+
       await updateItem(itemId, payload);
       router.push("/stock");
     } catch (err) {
