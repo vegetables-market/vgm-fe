@@ -3,16 +3,19 @@ import Image from "next/image";
 
 interface ProfileEditFormProps {
   initialUser: any;
-  onSave: (updatedUser: any) => void;
+  isSaving?: boolean;
+  onSave: (updatedUser: any, avatarFile: File | null) => void;
 }
 
-export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
+export function ProfileEditForm({ initialUser, isSaving = false, onSave }: ProfileEditFormProps) {
   const [user, setUser] = useState(initialUser);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setUser({ ...user, avatarUrl: reader.result as string });
@@ -61,10 +64,12 @@ export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
       </div>
 
       <button
-        onClick={() => onSave(user)}
-        className="w-full rounded-lg bg-emerald-500 py-3 font-bold text-white transition hover:bg-emerald-600"
+        type="button"
+        disabled={isSaving}
+        onClick={() => onSave(user, avatarFile)}
+        className="w-full rounded-lg bg-emerald-500 py-3 font-bold text-white transition hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        変更を保存する
+        {isSaving ? "保存中..." : "変更を保存する"}
       </button>
     </div>
   );
