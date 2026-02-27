@@ -1,0 +1,3 @@
+src/service/market/stocks/mappers/my-stock-item.ts(6,1): error TS1185: Merge conflict marker encountered.
+src/service/market/stocks/mappers/my-stock-item.ts(8,1): error TS1185: Merge conflict marker encountered.
+src/service/market/stocks/mappers/my-stock-item.ts(10,1): error TS1185: Merge conflict marker encountered.

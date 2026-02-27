@@ -110,9 +110,13 @@ function BasketContent() {
       </h1>
 
       <div className="space-y-6">
-        {cart.items.map((item) => (
+        {cart.items.map((item, index) => (
           <div
-            key={item.cartItemId}
+            key={
+              item.cartItemId > 0
+                ? `cart-item-${item.cartItemId}`
+                : `cart-item-fallback-${index}-${item.itemId}`
+            }
             className="flex flex-col items-start gap-4 rounded-lg border p-4 shadow-sm sm:flex-row sm:items-center"
           >
             {/* Image */}

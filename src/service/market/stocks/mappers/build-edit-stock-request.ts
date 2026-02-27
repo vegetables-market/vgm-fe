@@ -5,7 +5,7 @@ export function buildEditStockRequest(input: StockFormInput): EditStockRequestDt
   return {
     name: input.name,
     description: input.description,
-    categoryId: Number(input.categoryId),
+    category_id: Number(input.categoryId),
     price: Number(input.price),
     quantity: Number(input.quantity),
     shippingPayerType: input.shippingPayerType,
