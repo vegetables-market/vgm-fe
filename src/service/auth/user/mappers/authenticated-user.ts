@@ -1,4 +1,5 @@
-﻿import type { UserInfo } from "@/lib/auth/shared/types/user-info";
+import type { UserInfo } from "@/lib/auth/shared/types/user-info";
+import { getApiUrl } from "@/lib/api/urls";
 
 type UserPayload = {
   username?: string;
@@ -27,7 +28,7 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
   const username = raw.username ?? raw.user_id ?? raw.userId ?? "";
   const displayName = raw.displayName ?? raw.display_name ?? raw.name ?? "";
   const email = raw.email ?? null;
-  const avatarUrl = raw.avatarUrl ?? raw.avatar_url ?? null;
+  const avatarUrl = normalizeAvatarUrl(raw.avatarUrl ?? raw.avatar_url ?? null);
   const isEmailVerified = raw.isEmailVerified ?? raw.is_email_verified;
 
   if (!username && !email) return null;
@@ -41,3 +42,15 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
   };
 }
 
+function normalizeAvatarUrl(avatarUrl: string | null): string | null {
+  if (!avatarUrl) return null;
+  if (avatarUrl.startsWith("http")) return avatarUrl;
+  const baseApi = getApiUrl();
+  if (avatarUrl.startsWith("/api/")) {
+    return `${baseApi}${avatarUrl}`;
+  }
+  if (avatarUrl.startsWith("/")) {
+    return `${baseApi}/api${avatarUrl}`;
+  }
+  return `${baseApi}/api/${avatarUrl}`;
+}

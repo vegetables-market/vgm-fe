@@ -17,7 +17,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
         {/* アバター部分 */}
         <div className="relative h-24 w-24 mb-4">
           <Image
-            src={user.avatarUrl || "/images/default-avatar.png"}
+            src={user.avatarUrl || "/images/no-image.png"}
             alt={user.displayName}
             fill
             className="rounded-full border-2 border-white object-cover shadow-md"

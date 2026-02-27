@@ -2,31 +2,119 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { fetchApi } from "@/lib/api/fetch";
+import { getApiUrl } from "@/lib/api/urls";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { ProfileMenuList } from "@/components/profile/ProfileMenuList";
 import { ItemCard } from "@/components/market/ItemCard";
+import { getMyItems } from "@/service/market/stocks/get-my-items";
+import type { MyStockItem } from "@/lib/market/stocks/types/my-stock-item";
+
+type ProfileApiResponse = {
+    userId?: number;
+    username?: string;
+    displayName?: string;
+    display_name?: string;
+    email?: string | null;
+    avatarUrl?: string | null;
+    avatar_url?: string | null;
+    bio?: string | null;
+};
+
+type ProfileItemCard = {
+    id: string;
+    name: string;
+    price: number;
+    images: string[];
+    status: "active" | "sold";
+};
+
+function toMediaUrl(imageUrl: string | null) {
+    if (!imageUrl) return "/images/no-image.png";
+    if (imageUrl.startsWith("http")) return imageUrl;
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
+    return `${baseUrl}/${cleanedPath}`;
+}
+
+function toAvatarUrl(imageUrl: string | null) {
+    if (!imageUrl) return null;
+    if (imageUrl.startsWith("http")) return imageUrl;
+    if (imageUrl.startsWith("/api/")) return `${getApiUrl()}${imageUrl}`;
+    if (imageUrl.startsWith("/")) return `${getApiUrl()}/api${imageUrl}`;
+    return `${getApiUrl()}/api/${imageUrl}`;
+}
+
+function mapToProfileItems(items: MyStockItem[]): ProfileItemCard[] {
+    return items
+        .filter((item) => item.status === 2 || item.status === 3 || item.status === 4)
+        .map((item) => ({
+            id: item.itemId,
+            name: item.name,
+            price: item.price,
+            images: [toMediaUrl(item.imageUrl)],
+            status: item.status === 4 ? "sold" : "active",
+        }));
+}
 
 export default function ProfilePage() {
-    const [myListings, setMyListings] = useState<any[]>([]);
+    const [myListings, setMyListings] = useState<ProfileItemCard[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
 
     const [user, setUser] = useState({
-        displayName: "田中 花子",
-        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=hanako",
-        ratingAverage: 4.8,
-        location: "東京都世田谷区",
-        bio: "趣味で野菜を育てています🌱"
+        displayName: "",
+        avatarUrl: null as string | null,
+        ratingAverage: null as number | null,
+        location: "",
+        bio: ""
     });
 
     useEffect(() => {
-        const savedData = localStorage.getItem("userData");
-        if (savedData) {
-            setUser(JSON.parse(savedData));
+        const load = async () => {
+            setIsLoading(true);
+            setError("");
+            try {
+                const [profileResult, myItemsResult] = await Promise.allSettled([
+                    fetchApi<ProfileApiResponse>("/v1/user/account/me", { method: "GET", credentials: "include" }),
+                    getMyItems(),
+                ]);
+
+                if (profileResult.status === "fulfilled") {
+                    const profile = profileResult.value;
+                    setUser({
+                        displayName: profile.displayName ?? profile.display_name ?? "ユーザー",
+                        avatarUrl: toAvatarUrl(profile.avatarUrl ?? profile.avatar_url ?? null),
+                        ratingAverage: null,
+                        location: "",
+                        bio: profile.bio ?? "",
+                    });
+                } else {
+                    console.error(profileResult.reason);
+                    setError("プロフィール情報の取得に失敗しました");
+                }
+
+                if (myItemsResult.status === "fulfilled") {
+                    setMyListings(mapToProfileItems(myItemsResult.value));
+                } else {
+                    console.error(myItemsResult.reason);
+                    setError((prev) =>
+                        prev
+                            ? `${prev} / 出品情報の取得に失敗しました`
+                            : "出品情報の取得に失敗しました",
+                    );
+                }
+            } catch (err) {
+                console.error(err);
+                setError("データ取得に失敗しました");
+            } finally {
+                setIsLoading(false);
+            }
         }
-        const items = JSON.parse(localStorage.getItem("myListings") || "[]");
-        setMyListings(items);
-        setIsLoading(false);
+
+        load();
     }, []);
 
     const activeItems = myListings.filter((item) => item.status === "active");
@@ -59,11 +147,13 @@ export default function ProfilePage() {
 
                     {isLoading ? (
                         <div className="rounded-lg bg-white p-8 text-center text-stone-500">読み込み中...</div>
+                    ) : error ? (
+                        <div className="rounded-lg bg-white p-8 text-center text-red-600">{error}</div>
                     ) : activeItems.length > 0 ? (
                         <div className="grid grid-cols-2 gap-3">
                             {activeItems.map((item, index) => (
                                 <ItemCard
-                                    key={item?.id && item.id > 0 ? `listing-${item.id}` : `listing-fallback-${index}`}
+                                    key={item.id ? `listing-${item.id}` : `listing-fallback-${index}`}
                                     item={item}
                                 />
                             ))}
