@@ -19,6 +19,10 @@ export type StockEditDetailApiResponse = {
     shipping_method_id?: number | string;
     itemCondition?: number | string;
     item_condition?: number | string;
+    images?: Array<{
+      imageUrl?: string;
+      image_url?: string;
+    }>;
   };
 };
 

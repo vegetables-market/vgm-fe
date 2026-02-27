@@ -10,8 +10,8 @@ import type { MyStockItem } from "@/lib/market/stocks/types/my-stock-item";
 export default function StockPage() {
   const [items, setItems] = useState<MyStockItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState<number | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   const loadItems = () => {
     setLoading(true);
@@ -30,7 +30,7 @@ export default function StockPage() {
     loadItems();
   }, []);
 
-  const handleDelete = async (itemId: number, itemName: string) => {
+  const handleDelete = async (itemId: string, itemName: string) => {
     if (!confirm(`「${itemName}」を削除しますか？この操作は取り消せません。`)) {
       return;
     }
@@ -47,7 +47,7 @@ export default function StockPage() {
     }
   };
 
-  const handleToggleStatus = async (itemId: number, currentStatus: number) => {
+  const handleToggleStatus = async (itemId: string, currentStatus: number) => {
     const newStatus = currentStatus === 2 ? 5 : 2;
     const statusText = newStatus === 2 ? "出品中" : "公開停止";
 
@@ -165,7 +165,7 @@ export default function StockPage() {
               {items.map((item, index) => (
                 <tr
                   key={
-                    item.itemId > 0
+                    item.itemId
                       ? `stock-${item.itemId}`
                       : `stock-fallback-${index}-${item.createdAt}`
                   }

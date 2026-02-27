@@ -5,14 +5,14 @@ export function buildEditStockRequest(input: StockFormInput): EditStockRequestDt
   return {
     name: input.name,
     description: input.description,
-    categoryId: Number(input.categoryId),
+    category_id: Number(input.categoryId),
     price: Number(input.price),
     quantity: Number(input.quantity),
-    shippingPayerType: input.shippingPayerType,
-    shippingOriginArea: input.prefectureId,
-    shippingDaysId: input.shippingDaysId,
-    shippingMethodId: input.shippingMethodId,
-    itemCondition: input.itemCondition,
+    shipping_payer_type: input.shippingPayerType,
+    shipping_origin_area: input.prefectureId,
+    shipping_days_id: input.shippingDaysId,
+    shipping_method_id: input.shippingMethodId,
+    item_condition: input.itemCondition,
   };
 }
 

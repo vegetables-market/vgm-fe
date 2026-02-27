@@ -1,6 +1,7 @@
 import type { StockSellerRaw } from "./stock-seller-raw";
 
 export type StockItemRaw = {
+  id?: string | number;
   item_id?: string | number;
   itemId?: string | number;
   title?: string;
