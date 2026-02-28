@@ -15,6 +15,7 @@ type AccountMeResponse = {
   avatar_url?: string | null;
   bio?: string | null;
   hasPassword?: boolean;
+  has_password?: boolean;
 };
 
 export default function ProfileEditPage() {
@@ -41,7 +42,7 @@ export default function ProfileEditPage() {
           displayName: profile.displayName ?? profile.display_name ?? "",
           avatarUrl,
           bio: profile.bio ?? "",
-          hasPassword: profile.hasPassword ?? false,
+          hasPassword: profile.hasPassword ?? profile.has_password ?? false,
           password: "",
         });
       } catch (err) {
@@ -62,14 +63,21 @@ export default function ProfileEditPage() {
 
   const handleSave = async (updatedUser: any) => {
     if (!userData || isSaving) return;
+
+    const isDisplayNameChanged = updatedUser.displayName !== userData.displayName;
+    if (isDisplayNameChanged && userData.hasPassword && !(updatedUser.password ?? "").trim()) {
+      alert("表示名を変更するにはパスワードの入力が必要です");
+      return;
+    }
+
     setIsSaving(true);
     try {
-      if (updatedUser.displayName !== userData.displayName) {
+      if (isDisplayNameChanged) {
         await fetchApi("/v1/user/account/display-name", {
           method: "PUT",
           credentials: "include",
           body: JSON.stringify({
-            displayName: updatedUser.displayName,
+            display_name: updatedUser.displayName,
             password: updatedUser.password || undefined,
           }),
         });

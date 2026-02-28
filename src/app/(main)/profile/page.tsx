@@ -145,7 +145,7 @@ export default function ProfilePage() {
                             出品中の商品
                             <span className="ml-2 text-sm font-normal text-stone-500">({activeItems.length}件)</span>
                         </h2>
-                        <Link href="/my/stocks/new" className="text-sm font-medium text-emerald-600 hover:underline">+ 新規出品</Link>
+                        <Link href="/my/stocks/" className="text-sm font-medium text-emerald-600 hover:underline">商品を管理</Link>
                     </div>
 
                     {isLoading ? (
