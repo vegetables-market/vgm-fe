@@ -15,7 +15,7 @@ export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setUser({ ...user, avatarUrl: reader.result as string });
+        setUser({ ...user, avatarUrl: reader.result as string, avatarFile: file });
       };
       reader.readAsDataURL(file);
     }
@@ -29,7 +29,7 @@ export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
           className="relative h-24 w-24 cursor-pointer overflow-hidden rounded-full border-2 border-emerald-500 shadow-sm transition hover:opacity-80"
           onClick={() => fileInputRef.current?.click()}
         >
-          <Image src={user.avatarUrl || "/images/default-avatar.png"} alt="Avatar" fill className="object-cover" unoptimized />
+          <Image src={user.avatarUrl || "/images/no-image.png"} alt="Avatar" fill className="object-cover" unoptimized />
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 text-white">
             <span className="text-xs font-bold">変更</span>
           </div>
@@ -58,6 +58,17 @@ export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
             onChange={(e) => setUser({ ...user, bio: e.target.value })}
           />
         </div>
+        {user.hasPassword && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700">パスワード（表示名変更時に必要）</label>
+            <input
+              type="password"
+              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-sm focus:border-emerald-500 focus:outline-none"
+              value={user.password || ""}
+              onChange={(e) => setUser({ ...user, password: e.target.value })}
+            />
+          </div>
+        )}
       </div>
 
       <button
