@@ -20,6 +20,12 @@ export default function WebHeader() {
   const { user, logout } = useAuth();
   const redirectTo = getRedirectToFromLocation();
 
+  // localStorageの "userData" からプロフィール編集で保存したアバターを取得（フォールバック）
+  const storedUserData = typeof window !== "undefined"
+    ? (() => { try { return JSON.parse(localStorage.getItem("userData") || "null"); } catch { return null; } })()
+    : null;
+  const avatarUrl = storedUserData?.avatarUrl || user?.avatarUrl || null;
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -102,11 +108,11 @@ export default function WebHeader() {
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex h-9 w-9 cursor-pointer items-center justify-center overflow-hidden rounded-full border border-gray-300 bg-gray-100 transition-all hover:ring-2 hover:ring-amber-500 dark:border-gray-700 dark:bg-gray-800"
             >
-              {user.avatarUrl ? (
+              {avatarUrl ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={user.avatarUrl}
+                  src={avatarUrl}
                   alt={user.displayName}
                   className="h-full w-full object-cover"
                 />

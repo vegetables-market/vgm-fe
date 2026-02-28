@@ -4,4 +4,5 @@ export type UserInfo = {
   email: string | null;
   avatarUrl: string | null;
   isEmailVerified?: boolean;
+  bio?: string;
 };

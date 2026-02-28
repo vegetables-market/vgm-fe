@@ -30,12 +30,17 @@ export default function ProfilePage() {
     const [isLoading, setIsLoading] = useState(true);
     const { user: authUser } = useAuth();
 
+    // localStorageの "userData" からプロフィール編集で保存したデータを読み込む
+    const storedUserData = typeof window !== "undefined"
+        ? (() => { try { return JSON.parse(localStorage.getItem("userData") || "null"); } catch { return null; } })()
+        : null;
+
     const user = {
-        displayName: authUser?.displayName || "ゲスト",
-        avatarUrl: authUser?.avatarUrl || "https://api.dicebear.com/7.x/avataaars/svg?seed=guest",
+        displayName: storedUserData?.displayName || authUser?.displayName || "ゲスト",
+        avatarUrl: storedUserData?.avatarUrl || (authUser?.avatarUrl ? getImageUrl(authUser.avatarUrl) : "https://api.dicebear.com/7.x/avataaars/svg?seed=guest"),
         ratingAverage: 4.8,
         location: "未設定",
-        bio: "よろしくお願いします！"
+        bio: storedUserData?.bio || authUser?.bio || "よろしくお願いします！"
     };
 
     useEffect(() => {
