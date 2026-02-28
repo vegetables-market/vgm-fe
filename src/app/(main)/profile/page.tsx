@@ -42,9 +42,12 @@ function toMediaUrl(imageUrl: string | null) {
 function toAvatarUrl(imageUrl: string | null) {
     if (!imageUrl) return null;
     if (imageUrl.startsWith("http")) return imageUrl;
-    if (imageUrl.startsWith("/api/")) return `${getApiUrl()}${imageUrl}`;
-    if (imageUrl.startsWith("/")) return `${getApiUrl()}/api${imageUrl}`;
-    return `${getApiUrl()}/api/${imageUrl}`;
+    if (imageUrl.startsWith("/uploads/")) return `${getApiUrl()}/api${imageUrl}`;
+
+    const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+    const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+    const cleanedPath = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
+    return `${baseUrl}/${cleanedPath}`;
 }
 
 function mapToProfileItems(items: MyStockItem[]): ProfileItemCard[] {

@@ -45,12 +45,11 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
 function normalizeAvatarUrl(avatarUrl: string | null): string | null {
   if (!avatarUrl) return null;
   if (avatarUrl.startsWith("http")) return avatarUrl;
-  const baseApi = getApiUrl();
-  if (avatarUrl.startsWith("/api/")) {
-    return `${baseApi}${avatarUrl}`;
+  if (avatarUrl.startsWith("/uploads/")) {
+    return `${getApiUrl()}/api${avatarUrl}`;
   }
-  if (avatarUrl.startsWith("/")) {
-    return `${baseApi}/api${avatarUrl}`;
-  }
-  return `${baseApi}/api/${avatarUrl}`;
+  const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+  const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+  const cleanedPath = avatarUrl.startsWith("/") ? avatarUrl.slice(1) : avatarUrl;
+  return `${baseUrl}/${cleanedPath}`;
 }

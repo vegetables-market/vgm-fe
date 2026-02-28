@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import { fetchApi } from "@/lib/api/fetch";
 import { getApiUrl } from "@/lib/api/urls";
+import { uploadImage } from "@/lib/api/media";
+import type { UploadTokenResponse } from "@/types/upload";
 
 type AccountMeResponse = {
   displayName?: string;
@@ -32,11 +34,7 @@ export default function ProfileEditPage() {
         const avatarUrl = avatarRaw && avatarRaw.startsWith("http")
           ? avatarRaw
           : avatarRaw
-            ? avatarRaw.startsWith("/api/")
-              ? `${getApiUrl()}${avatarRaw}`
-              : avatarRaw.startsWith("/")
-                ? `${getApiUrl()}/api${avatarRaw}`
-                : `${getApiUrl()}/api/${avatarRaw}`
+            ? toAvatarUrl(avatarRaw)
             : null;
 
         setUserData({
@@ -88,16 +86,22 @@ export default function ProfileEditPage() {
       }
 
       if (updatedUser.avatarFile instanceof File) {
-        const formData = new FormData();
-        formData.append("image", updatedUser.avatarFile);
-        const response = await fetch(`${getApiUrl()}/api/v1/user/profile/avatar`, {
+        const { token, filename } = await fetchApi<UploadTokenResponse>("/v1/user/profile/avatar/upload-token", {
           method: "POST",
           credentials: "include",
-          body: formData,
         });
-        if (!response.ok) {
-          throw new Error("Avatar upload failed");
-        }
+        await uploadImage(
+          updatedUser.avatarFile,
+          detectImageFormat(updatedUser.avatarFile),
+          token,
+          filename,
+          { maxSizeBytes: 5 * 1024 * 1024 },
+        );
+        await fetchApi("/v1/user/profile/avatar", {
+          method: "PUT",
+          credentials: "include",
+          body: JSON.stringify({ filename }),
+        });
       }
 
       alert("プロフィールを更新しました");
@@ -122,4 +126,22 @@ export default function ProfileEditPage() {
       </div>
     </main>
   );
+}
+
+function toAvatarUrl(raw: string): string {
+  if (!raw) return "";
+  if (raw.startsWith("http")) return raw;
+  if (raw.startsWith("/uploads/")) {
+    return `${getApiUrl()}/api${raw}`;
+  }
+  const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+  const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+  const cleaned = raw.startsWith("/") ? raw.slice(1) : raw;
+  return `${baseUrl}/${cleaned}`;
+}
+
+function detectImageFormat(file: File): "jpg" | "png" | "webp" {
+  if (file.type === "image/png") return "png";
+  if (file.type === "image/webp") return "webp";
+  return "jpg";
 }
