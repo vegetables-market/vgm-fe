@@ -1,4 +1,5 @@
-﻿import type { UserInfo } from "@/lib/auth/shared/types/user-info";
+import type { UserInfo } from "@/lib/auth/shared/types/user-info";
+import { getApiUrl } from "@/lib/api/urls";
 
 type UserPayload = {
   username?: string;
@@ -27,7 +28,7 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
   const username = raw.username ?? raw.user_id ?? raw.userId ?? "";
   const displayName = raw.displayName ?? raw.display_name ?? raw.name ?? "";
   const email = raw.email ?? null;
-  const avatarUrl = raw.avatarUrl ?? raw.avatar_url ?? null;
+  const avatarUrl = normalizeAvatarUrl(raw.avatarUrl ?? raw.avatar_url ?? null);
   const isEmailVerified = raw.isEmailVerified ?? raw.is_email_verified;
 
   if (!username && !email) return null;
@@ -41,3 +42,14 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
   };
 }
 
+function normalizeAvatarUrl(avatarUrl: string | null): string | null {
+  if (!avatarUrl) return null;
+  if (avatarUrl.startsWith("http")) return avatarUrl;
+  if (avatarUrl.startsWith("/uploads/")) {
+    return `${getApiUrl()}/api${avatarUrl}`;
+  }
+  const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
+  const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
+  const cleanedPath = avatarUrl.startsWith("/") ? avatarUrl.slice(1) : avatarUrl;
+  return `${baseUrl}/${cleanedPath}`;
+}
