@@ -6,7 +6,6 @@ import { confirmPurchase } from "@/service/market/orders/confirm-purchase";
 import { getStockDetail } from "@/service/market/stocks/get-stock-detail";
 import {
   DEFAULT_DELIVERY_PLACE,
-  MOCK_ADDRESSES,
   MOCK_PAYMENT_METHODS,
 } from "@/lib/mockData";
 import type {
@@ -14,6 +13,12 @@ import type {
   PaymentMethod,
   ShippingAddress,
 } from "@/lib/types";
+import { getAddresses } from "@/service/user/addresses/get-addresses";
+import { createAddress } from "@/service/user/addresses/create-address";
+import {
+  mapShippingAddressToUpsertRequestDto,
+  mapUserAddressDtoToShippingAddress,
+} from "@/service/user/addresses/mappers";
 
 type UsePurchasePageResult = {
   stock: StockDetail | null;
@@ -22,21 +27,21 @@ type UsePurchasePageResult = {
   isPurchased: boolean;
   isProcessing: boolean;
   addresses: ShippingAddress[];
-  selectedAddress: ShippingAddress;
+  selectedAddress: ShippingAddress | null;
   selectedPayment: PaymentMethod;
   selectedDeliveryPlace: DeliveryPlaceOption;
   showAddressModal: boolean;
   showAddAddressModal: boolean;
   showPaymentModal: boolean;
   showPlaceModal: boolean;
-  setSelectedAddress: (value: ShippingAddress) => void;
+  setSelectedAddress: (value: ShippingAddress | null) => void;
   setSelectedPayment: (value: PaymentMethod) => void;
   setSelectedDeliveryPlace: (value: DeliveryPlaceOption) => void;
   setShowAddressModal: (value: boolean) => void;
   setShowAddAddressModal: (value: boolean) => void;
   setShowPaymentModal: (value: boolean) => void;
   setShowPlaceModal: (value: boolean) => void;
-  handleAddAddress: (newAddress: ShippingAddress) => void;
+  handleAddAddress: (newAddress: ShippingAddress) => Promise<void>;
   handlePurchase: () => Promise<void>;
 };
 
@@ -46,9 +51,9 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
   const [error, setError] = useState("");
   const [isPurchased, setIsPurchased] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [addresses, setAddresses] = useState<ShippingAddress[]>(MOCK_ADDRESSES);
-  const [selectedAddress, setSelectedAddress] = useState<ShippingAddress>(
-    MOCK_ADDRESSES.find((address) => address.isDefault) || MOCK_ADDRESSES[0],
+  const [addresses, setAddresses] = useState<ShippingAddress[]>([]);
+  const [selectedAddress, setSelectedAddress] = useState<ShippingAddress | null>(
+    null,
   );
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>(
     MOCK_PAYMENT_METHODS[0],
@@ -73,12 +78,26 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
       setError("");
 
       try {
-        const data = await getStockDetail(itemId);
-        if (data.item.status !== 2) {
+        const [stockData, addressData] = await Promise.all([
+          getStockDetail(itemId),
+          getAddresses(),
+        ]);
+        const fetchedAddresses = addressData.addresses.map(
+          mapUserAddressDtoToShippingAddress,
+        );
+
+        setAddresses(fetchedAddresses);
+        setSelectedAddress(
+          fetchedAddresses.find((address) => address.isDefault) ||
+            fetchedAddresses[0] ||
+            null,
+        );
+
+        if (stockData.item.status !== 2) {
           setError("この商品は現在購入できません");
           setStock(null);
         } else {
-          setStock(data);
+          setStock(stockData);
         }
       } catch (err: unknown) {
         setError(getErrorMessage(err) || "商品の取得に失敗しました");
@@ -90,13 +109,24 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
     fetchStock();
   }, [itemId]);
 
-  const handleAddAddress = (newAddress: ShippingAddress) => {
-    setAddresses((prev) => [...prev, newAddress]);
-    setSelectedAddress(newAddress);
+  const handleAddAddress = async (newAddress: ShippingAddress) => {
+    const requestDto = mapShippingAddressToUpsertRequestDto(newAddress);
+    const response = await createAddress(requestDto);
+    const createdAddress = mapUserAddressDtoToShippingAddress(response.address);
+
+    setAddresses((prev) => {
+      const next = [...prev, createdAddress];
+      return next.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
+    });
+    setSelectedAddress(createdAddress);
   };
 
   const handlePurchase = async () => {
     if (!stock) return;
+    if (!selectedAddress) {
+      setError("住所が設定されていません");
+      return;
+    }
 
     setIsProcessing(true);
     try {

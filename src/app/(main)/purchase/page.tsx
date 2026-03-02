@@ -198,6 +198,10 @@ function PurchaseContent() {
               itemPrice={item.price}
               selectedPayment={selectedPayment}
               isProcessing={isProcessing}
+              canPurchase={Boolean(selectedAddress)}
+              disabledReason={
+                selectedAddress ? undefined : "住所が設定されていません"
+              }
               onPurchase={() => {
                 void handlePurchase();
               }}
@@ -219,7 +223,7 @@ function PurchaseContent() {
         isOpen={showAddressModal}
         onClose={() => setShowAddressModal(false)}
         addresses={addresses}
-        selectedAddressId={selectedAddress.id}
+        selectedAddressId={selectedAddress?.id ?? null}
         onSelect={setSelectedAddress}
         onAddNewClick={() => setShowAddAddressModal(true)}
       />

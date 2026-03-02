@@ -3,7 +3,7 @@
 import { ShippingAddress } from "@/lib/types";
 
 interface ShippingAddressSectionProps {
-  address: ShippingAddress;
+  address: ShippingAddress | null;
   onChangeClick: () => void;
 }
 
@@ -19,7 +19,7 @@ export function ShippingAddressSection({
           onClick={onChangeClick}
           className="text-blue-500 text-sm hover:underline flex items-center gap-1"
         >
-          変更する
+          {address ? "変更する" : "住所を追加"}
           <svg
             className="w-4 h-4"
             fill="none"
@@ -36,7 +36,12 @@ export function ShippingAddressSection({
         </button>
       </div>
 
-      <div className="space-y-1">
+      {!address ? (
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          住所が設定されていません
+        </p>
+      ) : (
+        <div className="space-y-1">
         {/* 登録済み住所ラベル */}
         <span className="inline-block bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs px-2 py-0.5 rounded mb-2">
           登録済み
@@ -63,7 +68,8 @@ export function ShippingAddressSection({
             {address.address2}
           </p>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

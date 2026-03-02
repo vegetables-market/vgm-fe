@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (address: ShippingAddress) => void;
+  onAdd: (address: ShippingAddress) => Promise<void> | void;
 }
 
 // 郵便番号API（zipcloud）のレスポンス型
@@ -46,6 +46,8 @@ export function AddAddressModal({
   const [addressSearchError, setAddressSearchError] = useState<string | null>(
     null,
   );
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const prefectures = [
     "北海道",
@@ -144,6 +146,7 @@ export function AddAddressModal({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSubmitError(null);
     // エラーをクリア
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -183,10 +186,13 @@ export function AddAddressModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
 
     const newAddress: ShippingAddress = {
       id: `addr_${Date.now()}`,
@@ -203,21 +209,27 @@ export function AddAddressModal({
       isDefault: false,
     };
 
-    onAdd(newAddress);
+    try {
+      await onAdd(newAddress);
 
-    // フォームをリセット
-    setFormData({
-      name: "",
-      nameKana: "",
-      postalCode: "",
-      prefecture: "",
-      city: "",
-      address1: "",
-      address2: "",
-      phone: "",
-    });
+      // フォームをリセット
+      setFormData({
+        name: "",
+        nameKana: "",
+        postalCode: "",
+        prefecture: "",
+        city: "",
+        address1: "",
+        address2: "",
+        phone: "",
+      });
 
-    onClose();
+      onClose();
+    } catch {
+      setSubmitError("住所の保存に失敗しました。時間をおいて再度お試しください。");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputClass = (field: string) =>
@@ -464,11 +476,15 @@ export function AddAddressModal({
               </div>
 
               {/* 送信ボタン */}
+              {submitError && (
+                <p className="text-red-400 text-sm">{submitError}</p>
+              )}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors mt-6"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors mt-6 disabled:cursor-not-allowed disabled:bg-gray-600"
               >
-                配送先を追加する
+                {isSubmitting ? "保存中..." : "配送先を追加する"}
               </button>
             </form>
           </motion.div>

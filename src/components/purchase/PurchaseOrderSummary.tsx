@@ -5,6 +5,8 @@ type PurchaseOrderSummaryProps = {
   itemPrice: number;
   selectedPayment: PaymentMethod;
   isProcessing: boolean;
+  canPurchase?: boolean;
+  disabledReason?: string;
   onPurchase: () => void;
 };
 
@@ -12,6 +14,8 @@ export function PurchaseOrderSummary({
   itemPrice,
   selectedPayment,
   isProcessing,
+  canPurchase = true,
+  disabledReason,
   onPurchase,
 }: PurchaseOrderSummaryProps) {
   return (
@@ -56,7 +60,7 @@ export function PurchaseOrderSummary({
 
       <button
         onClick={onPurchase}
-        disabled={isProcessing}
+        disabled={isProcessing || !canPurchase}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-red-500 py-4 font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:bg-gray-400"
       >
         {isProcessing ? (
@@ -82,6 +86,9 @@ export function PurchaseOrderSummary({
           "購入を確定する"
         )}
       </button>
+      {!canPurchase && disabledReason && (
+        <p className="mt-2 text-xs text-red-500">{disabledReason}</p>
+      )}
     </div>
   );
 }
