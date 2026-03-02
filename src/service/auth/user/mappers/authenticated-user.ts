@@ -1,5 +1,4 @@
 import type { UserInfo } from "@/lib/auth/shared/types/user-info";
-import { getApiUrl } from "@/lib/api/urls";
 
 type UserPayload = {
   username?: string;
@@ -45,9 +44,7 @@ export function mapAuthenticatedUser(response: unknown): UserInfo | null {
 function normalizeAvatarUrl(avatarUrl: string | null): string | null {
   if (!avatarUrl) return null;
   if (avatarUrl.startsWith("http")) return avatarUrl;
-  if (avatarUrl.startsWith("/uploads/")) {
-    return `${getApiUrl()}/api${avatarUrl}`;
-  }
+  if (avatarUrl.startsWith("/images/")) return avatarUrl;
   const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
   const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
   const cleanedPath = avatarUrl.startsWith("/") ? avatarUrl.slice(1) : avatarUrl;

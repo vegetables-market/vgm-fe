@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { fetchApi } from "@/lib/api/fetch";
-import { getApiUrl } from "@/lib/api/urls";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileStats } from "@/components/profile/ProfileStats";
 import { ProfileMenuList } from "@/components/profile/ProfileMenuList";
@@ -42,7 +41,7 @@ function toMediaUrl(imageUrl: string | null) {
 function toAvatarUrl(imageUrl: string | null) {
     if (!imageUrl) return null;
     if (imageUrl.startsWith("http")) return imageUrl;
-    if (imageUrl.startsWith("/uploads/")) return `${getApiUrl()}/api${imageUrl}`;
+    if (imageUrl.startsWith("/images/")) return imageUrl;
 
     const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
     const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;

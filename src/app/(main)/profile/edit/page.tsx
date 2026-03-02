@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import { fetchApi } from "@/lib/api/fetch";
-import { getApiUrl } from "@/lib/api/urls";
 import { uploadImage } from "@/lib/api/media";
 import type { UploadTokenResponse } from "@/types/upload";
 
@@ -18,6 +17,10 @@ type AccountMeResponse = {
   has_password?: boolean;
 };
 
+type GetAvatarResponse = {
+  avatarUrl?: string | null;
+};
+
 export default function ProfileEditPage() {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
@@ -26,12 +29,18 @@ export default function ProfileEditPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const profile = await fetchApi<AccountMeResponse>("/v1/user/account/me", {
-          method: "GET",
-          credentials: "include",
-        });
+        const [profile, avatarResponse] = await Promise.all([
+          fetchApi<AccountMeResponse>("/v1/user/account/me", {
+            method: "GET",
+            credentials: "include",
+          }),
+          fetchApi<GetAvatarResponse>("/v1/user/profile/get-avatar", {
+            method: "GET",
+            credentials: "include",
+          }),
+        ]);
 
-        const avatarRaw = profile.avatarUrl ?? profile.avatar_url ?? null;
+        const avatarRaw = avatarResponse.avatarUrl ?? profile.avatarUrl ?? profile.avatar_url ?? null;
         const avatarUrl = avatarRaw && avatarRaw.startsWith("http")
           ? avatarRaw
           : avatarRaw
@@ -105,8 +114,8 @@ export default function ProfileEditPage() {
           filename,
           { maxSizeBytes: 5 * 1024 * 1024 },
         );
-        await fetchApi("/v1/user/profile/avatar", {
-          method: "PUT",
+        await fetchApi("/v1/user/profile/upload-avatar", {
+          method: "POST",
           credentials: "include",
           body: JSON.stringify({ filename }),
         });
@@ -139,9 +148,7 @@ export default function ProfileEditPage() {
 function toAvatarUrl(raw: string): string {
   if (!raw) return "";
   if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/uploads/")) {
-    return `${getApiUrl()}/api${raw}`;
-  }
+  if (raw.startsWith("/images/")) return raw;
   const mediaUrl = process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
   const baseUrl = mediaUrl.endsWith("/") ? mediaUrl.slice(0, -1) : mediaUrl;
   const cleaned = raw.startsWith("/") ? raw.slice(1) : raw;
