@@ -35,35 +35,35 @@ export function ProfileEditForm({ initialUser, onSave }: ProfileEditFormProps) {
           </div>
         </div>
         <input type="file" ref={fileInputRef} hidden accept="image/*" onChange={handleImageChange} />
-        <p className="text-xs text-gray-500">タップして画像を変更</p>
+        <p className="text-xs text-gray-500 dark:text-zinc-400">タップして画像を変更</p>
       </div>
 
       {/* テキスト入力部分 */}
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">名前</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300">名前</label>
           <input
             type="text"
-            className="mt-1 w-full rounded-md border border-gray-300 p-2 text-sm focus:border-emerald-500 focus:outline-none"
+            className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             value={user.displayName}
             onChange={(e) => setUser({ ...user, displayName: e.target.value })}
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">自己紹介</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300">自己紹介</label>
           <textarea
             rows={4}
-            className="mt-1 w-full rounded-md border border-gray-300 p-2 text-sm focus:border-emerald-500 focus:outline-none"
+            className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             value={user.bio}
             onChange={(e) => setUser({ ...user, bio: e.target.value })}
           />
         </div>
         {user.hasPassword && (
           <div>
-            <label className="block text-sm font-medium text-gray-700">パスワード（表示名変更時に必要）</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-zinc-300">パスワード（表示名変更時に必要）</label>
             <input
               type="password"
-              className="mt-1 w-full rounded-md border border-gray-300 p-2 text-sm focus:border-emerald-500 focus:outline-none"
+              className="mt-1 w-full rounded-md border border-gray-300 bg-white p-2 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               value={user.password || ""}
               onChange={(e) => setUser({ ...user, password: e.target.value })}
             />

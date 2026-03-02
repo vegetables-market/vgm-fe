@@ -131,12 +131,18 @@ export default function ProfileEditPage() {
     }
   };
 
-  if (!userData) return <div className="p-8 text-center">読み込み中...</div>;
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-stone-50 p-8 text-center text-stone-700 dark:bg-zinc-950 dark:text-zinc-200">
+        読み込み中...
+      </div>
+    );
+  }
 
   return (
-    <main className="min-h-screen bg-stone-50 pb-20">
-      <div className="bg-white p-4 shadow-sm">
-        <h1 className="text-center text-lg font-bold">プロフィール編集</h1>
+    <main className="min-h-screen bg-stone-50 pb-20 text-stone-900 dark:bg-zinc-950 dark:text-zinc-100">
+      <div className="bg-white p-4 shadow-sm dark:bg-zinc-900 dark:shadow-none">
+        <h1 className="text-center text-lg font-bold text-stone-900 dark:text-zinc-100">プロフィール編集</h1>
       </div>
       <div className="mx-auto max-w-md">
         <ProfileEditForm initialUser={userData} onSave={handleSave} />
