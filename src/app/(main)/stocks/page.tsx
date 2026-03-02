@@ -25,10 +25,10 @@ export default function StocksPage() {
   return (
     <div className="stocks-page">
       <div className="page-header">
-        <h1 className="page-title">蝨ｨ蠎ｫ讀懃ｴ｢</h1>
+        <h1 className="page-title">在庫検索</h1>
       </div>
 
-      {/* 讀懃ｴ｢繝舌・ */}
+      {/* 検索バー */}
       <div className="search-section">
         <div className="search-bar">
           <input
@@ -36,32 +36,32 @@ export default function StocksPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="蝨ｨ蠎ｫ繧呈､懃ｴ｢..."
+            placeholder="在庫を検索..."
             className="search-input"
           />
           <button onClick={handleSearch} className="search-button">
-            讀懃ｴ｢
+            検索
           </button>
         </div>
 
-        {/* 繝輔ぅ繝ｫ繧ｿ繝ｼ */}
+        {/* フィルター */}
         <div className="filters">
           <div className="filter-group">
-            <label>萓｡譬ｼ遽・峇</label>
+            <label>価格範囲</label>
             <div className="price-range">
               <input
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                placeholder="譛菴惹ｾ｡譬ｼ"
+                placeholder="最低価格"
                 className="price-input"
               />
-              <span>?</span>
+              <span>〜</span>
               <input
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                placeholder="譛鬮倅ｾ｡譬ｼ"
+                placeholder="最高価格"
                 className="price-input"
               />
             </div>
@@ -82,18 +82,18 @@ export default function StocksPage() {
           </div>
 
           <button onClick={handleSearch} className="filter-apply-button">
-            驕ｩ逕ｨ
+            適用
           </button>
         </div>
       </div>
 
-      {/* 繧ｨ繝ｩ繝ｼ陦ｨ遉ｺ */}
+      {/* エラー表示 */}
       {error && <div className="error-box">{error}</div>}
 
-      {/* 繝ｭ繝ｼ繝・ぅ繝ｳ繧ｰ */}
-      {isLoading && <div className="loading">隱ｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>}
+      {/* ローディング */}
+      {isLoading && <div className="loading">読み込み中...</div>}
 
-      {/* 蝠・刀荳隕ｧ */}
+      {/* 商品一覧 */}
       {!isLoading && (
         <>
           <div className="stocks-grid">
@@ -119,7 +119,7 @@ export default function StocksPage() {
                   <h3 className="stock-title">{stock.title}</h3>
                   <p className="stock-price">{formatStockPrice(stock.price)}</p>
                   <div className="stock-meta">
-                    <span className="likes-count">笙･ {stock.likesCount}</span>
+                    <span className="likes-count">♥ {stock.likesCount}</span>
                     {stock.categoryName && (
                       <span className="category">{stock.categoryName}</span>
                     )}
@@ -132,7 +132,7 @@ export default function StocksPage() {
             ))}
           </div>
 
-          {/* 繝壹・繧ｸ繝阪・繧ｷ繝ｧ繝ｳ */}
+          {/* ページネーション */}
           {result.pagination.totalPages > 1 && (
             <div className="pagination">
               <button
@@ -140,7 +140,7 @@ export default function StocksPage() {
                 disabled={result.pagination.page === 1}
                 className="pagination-button"
               >
-                蜑阪∈
+                前へ
               </button>
               <span className="pagination-info">
                 {result.pagination.page} / {result.pagination.totalPages}
@@ -150,14 +150,14 @@ export default function StocksPage() {
                 disabled={result.pagination.page === result.pagination.totalPages}
                 className="pagination-button"
               >
-                谺｡縺ｸ
+                次へ
               </button>
             </div>
           )}
 
           {result.items.length === 0 && !isLoading && (
             <div className="no-results">
-              <p>蝨ｨ蠎ｫ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縺ｧ縺励◆</p>
+              <p>在庫が見つかりませんでした</p>
             </div>
           )}
         </>
