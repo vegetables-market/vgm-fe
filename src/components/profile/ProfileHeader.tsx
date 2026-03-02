@@ -17,7 +17,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
         {/* アバター部分 */}
         <div className="relative h-24 w-24 mb-4">
           <Image
-            src={user.avatarUrl || "/images/default-avatar.png"}
+            src={user.avatarUrl || "/images/no-image.png"}
             alt={user.displayName}
             fill
             className="rounded-full border-2 border-white object-cover shadow-md"
@@ -29,7 +29,7 @@ export function ProfileHeader({ user }: ProfileHeaderProps) {
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           {user.displayName}
         </h1>
-        <div className="flex items-center gap-1 mt-1 text-sm text-gray-500">
+        <div className="mt-1 flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
           <span className="text-orange-400">★</span>
           <span>{user.ratingAverage?.toFixed(1) || "0.0"}</span>
           <span className="mx-1">・</span>
