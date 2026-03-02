@@ -80,7 +80,7 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
       try {
         const [stockData, addressData] = await Promise.all([
           getStockDetail(itemId),
-          getAddresses(),
+          getAddresses("DELIVERY"),
         ]);
         const fetchedAddresses = addressData.addresses.map(
           mapUserAddressDtoToShippingAddress,
@@ -111,7 +111,7 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
 
   const handleAddAddress = async (newAddress: ShippingAddress) => {
     const requestDto = mapShippingAddressToUpsertRequestDto(newAddress);
-    const response = await createAddress(requestDto);
+    const response = await createAddress(requestDto, "DELIVERY");
     const createdAddress = mapUserAddressDtoToShippingAddress(response.address);
 
     setAddresses((prev) => {

@@ -6,9 +6,13 @@ import type {
 
 export async function createAddress(
   input: UpsertUserAddressRequestDto,
+  addressType: "DELIVERY" | "SENDER" = "DELIVERY",
 ): Promise<UserAddressMutationResponseDto> {
-  return fetchApi<UserAddressMutationResponseDto>("/v1/user/addresses", {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  return fetchApi<UserAddressMutationResponseDto>(
+    `/v1/user/addresses?addressType=${addressType}`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
 }

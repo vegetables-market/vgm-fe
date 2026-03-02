@@ -6,6 +6,7 @@ export type StockFormInput = {
   quantity: string;
   shippingPayerType: number;
   prefectureId: number;
+  shippingOriginAddressId?: number | null;
   shippingDaysId: number;
   shippingMethodId: number;
   itemCondition: number;

@@ -3,8 +3,12 @@ import type { UserAddressDeleteResponseDto } from "@/service/user/addresses/type
 
 export async function deleteAddress(
   addressId: number,
+  addressType: "DELIVERY" | "SENDER" = "DELIVERY",
 ): Promise<UserAddressDeleteResponseDto> {
-  return fetchApi<UserAddressDeleteResponseDto>(`/v1/user/addresses/${addressId}`, {
-    method: "DELETE",
-  });
+  return fetchApi<UserAddressDeleteResponseDto>(
+    `/v1/user/addresses/${addressId}?addressType=${addressType}`,
+    {
+      method: "DELETE",
+    },
+  );
 }

@@ -7,17 +7,22 @@ import type {
 export function mapUserAddressDtoToShippingAddress(
   dto: UserAddressDto,
 ): ShippingAddress {
+  const rawId = dto.addressId ?? dto.address_id;
+  if (rawId == null) {
+    throw new Error("Address id is missing in response");
+  }
+
   return {
-    id: String(dto.addressId),
+    id: String(rawId),
     name: dto.name ?? "未設定",
-    nameKana: dto.nameKana ?? "",
-    postalCode: dto.postalCode,
-    prefecture: dto.prefecture,
-    city: dto.city,
-    address1: dto.addressLine1,
-    address2: dto.addressLine2 ?? undefined,
-    phone: dto.phoneNumber ?? "",
-    isDefault: dto.isDefault,
+    nameKana: dto.nameKana ?? dto.name_kana ?? "",
+    postalCode: dto.postalCode ?? dto.postal_code ?? "",
+    prefecture: dto.prefecture ?? "",
+    city: dto.city ?? "",
+    address1: dto.addressLine1 ?? dto.address_line1 ?? "",
+    address2: dto.addressLine2 ?? dto.address_line2 ?? undefined,
+    phone: dto.phoneNumber ?? dto.phone_number ?? "",
+    isDefault: dto.isDefault ?? dto.is_default ?? false,
   };
 }
 
