@@ -1,6 +1,7 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   SHIPPING_DAYS_OPTIONS,
@@ -10,10 +11,22 @@ import {
 import { validateStockFormInput } from "@/lib/market/stocks/validate-stock-form";
 import { buildNewStockRequest } from "@/service/market/stocks/mappers/build-new-stock-request";
 import { updateItem } from "@/service/market/stocks/update-item";
+import { getAddresses } from "@/service/user/addresses/get-addresses";
+import { mapUserAddressDtoToShippingAddress } from "@/service/user/addresses/mappers";
 import { useItemDraft } from "@/hooks/item/useItemDraft";
 import { useMultiImageUpload } from "@/hooks/item/useMultiImageUpload";
 import { useImageDropInput } from "@/hooks/item/use-image-drop-input";
 import { useStockCategories } from "@/hooks/market/stocks/use-stock-categories";
+
+type SenderAddressOption = {
+  id: string;
+  label: string;
+  prefectureId: number | null;
+};
+
+function normalizePrefectureName(name: string): string {
+  return name.trim().replace(/\s+/g, "");
+}
 
 export default function StockNewPage() {
   const router = useRouter();
@@ -40,7 +53,10 @@ export default function StockNewPage() {
 
   const [shippingDaysId, setShippingDaysId] = useState(1);
   const [shippingMethodId, setShippingMethodId] = useState(1);
-  const [prefectureId, setPrefectureId] = useState(13);
+  const [senderAddressOptions, setSenderAddressOptions] = useState<
+    SenderAddressOption[]
+  >([]);
+  const [selectedSenderAddressId, setSelectedSenderAddressId] = useState<string>("");
   const [shippingPayerType, setShippingPayerType] = useState(0); // 0:送料込み
   const [itemCondition, setItemCondition] = useState(0); // 0:新品
 
@@ -51,6 +67,37 @@ export default function StockNewPage() {
     handleFileSelect,
     openFileDialog,
   } = useImageDropInput({ addFiles });
+
+  useEffect(() => {
+    const fetchSenderAddresses = async () => {
+      try {
+        const response = await getAddresses("SENDER");
+        const mapped = response.addresses.map(mapUserAddressDtoToShippingAddress);
+        const options = mapped.map((address) => {
+          const matchedPrefecture = PREFECTURE_OPTIONS.find(
+            (prefecture) =>
+              normalizePrefectureName(prefecture.name) ===
+              normalizePrefectureName(address.prefecture),
+          );
+          return {
+            id: address.id,
+            label: `${address.prefecture}${address.city}${address.address1}${address.isDefault ? " (デフォルト)" : ""}`,
+            prefectureId: matchedPrefecture?.id ?? null,
+          };
+        });
+        setSenderAddressOptions(options);
+
+        const defaultAddress = mapped.find((address) => address.isDefault) || mapped[0];
+        if (defaultAddress) {
+          setSelectedSenderAddressId(defaultAddress.id);
+        }
+      } catch (err) {
+        console.error("Failed to fetch sender addresses", err);
+      }
+    };
+
+    void fetchSenderAddresses();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +137,18 @@ export default function StockNewPage() {
       return;
     }
 
+    const selectedSenderAddress = senderAddressOptions.find(
+      (address) => address.id === selectedSenderAddressId,
+    );
+    if (!selectedSenderAddress) {
+      setError("発送元住所を選択してください。");
+      return;
+    }
+    if (selectedSenderAddress.prefectureId == null) {
+      setError("発送元住所の都道府県を判定できません。住所設定を確認してください。");
+      return;
+    }
+
     setLoading(true);
     try {
       const payload = buildNewStockRequest({
@@ -99,7 +158,8 @@ export default function StockNewPage() {
         price,
         quantity,
         shippingPayerType,
-        prefectureId,
+        prefectureId: selectedSenderAddress.prefectureId,
+        shippingOriginAddressId: Number(selectedSenderAddressId),
         shippingDaysId,
         shippingMethodId,
         itemCondition,
@@ -315,19 +375,38 @@ export default function StockNewPage() {
 
             <div>
               <label className="block text-sm font-medium text-gray-900">
-                発送元の地域
+                発送元住所
               </label>
               <select
                 className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm"
-                value={prefectureId}
-                onChange={(e) => setPrefectureId(Number(e.target.value))}
+                value={selectedSenderAddressId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setSelectedSenderAddressId(selectedId);
+                }}
               >
-                {PREFECTURE_OPTIONS.map((p) => (
-                  <option key={p.id} value={p.id} className="text-gray-900">
-                    {p.name}
+                <option value="" className="text-gray-900">
+                  選択してください
+                </option>
+                {senderAddressOptions.map((address) => (
+                  <option
+                    key={address.id}
+                    value={address.id}
+                    className="text-gray-900"
+                  >
+                    {address.label}
                   </option>
                 ))}
               </select>
+              {senderAddressOptions.length === 0 && (
+                <p className="mt-2 text-xs text-amber-600">
+                  発送元住所が未登録です。
+                  <Link href="/settings/address/senderaddress" className="underline">
+                    住所設定ページ
+                  </Link>
+                  から登録してください。
+                </p>
+              )}
             </div>
 
             <div>

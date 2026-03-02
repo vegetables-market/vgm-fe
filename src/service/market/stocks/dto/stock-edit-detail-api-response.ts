@@ -13,6 +13,8 @@ export type StockEditDetailApiResponse = {
     shipping_payer_type?: number | string;
     shippingOriginArea?: number | string;
     shipping_origin_area?: number | string;
+    shippingOriginAddressId?: number | string | null;
+    shipping_origin_address_id?: number | string | null;
     shippingDaysId?: number | string;
     shipping_days_id?: number | string;
     shippingMethodId?: number | string;

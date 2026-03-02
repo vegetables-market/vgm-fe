@@ -6,6 +6,8 @@ import type { ShippingAddress } from "@/lib/types";
 import { getErrorMessage } from "@/lib/api/error-handler";
 import { getAddresses } from "@/service/user/addresses/get-addresses";
 import { createAddress } from "@/service/user/addresses/create-address";
+import { updateAddress } from "@/service/user/addresses/update-address";
+import { deleteAddress } from "@/service/user/addresses/delete-address";
 import {
   mapShippingAddressToUpsertRequestDto,
   mapUserAddressDtoToShippingAddress,
@@ -24,6 +26,9 @@ export function AddressSettingsPanel({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(
+    null,
+  );
 
   const loadAddresses = async () => {
     setIsLoading(true);
@@ -42,14 +47,49 @@ export function AddressSettingsPanel({
     void loadAddresses();
   }, [addressType]);
 
-  const handleAddAddress = async (newAddress: ShippingAddress) => {
+  const handleSaveAddress = async (newAddress: ShippingAddress) => {
     const requestDto = mapShippingAddressToUpsertRequestDto(newAddress);
+    if (editingAddress) {
+      const response = await updateAddress(
+        Number(editingAddress.id),
+        requestDto,
+        addressType,
+      );
+      const updated = mapUserAddressDtoToShippingAddress(response.address);
+      setAddresses((prev) =>
+        prev
+          .map((address) => (address.id === editingAddress.id ? updated : address))
+          .sort((a, b) => Number(b.isDefault) - Number(a.isDefault)),
+      );
+      return;
+    }
+
     const response = await createAddress(requestDto, addressType);
     const created = mapUserAddressDtoToShippingAddress(response.address);
-    setAddresses((prev) => {
-      const next = [...prev, created];
-      return next.sort((a, b) => Number(b.isDefault) - Number(a.isDefault));
-    });
+    setAddresses((prev) =>
+      [...prev, created].sort((a, b) => Number(b.isDefault) - Number(a.isDefault)),
+    );
+  };
+
+  const handleDeleteAddress = async (address: ShippingAddress) => {
+    const confirmed = window.confirm("この住所を削除しますか？");
+    if (!confirmed) return;
+    try {
+      await deleteAddress(Number(address.id), addressType);
+      setAddresses((prev) => prev.filter((a) => a.id !== address.id));
+    } catch (err: unknown) {
+      setError(getErrorMessage(err) || "住所の削除に失敗しました");
+    }
+  };
+
+  const openCreateModal = () => {
+    setEditingAddress(null);
+    setIsAddModalOpen(true);
+  };
+
+  const openEditModal = (address: ShippingAddress) => {
+    setEditingAddress(address);
+    setIsAddModalOpen(true);
   };
 
   return (
@@ -57,7 +97,7 @@ export function AddressSettingsPanel({
       <div className="mb-4 flex items-center justify-between">
         <p className="text-sm text-gray-500">{description}</p>
         <button
-          onClick={() => setIsAddModalOpen(true)}
+          onClick={openCreateModal}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
         >
           住所を追加
@@ -103,6 +143,24 @@ export function AddressSettingsPanel({
               {address.phone && (
                 <p className="mt-1 text-sm text-gray-500">{address.phone}</p>
               )}
+              <div className="mt-3 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => openEditModal(address)}
+                  className="rounded border border-gray-300 px-3 py-1 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  編集
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void handleDeleteAddress(address);
+                  }}
+                  className="rounded border border-red-200 px-3 py-1 text-xs text-red-600 hover:bg-red-50"
+                >
+                  削除
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -110,8 +168,14 @@ export function AddressSettingsPanel({
 
       <AddAddressModal
         isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onAdd={handleAddAddress}
+        onClose={() => {
+          setIsAddModalOpen(false);
+          setEditingAddress(null);
+        }}
+        onAdd={handleSaveAddress}
+        initialAddress={editingAddress}
+        title={editingAddress ? "住所を編集" : "新しい住所を追加"}
+        submitLabel={editingAddress ? "住所を更新する" : "住所を追加する"}
       />
     </div>
   );
