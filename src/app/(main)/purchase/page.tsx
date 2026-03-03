@@ -13,6 +13,7 @@ import {
 } from "@/lib/mockData";
 
 import { ShippingAddressSection } from "@/components/purchase/ShippingAddressSection";
+import { ShippingEstimateSection } from "@/components/purchase/ShippingEstimateSection";
 import { PaymentMethodSection } from "@/components/purchase/PaymentMethodSection";
 import { DeliveryPlaceSection } from "@/components/purchase/DeliveryPlaceSection";
 import { PaymentMethodSelectModal } from "@/components/purchase/PaymentMethodSelectModal";
@@ -183,6 +184,10 @@ function PurchaseContent() {
             <ShippingAddressSection
               address={selectedAddress}
               onChangeClick={() => setShowAddressModal(true)}
+            />
+            <ShippingEstimateSection
+              itemId={itemId ?? item.itemId}
+              selectedAddress={selectedAddress}
             />
 
             {/* 置き配の指定 */}
