@@ -284,6 +284,7 @@ export default function StockNewPage() {
             className="mt-1 block w-full rounded-md border border-gray-300 bg-white p-2 text-gray-900 shadow-sm focus:border-green-500 focus:ring-green-500"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            maxLength={50}
             required
           />
         </div>
@@ -297,6 +298,7 @@ export default function StockNewPage() {
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            maxLength={300}
             required
           />
         </div>

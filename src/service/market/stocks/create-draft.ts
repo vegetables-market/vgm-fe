@@ -7,9 +7,6 @@ export const createDraft = async (): Promise<CreateDraftResponse> => {
     `${API_ENDPOINTS.ITEMS}/draft`,
     {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
     },
   );
 

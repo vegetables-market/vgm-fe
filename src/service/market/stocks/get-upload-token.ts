@@ -5,8 +5,5 @@ import type { UploadTokenResponse } from "@/types/upload";
 export const getUploadToken = async (): Promise<UploadTokenResponse> => {
   return fetchApi<UploadTokenResponse>(`${API_ENDPOINTS.ITEMS}/upload-token`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
   });
 };
