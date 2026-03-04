@@ -11,7 +11,7 @@ export type ValidateStockFormInput = {
 };
 
 const MAX_ITEM_NAME_LENGTH = 50;
-const MAX_ITEM_DESCRIPTION_LENGTH = 300;
+const MAX_ITEM_DESCRIPTION_LENGTH = 1000;
 
 export function validateStockFormInput(
   input: ValidateStockFormInput,

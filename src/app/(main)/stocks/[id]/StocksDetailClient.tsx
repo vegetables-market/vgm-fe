@@ -136,6 +136,22 @@ export default function StocksDetailClient({ id }: { id: string }) {
     return `${baseUrl}/${cleanedPath}`;
   };
 
+  const wrapTextByChars = (text: string, charsPerLine: number) => {
+    return text
+      .split(/\r?\n/)
+      .map((line) => {
+        const chars = Array.from(line);
+        if (chars.length <= charsPerLine) return line;
+
+        const chunks: string[] = [];
+        for (let i = 0; i < chars.length; i += charsPerLine) {
+          chunks.push(chars.slice(i, i + charsPerLine).join(""));
+        }
+        return chunks.join("\n");
+      })
+      .join("\n");
+  };
+
   if (isLoading) {
     return <div className="loading">読み込み中...</div>;
   }
@@ -153,6 +169,9 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
   const { item } = stock;
   const relatedItems = stock.relatedItems;
+  const descriptionText = item.description?.trim()
+    ? wrapTextByChars(item.description, 50)
+    : "説明はありません";
 
   return (
     <div className="stock-detail-page">
@@ -219,7 +238,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
           <div className="stock-description">
             <h2>商品説明</h2>
-            <p>{item.description || "説明はありません"}</p>
+            <p>{descriptionText}</p>
           </div>
 
           <div className="stock-details">

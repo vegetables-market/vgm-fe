@@ -89,6 +89,12 @@ export default function StockPage() {
     }).format(price);
   };
 
+  const formatItemName = (name: string) => {
+    const chars = Array.from(name);
+    if (chars.length <= 10) return name;
+    return `${chars.slice(0, 10).join("")}…`;
+  };
+
   const getImageUrl = (filename: string | null) => {
     if (!filename) return "/images/no-image.png";
     if (filename.startsWith("http")) return filename;
@@ -181,7 +187,9 @@ export default function StockPage() {
                         />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                        <div className="text-sm font-medium text-gray-900" title={item.name}>
+                          {formatItemName(item.name)}
+                        </div>
                         <div className="text-sm text-gray-500">ID: {item.itemId}</div>
                       </div>
                     </div>

@@ -378,7 +378,7 @@ export default function StockEditClient({ id }: { id: string }) {
             rows={5}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            maxLength={300}
+            maxLength={1000}
             required
           />
         </div>
