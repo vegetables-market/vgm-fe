@@ -29,6 +29,9 @@ export function AddressSettingsPanel({
   const [editingAddress, setEditingAddress] = useState<ShippingAddress | null>(
     null,
   );
+  const canCreateAddress = !(
+    addressType === "SENDER" && addresses.length >= 1
+  );
 
   const loadAddresses = async () => {
     setIsLoading(true);
@@ -48,6 +51,11 @@ export function AddressSettingsPanel({
   }, [addressType]);
 
   const handleSaveAddress = async (newAddress: ShippingAddress) => {
+    if (!editingAddress && !canCreateAddress) {
+      setError("発送元住所は1件まで登録できます。既存住所を編集してください。");
+      throw new Error("Sender address limit reached");
+    }
+
     const requestDto = mapShippingAddressToUpsertRequestDto(newAddress);
     if (editingAddress) {
       const response = await updateAddress(
@@ -98,11 +106,18 @@ export function AddressSettingsPanel({
         <p className="text-sm text-gray-500">{description}</p>
         <button
           onClick={openCreateModal}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          disabled={!canCreateAddress}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           住所を追加
         </button>
       </div>
+
+      {!canCreateAddress && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+          発送元住所は1件のみ登録できます。追加ではなく既存住所を編集してください。
+        </div>
+      )}
 
       {isLoading ? (
         <div className="rounded-xl border border-gray-200 bg-white p-6 text-sm text-gray-500">

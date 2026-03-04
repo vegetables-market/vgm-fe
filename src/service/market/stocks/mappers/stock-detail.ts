@@ -7,7 +7,7 @@ export function mapStockDetail(raw: StockDetailApiResponse): StockDetail {
 
   return {
     item: {
-      itemId: Number(rawItem.itemId ?? rawItem.item_id ?? 0),
+      itemId: String(rawItem.itemId ?? rawItem.item_id ?? ""),
       title: rawItem.title ?? "",
       description: rawItem.description ?? null,
       price: Number(rawItem.price ?? 0),
@@ -44,7 +44,7 @@ export function mapStockDetail(raw: StockDetailApiResponse): StockDetail {
       updatedAt: rawItem.updatedAt ?? rawItem.updated_at ?? "",
     },
     relatedItems: rawRelatedItems.map((relatedItem) => ({
-      itemId: Number(relatedItem.itemId ?? relatedItem.item_id ?? 0),
+      itemId: String(relatedItem.itemId ?? relatedItem.item_id ?? ""),
       title: relatedItem.title ?? "",
       price: Number(relatedItem.price ?? 0),
       thumbnailUrl: relatedItem.thumbnailUrl ?? relatedItem.thumbnail_url ?? null,

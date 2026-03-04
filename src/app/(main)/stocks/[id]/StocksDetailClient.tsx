@@ -82,10 +82,11 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
     setIsProcessing(true);
     try {
+      const targetItemId = stock.item.itemId || id;
       await fetchApi("/v1/market/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item_id: stock.item.itemId, quantity: 1 }),
+        body: JSON.stringify({ item_id: targetItemId, quantity: 1 }),
         credentials: "include",
       });
       if (confirm("カートに追加しました。カートへ移動しますか？")) {
@@ -246,7 +247,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
                 {relatedItems.map((related, index) => (
                   <div
                     key={
-                      related.itemId > 0
+                      related.itemId
                         ? `related-item-${related.itemId}`
                         : `related-item-fallback-${index}`
                     }

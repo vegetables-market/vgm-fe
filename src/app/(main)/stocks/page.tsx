@@ -4,6 +4,21 @@ import { useStocksPage } from "@/hooks/market/stocks/use-stocks-page";
 import { formatStockPrice } from "@/lib/market/stocks/format-price";
 import { getStockImageUrl } from "@/lib/market/stocks/get-image-url";
 
+function getListingElapsedLabel(createdAt: string): string | null {
+  if (!createdAt) return null;
+
+  const createdDate = new Date(createdAt);
+  if (Number.isNaN(createdDate.getTime())) {
+    return null;
+  }
+
+  const now = new Date();
+  const diffMs = now.getTime() - createdDate.getTime();
+  const elapsedDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+  const dayCount = Math.max(1, elapsedDays);
+  return `出品されて${dayCount}日目！`;
+}
+
 export default function StocksPage() {
   const {
     keyword,
@@ -97,39 +112,43 @@ export default function StocksPage() {
       {!isLoading && (
         <>
           <div className="stocks-grid">
-            {result.items.map((stock) => (
-              <div
-                key={stock.itemId}
-                className="stock-card"
-                onClick={() => handleStockClick(stock.itemId)}
-              >
-                <div className="stock-image">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getStockImageUrl(
-                      stock.thumbnailUrl ?? stock.imageUrl,
-                    )}
-                    alt={stock.title}
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/no-image.png";
-                    }}
-                  />
-                </div>
-                <div className="stock-info">
-                  <h3 className="stock-title">{stock.title}</h3>
-                  <p className="stock-price">{formatStockPrice(stock.price)}</p>
-                  <div className="stock-meta">
-                    <span className="likes-count">♥ {stock.likesCount}</span>
-                    {stock.categoryName && (
-                      <span className="category">{stock.categoryName}</span>
-                    )}
+            {result.items.map((stock) => {
+              const elapsedLabel = getListingElapsedLabel(stock.createdAt);
+              return (
+                <div
+                  key={stock.itemId}
+                  className="stock-card"
+                  onClick={() => handleStockClick(stock.itemId)}
+                >
+                  {elapsedLabel && <p className="listing-elapsed">{elapsedLabel}</p>}
+                  <div className="stock-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getStockImageUrl(
+                        stock.thumbnailUrl ?? stock.imageUrl,
+                      )}
+                      alt={stock.title}
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/no-image.png";
+                      }}
+                    />
                   </div>
-                  <div className="seller-info">
-                    <span className="seller-name">{stock.seller.displayName}</span>
+                  <div className="stock-info">
+                    <h3 className="stock-title">{stock.title}</h3>
+                    <p className="stock-price">{formatStockPrice(stock.price)}</p>
+                    <div className="stock-meta">
+                      <span className="likes-count">♥ {stock.likesCount}</span>
+                      {stock.categoryName && (
+                        <span className="category">{stock.categoryName}</span>
+                      )}
+                    </div>
+                    <div className="seller-info">
+                      <span className="seller-name">{stock.seller.displayName}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* ページネーション */}
@@ -297,12 +316,28 @@ export default function StocksPage() {
         }
 
         .stock-card {
+          position: relative;
           background: #fff;
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .listing-elapsed {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          z-index: 2;
+          margin: 0;
+          border-radius: 999px;
+          background: rgba(22, 163, 74, 0.9);
+          color: #fff;
+          padding: 6px 10px;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1;
         }
 
         .stock-card:hover {
