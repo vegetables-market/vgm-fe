@@ -10,6 +10,9 @@ export function buildNewStockRequest(input: StockFormInput): NewStockRequestDto 
     quantity: Number(input.quantity),
     shipping_payer_type: input.shippingPayerType,
     shipping_origin_area: input.prefectureId,
+    ...(input.shippingOriginAddressId
+      ? { shipping_origin_address_id: input.shippingOriginAddressId }
+      : {}),
     shipping_days_id: input.shippingDaysId,
     shipping_method_id: input.shippingMethodId,
     item_condition: input.itemCondition,

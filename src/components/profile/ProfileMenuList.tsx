@@ -10,6 +10,7 @@ export function ProfileMenuList() {
   const menuItems: MenuItem[] = [
     { label: "注文履歴", href: "/orders" },
     { label: "プロフィール編集", href: "/profile/edit" },
+    { label: "住所設定", href: "/settings/address" },
     { label: "売上管理", href: "/sales" },
     { label: "お気に入り一覧", href: "/favorites" },
     { label: "設定", href: "/settings" },

@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ShippingAddress } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface AddAddressModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (address: ShippingAddress) => void;
+  onAdd: (address: ShippingAddress) => Promise<void> | void;
+  initialAddress?: ShippingAddress | null;
+  submitLabel?: string;
+  title?: string;
 }
 
 // 郵便番号API（zipcloud）のレスポンス型
@@ -29,8 +32,11 @@ export function AddAddressModal({
   isOpen,
   onClose,
   onAdd,
+  initialAddress = null,
+  submitLabel = "配送先を追加する",
+  title = "新しい配送先を追加",
 }: AddAddressModalProps) {
-  const [formData, setFormData] = useState({
+  const emptyFormData = {
     name: "",
     nameKana: "",
     postalCode: "",
@@ -39,6 +45,10 @@ export function AddAddressModal({
     address1: "",
     address2: "",
     phone: "",
+  };
+
+  const [formData, setFormData] = useState({
+    ...emptyFormData,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -46,6 +56,29 @@ export function AddAddressModal({
   const [addressSearchError, setAddressSearchError] = useState<string | null>(
     null,
   );
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (initialAddress) {
+      setFormData({
+        name: initialAddress.name,
+        nameKana: initialAddress.nameKana,
+        postalCode: initialAddress.postalCode,
+        prefecture: initialAddress.prefecture,
+        city: initialAddress.city,
+        address1: initialAddress.address1,
+        address2: initialAddress.address2 || "",
+        phone: initialAddress.phone,
+      });
+    } else {
+      setFormData({ ...emptyFormData });
+    }
+    setErrors({});
+    setAddressSearchError(null);
+    setSubmitError(null);
+  }, [isOpen, initialAddress]);
 
   const prefectures = [
     "北海道",
@@ -144,6 +177,7 @@ export function AddAddressModal({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setSubmitError(null);
     // エラーをクリア
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -183,13 +217,16 @@ export function AddAddressModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validate()) return;
 
+    setIsSubmitting(true);
+    setSubmitError(null);
+
     const newAddress: ShippingAddress = {
-      id: `addr_${Date.now()}`,
+      id: initialAddress?.id ?? `addr_${Date.now()}`,
       name: formData.name,
       nameKana: formData.nameKana,
       postalCode: formData.postalCode
@@ -200,24 +237,23 @@ export function AddAddressModal({
       address1: formData.address1,
       address2: formData.address2 || undefined,
       phone: formData.phone,
-      isDefault: false,
+      isDefault: initialAddress?.isDefault ?? false,
     };
 
-    onAdd(newAddress);
+    try {
+      await onAdd(newAddress);
 
-    // フォームをリセット
-    setFormData({
-      name: "",
-      nameKana: "",
-      postalCode: "",
-      prefecture: "",
-      city: "",
-      address1: "",
-      address2: "",
-      phone: "",
-    });
+      // フォームをリセット
+      setFormData({
+        ...emptyFormData,
+      });
 
-    onClose();
+      onClose();
+    } catch {
+      setSubmitError("住所の保存に失敗しました。時間をおいて再度お試しください。");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const inputClass = (field: string) =>
@@ -264,7 +300,7 @@ export function AddAddressModal({
                 </svg>
               </button>
               <h2 className="text-lg font-bold text-white">
-                新しい配送先を追加
+                {title}
               </h2>
               <div className="w-10" />
             </div>
@@ -464,11 +500,15 @@ export function AddAddressModal({
               </div>
 
               {/* 送信ボタン */}
+              {submitError && (
+                <p className="text-red-400 text-sm">{submitError}</p>
+              )}
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors mt-6"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg transition-colors mt-6 disabled:cursor-not-allowed disabled:bg-gray-600"
               >
-                配送先を追加する
+                {isSubmitting ? "保存中..." : submitLabel}
               </button>
             </form>
           </motion.div>

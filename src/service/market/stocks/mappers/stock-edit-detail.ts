@@ -17,6 +17,10 @@ export function mapStockEditDetail(raw: StockEditDetailApiResponse): StockEditDe
     quantity: Number(item.quantity ?? 1),
     shippingPayerType: Number(item.shippingPayerType ?? item.shipping_payer_type ?? 0),
     shippingOriginArea: Number(item.shippingOriginArea ?? item.shipping_origin_area ?? 13),
+    shippingOriginAddressId:
+      item.shippingOriginAddressId != null || item.shipping_origin_address_id != null
+        ? Number(item.shippingOriginAddressId ?? item.shipping_origin_address_id)
+        : null,
     shippingDaysId: Number(item.shippingDaysId ?? item.shipping_days_id ?? 1),
     shippingMethodId: Number(item.shippingMethodId ?? item.shipping_method_id ?? 1),
     itemCondition: Number(item.itemCondition ?? item.item_condition ?? 0),

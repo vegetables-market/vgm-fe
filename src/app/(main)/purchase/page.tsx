@@ -13,6 +13,7 @@ import {
 } from "@/lib/mockData";
 
 import { ShippingAddressSection } from "@/components/purchase/ShippingAddressSection";
+import { ShippingEstimateSection } from "@/components/purchase/ShippingEstimateSection";
 import { PaymentMethodSection } from "@/components/purchase/PaymentMethodSection";
 import { DeliveryPlaceSection } from "@/components/purchase/DeliveryPlaceSection";
 import { PaymentMethodSelectModal } from "@/components/purchase/PaymentMethodSelectModal";
@@ -23,6 +24,7 @@ import { PurchaseLoadingView } from "@/components/purchase/PurchaseLoadingView";
 import { PurchaseErrorView } from "@/components/purchase/PurchaseErrorView";
 import { PurchaseSuccessView } from "@/components/purchase/PurchaseSuccessView";
 import { PurchaseOrderSummary } from "@/components/purchase/PurchaseOrderSummary";
+import StripePaymentModal from "@/components/StripePaymentModal";
 import AuthGuard from "@/components/features/auth/AuthGuard";
 
 function PurchaseContent() {
@@ -42,6 +44,9 @@ function PurchaseContent() {
     showAddAddressModal,
     showPaymentModal,
     showPlaceModal,
+    showStripeModal,
+    stripeClientSecret,
+    stripeAmount,
     setSelectedAddress,
     setSelectedPayment,
     setSelectedDeliveryPlace,
@@ -49,6 +54,8 @@ function PurchaseContent() {
     setShowAddAddressModal,
     setShowPaymentModal,
     setShowPlaceModal,
+    handleStripeModalClose,
+    handleStripePaymentSuccess,
     handleAddAddress,
     handlePurchase,
   } = usePurchasePage(itemId);
@@ -184,6 +191,10 @@ function PurchaseContent() {
               address={selectedAddress}
               onChangeClick={() => setShowAddressModal(true)}
             />
+            <ShippingEstimateSection
+              itemId={itemId ?? item.itemId}
+              selectedAddress={selectedAddress}
+            />
 
             {/* 置き配の指定 */}
             <DeliveryPlaceSection
@@ -198,6 +209,10 @@ function PurchaseContent() {
               itemPrice={item.price}
               selectedPayment={selectedPayment}
               isProcessing={isProcessing}
+              canPurchase={Boolean(selectedAddress)}
+              disabledReason={
+                selectedAddress ? undefined : "住所が設定されていません"
+              }
               onPurchase={() => {
                 void handlePurchase();
               }}
@@ -219,7 +234,7 @@ function PurchaseContent() {
         isOpen={showAddressModal}
         onClose={() => setShowAddressModal(false)}
         addresses={addresses}
-        selectedAddressId={selectedAddress.id}
+        selectedAddressId={selectedAddress?.id ?? null}
         onSelect={setSelectedAddress}
         onAddNewClick={() => setShowAddAddressModal(true)}
       />
@@ -235,6 +250,17 @@ function PurchaseContent() {
         onClose={() => setShowPlaceModal(false)}
         selectedPlace={selectedDeliveryPlace}
         onSelect={setSelectedDeliveryPlace}
+      />
+
+      <StripePaymentModal
+        isOpen={showStripeModal && Boolean(stripeClientSecret)}
+        clientSecret={stripeClientSecret ?? ""}
+        amount={stripeAmount ?? item.price}
+        productName={item.title}
+        onClose={handleStripeModalClose}
+        onPaymentSuccess={(paymentIntentId) => {
+          void handleStripePaymentSuccess(paymentIntentId);
+        }}
       />
     </div>
   );

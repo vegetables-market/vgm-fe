@@ -10,6 +10,9 @@ export type ValidateStockFormInput = {
   requireImage?: boolean;
 };
 
+const MAX_ITEM_NAME_LENGTH = 50;
+const MAX_ITEM_DESCRIPTION_LENGTH = 1000;
+
 export function validateStockFormInput(
   input: ValidateStockFormInput,
 ): string | null {
@@ -29,8 +32,18 @@ export function validateStockFormInput(
     return "画像アップロードの完了を待ってください。";
   }
 
-  if (!input.name || !input.description || !input.price || !input.categoryId) {
+  if (!input.name.trim() || !input.description.trim() || !input.price || !input.categoryId) {
     return "必須項目を入力してください。";
+  }
+
+  const nameLength = Array.from(input.name.trim()).length;
+  if (nameLength > MAX_ITEM_NAME_LENGTH) {
+    return `商品名は${MAX_ITEM_NAME_LENGTH}文字以内で入力してください。`;
+  }
+
+  const descriptionLength = Array.from(input.description.trim()).length;
+  if (descriptionLength > MAX_ITEM_DESCRIPTION_LENGTH) {
+    return `商品の説明は${MAX_ITEM_DESCRIPTION_LENGTH}文字以内で入力してください。`;
   }
 
   return null;

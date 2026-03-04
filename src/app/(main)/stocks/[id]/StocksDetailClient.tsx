@@ -31,7 +31,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
       setStock(data);
       setIsLiked(data.item.isLiked);
     } catch (err) {
-      setError(getErrorMessage(err, "���i�̎擾�Ɏ��s���܂���"));
+      setError(getErrorMessage(err, "商品の取得に失敗しました"));
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +73,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
         });
       }
     } catch (err) {
-      alert(getErrorMessage(err, "���C�ɓ��葀��Ɏ��s���܂���"));
+      alert(getErrorMessage(err, "お気に入り操作に失敗しました"));
     }
   };
 
@@ -82,17 +82,18 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
     setIsProcessing(true);
     try {
+      const targetItemId = stock.item.itemId || id;
       await fetchApi("/v1/market/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ item_id: stock.item.itemId, quantity: 1 }),
+        body: JSON.stringify({ item_id: targetItemId, quantity: 1 }),
         credentials: "include",
       });
-      if (confirm("�J�[�g�ɒǉ����܂����B�J�[�g�ֈړ����܂����H")) {
+      if (confirm("カートに追加しました。カートへ移動しますか？")) {
         router.push("/basket");
       }
     } catch (err) {
-      alert(getErrorMessage(err, "�J�[�g�ւ̒ǉ��Ɏ��s���܂���"));
+      alert(getErrorMessage(err, "カートへの追加に失敗しました"));
     } finally {
       setIsProcessing(false);
     }
@@ -111,18 +112,18 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
   const getConditionText = (condition: number) => {
     const conditions = [
-      "�V�i",
-      "���g�p�ɋ߂�",
-      "�ڗ��������≘��Ȃ�",
-      "��⏝�≘�ꂠ��",
-      "���≘�ꂠ��",
-      "�S�̓I�ɏ�Ԃ�����",
+      "新品",
+      "未使用に近い",
+      "目立った傷や汚れなし",
+      "やや傷や汚れあり",
+      "傷や汚れあり",
+      "全体的に状態が悪い",
     ];
-    return conditions[condition] || "�s��";
+    return conditions[condition] || "不明";
   };
 
   const getShippingText = (type: number) => {
-    return type === 0 ? "�������݁i�o�i�ҕ��S�j" : "�������i�w���ҕ��S�j";
+    return type === 0 ? "送料込み（出品者負担）" : "着払い（購入者負担）";
   };
 
   const getImageUrl = (raw: string | null | undefined) => {
@@ -135,16 +136,32 @@ export default function StocksDetailClient({ id }: { id: string }) {
     return `${baseUrl}/${cleanedPath}`;
   };
 
+  const wrapTextByChars = (text: string, charsPerLine: number) => {
+    return text
+      .split(/\r?\n/)
+      .map((line) => {
+        const chars = Array.from(line);
+        if (chars.length <= charsPerLine) return line;
+
+        const chunks: string[] = [];
+        for (let i = 0; i < chars.length; i += charsPerLine) {
+          chunks.push(chars.slice(i, i + charsPerLine).join(""));
+        }
+        return chunks.join("\n");
+      })
+      .join("\n");
+  };
+
   if (isLoading) {
-    return <div className="loading">�ǂݍ��ݒ�...</div>;
+    return <div className="loading">読み込み中...</div>;
   }
 
   if (error || !stock) {
     return (
       <div className="error-page">
-        <p>{error || "���i��������܂���ł���"}</p>
+        <p>{error || "商品が見つかりませんでした"}</p>
         <button onClick={() => router.push("/stocks")} className="back-button">
-          ���i�ꗗ�ɖ߂�
+          商品一覧に戻る
         </button>
       </div>
     );
@@ -152,6 +169,9 @@ export default function StocksDetailClient({ id }: { id: string }) {
 
   const { item } = stock;
   const relatedItems = stock.relatedItems;
+  const descriptionText = item.description?.trim()
+    ? wrapTextByChars(item.description, 50)
+    : "説明はありません";
 
   return (
     <div className="stock-detail-page">
@@ -162,7 +182,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
               // eslint-disable-next-line @next/next/no-img-element
               <img src={getImageUrl(item.images[selectedImage].imageUrl)} alt={item.title} />
             ) : (
-              <div className="no-image">�摜�Ȃ�</div>
+              <div className="no-image">画像なし</div>
             )}
           </div>
           {item.images.length > 1 && (
@@ -190,7 +210,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
           <p className="stock-price">{formatPrice(item.price)}</p>
 
           <div className="stock-meta">
-            <span className="likes-count">? {item.likesCount}</span>
+            <span className="likes-count">♥ {item.likesCount}</span>
             {item.categoryName && <span className="category">{item.categoryName}</span>}
           </div>
 
@@ -200,7 +220,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
               className={`purchase-button ${item.quantity <= 0 ? "sold-out" : ""}`}
               disabled={item.quantity <= 0}
             >
-              {item.quantity <= 0 ? "����؂�" : "�w������"}
+              {item.quantity <= 0 ? "売り切れ" : "購入する"}
             </button>
 
             <button
@@ -208,45 +228,45 @@ export default function StocksDetailClient({ id }: { id: string }) {
               className="cart-button"
               disabled={item.quantity <= 0 || isProcessing}
             >
-              {isProcessing ? "������..." : "�J�[�g�ɒǉ�"}
+              {isProcessing ? "処理中..." : "カートに追加"}
             </button>
           </div>
 
           <button onClick={handleToggleFavorite} className={`favorite-button ${isLiked ? "liked" : ""}`}>
-            {isLiked ? "? ���C�ɓ������" : "? ���C�ɓ���"}
+            {isLiked ? "♥ お気に入り解除" : "♡ お気に入り"}
           </button>
 
           <div className="stock-description">
-            <h2>���i����</h2>
-            <p>{item.description || "�����͂���܂���"}</p>
+            <h2>商品説明</h2>
+            <p>{descriptionText}</p>
           </div>
 
           <div className="stock-details">
-            <h2>���i�ڍ�</h2>
+            <h2>商品詳細</h2>
             <dl>
-              <dt>�J�e�S���[</dt>
-              <dd>{item.categoryName || "���ݒ�"}</dd>
-              <dt>���</dt>
+              <dt>カテゴリ</dt>
+              <dd>{item.categoryName || "未設定"}</dd>
+              <dt>状態</dt>
               <dd>{getConditionText(item.condition)}</dd>
-              <dt>�u�����h</dt>
-              <dd>{item.brand || "���ݒ�"}</dd>
-              <dt>�d��</dt>
-              <dd>{item.weight ? `${item.weight}g` : "���ݒ�"}</dd>
-              <dt>����</dt>
+              <dt>ブランド</dt>
+              <dd>{item.brand || "未設定"}</dd>
+              <dt>重量</dt>
+              <dd>{item.weight ? `${item.weight}g` : "未設定"}</dd>
+              <dt>送料</dt>
               <dd>{getShippingText(item.shippingPayerType)}</dd>
-              <dt>�݌�</dt>
+              <dt>在庫</dt>
               <dd>{item.quantity}</dd>
             </dl>
           </div>
 
           {relatedItems.length > 0 && (
             <div className="related-section">
-              <h2>�֘A���i</h2>
+              <h2>関連商品</h2>
               <div className="related-grid">
                 {relatedItems.map((related, index) => (
                   <div
                     key={
-                      related.itemId > 0
+                      related.itemId
                         ? `related-item-${related.itemId}`
                         : `related-item-fallback-${index}`
                     }
@@ -258,7 +278,7 @@ export default function StocksDetailClient({ id }: { id: string }) {
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={getImageUrl(related.thumbnailUrl)} alt={related.title} />
                       ) : (
-                        <div className="no-image">�摜�Ȃ�</div>
+                        <div className="no-image">画像なし</div>
                       )}
                     </div>
                     <div className="related-info">

@@ -48,7 +48,7 @@ export const SETTINGS_NAVIGATION_ITEMS: SettingsNavigationItem[] = [
         iconBgColor: "bg-pink-400",
     },
     {
-        href: "/settings/shipping",
+        href: "/settings/address",
         label: "配送設定",
         icon: FaTruck,
         iconBgColor: "bg-indigo-400",

@@ -7,7 +7,7 @@ interface AddressSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
   addresses: ShippingAddress[];
-  selectedAddressId: string;
+  selectedAddressId: string | null;
   onSelect: (address: ShippingAddress) => void;
   onAddNewClick: () => void;
 }
@@ -76,50 +76,56 @@ export function AddressSelectModal({
 
             <div className="p-4 space-y-4">
               {/* 住所リスト */}
-              {addresses.map((address) => (
-                <label
-                  key={address.id}
-                  className={`block p-4 rounded-lg border-2 cursor-pointer transition-colors ${
-                    selectedAddressId === address.id
-                      ? "border-blue-500 bg-blue-900/20"
-                      : "border-gray-700 hover:border-gray-600"
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="radio"
-                      name="address"
-                      checked={selectedAddressId === address.id}
-                      onChange={() => handleSelect(address)}
-                      className="w-5 h-5 accent-blue-500 mt-1"
-                    />
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-center gap-2">
-                        <p className="text-white font-medium">{address.name}</p>
-                        {address.isDefault && (
-                          <span className="bg-gray-700 text-gray-300 text-xs px-2 py-0.5 rounded">
-                            デフォルト
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-400 text-sm">
-                        〒{address.postalCode}
-                      </p>
-                      <p className="text-gray-400 text-sm">
-                        {address.prefecture}
-                        {address.city}
-                        {address.address1}
-                      </p>
-                      {address.address2 && (
+              {addresses.length === 0 ? (
+                <div className="rounded-lg border border-gray-700 bg-gray-800/60 p-4 text-sm text-gray-300">
+                  住所が設定されていません
+                </div>
+              ) : (
+                addresses.map((address) => (
+                  <label
+                    key={address.id}
+                    className={`block p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                      selectedAddressId === address.id
+                        ? "border-blue-500 bg-blue-900/20"
+                        : "border-gray-700 hover:border-gray-600"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="radio"
+                        name="address"
+                        checked={selectedAddressId === address.id}
+                        onChange={() => handleSelect(address)}
+                        className="w-5 h-5 accent-blue-500 mt-1"
+                      />
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-white font-medium">{address.name}</p>
+                          {address.isDefault && (
+                            <span className="bg-gray-700 text-gray-300 text-xs px-2 py-0.5 rounded">
+                              デフォルト
+                            </span>
+                          )}
+                        </div>
                         <p className="text-gray-400 text-sm">
-                          {address.address2}
+                          〒{address.postalCode}
                         </p>
-                      )}
-                      <p className="text-gray-400 text-sm">{address.phone}</p>
+                        <p className="text-gray-400 text-sm">
+                          {address.prefecture}
+                          {address.city}
+                          {address.address1}
+                        </p>
+                        {address.address2 && (
+                          <p className="text-gray-400 text-sm">
+                            {address.address2}
+                          </p>
+                        )}
+                        <p className="text-gray-400 text-sm">{address.phone}</p>
+                      </div>
                     </div>
-                  </div>
-                </label>
-              ))}
+                  </label>
+                ))
+              )}
 
               {/* 新しい住所を追加 */}
               <button

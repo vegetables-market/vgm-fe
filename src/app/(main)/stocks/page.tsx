@@ -4,6 +4,21 @@ import { useStocksPage } from "@/hooks/market/stocks/use-stocks-page";
 import { formatStockPrice } from "@/lib/market/stocks/format-price";
 import { getStockImageUrl } from "@/lib/market/stocks/get-image-url";
 
+function getListingElapsedLabel(createdAt: string): string | null {
+  if (!createdAt) return null;
+
+  const createdDate = new Date(createdAt);
+  if (Number.isNaN(createdDate.getTime())) {
+    return null;
+  }
+
+  const now = new Date();
+  const diffMs = now.getTime() - createdDate.getTime();
+  const elapsedDays = Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1;
+  const dayCount = Math.max(1, elapsedDays);
+  return `出品されて${dayCount}日目！`;
+}
+
 export default function StocksPage() {
   const {
     keyword,
@@ -25,10 +40,10 @@ export default function StocksPage() {
   return (
     <div className="stocks-page">
       <div className="page-header">
-        <h1 className="page-title">蝨ｨ蠎ｫ讀懃ｴ｢</h1>
+        <h1 className="page-title">在庫検索</h1>
       </div>
 
-      {/* 讀懃ｴ｢繝舌・ */}
+      {/* 検索バー */}
       <div className="search-section">
         <div className="search-bar">
           <input
@@ -36,32 +51,32 @@ export default function StocksPage() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="蝨ｨ蠎ｫ繧呈､懃ｴ｢..."
+            placeholder="在庫を検索..."
             className="search-input"
           />
           <button onClick={handleSearch} className="search-button">
-            讀懃ｴ｢
+            検索
           </button>
         </div>
 
-        {/* 繝輔ぅ繝ｫ繧ｿ繝ｼ */}
+        {/* フィルター */}
         <div className="filters">
           <div className="filter-group">
-            <label>萓｡譬ｼ遽・峇</label>
+            <label>価格範囲</label>
             <div className="price-range">
               <input
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                placeholder="譛菴惹ｾ｡譬ｼ"
+                placeholder="最低価格"
                 className="price-input"
               />
-              <span>?</span>
+              <span>〜</span>
               <input
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                placeholder="譛鬮倅ｾ｡譬ｼ"
+                placeholder="最高価格"
                 className="price-input"
               />
             </div>
@@ -82,57 +97,61 @@ export default function StocksPage() {
           </div>
 
           <button onClick={handleSearch} className="filter-apply-button">
-            驕ｩ逕ｨ
+            適用
           </button>
         </div>
       </div>
 
-      {/* 繧ｨ繝ｩ繝ｼ陦ｨ遉ｺ */}
+      {/* エラー表示 */}
       {error && <div className="error-box">{error}</div>}
 
-      {/* 繝ｭ繝ｼ繝・ぅ繝ｳ繧ｰ */}
-      {isLoading && <div className="loading">隱ｭ縺ｿ霎ｼ縺ｿ荳ｭ...</div>}
+      {/* ローディング */}
+      {isLoading && <div className="loading">読み込み中...</div>}
 
-      {/* 蝠・刀荳隕ｧ */}
+      {/* 商品一覧 */}
       {!isLoading && (
         <>
           <div className="stocks-grid">
-            {result.items.map((stock) => (
-              <div
-                key={stock.itemId}
-                className="stock-card"
-                onClick={() => handleStockClick(stock.itemId)}
-              >
-                <div className="stock-image">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={getStockImageUrl(
-                      stock.thumbnailUrl ?? stock.imageUrl,
-                    )}
-                    alt={stock.title}
-                    onError={(e) => {
-                      e.currentTarget.src = "/images/no-image.png";
-                    }}
-                  />
-                </div>
-                <div className="stock-info">
-                  <h3 className="stock-title">{stock.title}</h3>
-                  <p className="stock-price">{formatStockPrice(stock.price)}</p>
-                  <div className="stock-meta">
-                    <span className="likes-count">笙･ {stock.likesCount}</span>
-                    {stock.categoryName && (
-                      <span className="category">{stock.categoryName}</span>
-                    )}
+            {result.items.map((stock) => {
+              const elapsedLabel = getListingElapsedLabel(stock.createdAt);
+              return (
+                <div
+                  key={stock.itemId}
+                  className="stock-card"
+                  onClick={() => handleStockClick(stock.itemId)}
+                >
+                  {elapsedLabel && <p className="listing-elapsed">{elapsedLabel}</p>}
+                  <div className="stock-image">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={getStockImageUrl(
+                        stock.thumbnailUrl ?? stock.imageUrl,
+                      )}
+                      alt={stock.title}
+                      onError={(e) => {
+                        e.currentTarget.src = "/images/no-image.png";
+                      }}
+                    />
                   </div>
-                  <div className="seller-info">
-                    <span className="seller-name">{stock.seller.displayName}</span>
+                  <div className="stock-info">
+                    <h3 className="stock-title">{stock.title}</h3>
+                    <p className="stock-price">{formatStockPrice(stock.price)}</p>
+                    <div className="stock-meta">
+                      <span className="likes-count">♥ {stock.likesCount}</span>
+                      {stock.categoryName && (
+                        <span className="category">{stock.categoryName}</span>
+                      )}
+                    </div>
+                    <div className="seller-info">
+                      <span className="seller-name">{stock.seller.displayName}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
-          {/* 繝壹・繧ｸ繝阪・繧ｷ繝ｧ繝ｳ */}
+          {/* ページネーション */}
           {result.pagination.totalPages > 1 && (
             <div className="pagination">
               <button
@@ -140,7 +159,7 @@ export default function StocksPage() {
                 disabled={result.pagination.page === 1}
                 className="pagination-button"
               >
-                蜑阪∈
+                前へ
               </button>
               <span className="pagination-info">
                 {result.pagination.page} / {result.pagination.totalPages}
@@ -150,14 +169,14 @@ export default function StocksPage() {
                 disabled={result.pagination.page === result.pagination.totalPages}
                 className="pagination-button"
               >
-                谺｡縺ｸ
+                次へ
               </button>
             </div>
           )}
 
           {result.items.length === 0 && !isLoading && (
             <div className="no-results">
-              <p>蝨ｨ蠎ｫ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ縺ｧ縺励◆</p>
+              <p>在庫が見つかりませんでした</p>
             </div>
           )}
         </>
@@ -297,12 +316,28 @@ export default function StocksPage() {
         }
 
         .stock-card {
+          position: relative;
           background: #fff;
           border-radius: 12px;
           overflow: hidden;
           cursor: pointer;
           transition: transform 0.2s, box-shadow 0.2s;
           box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .listing-elapsed {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          z-index: 2;
+          margin: 0;
+          border-radius: 999px;
+          background: rgba(22, 163, 74, 0.9);
+          color: #fff;
+          padding: 6px 10px;
+          font-size: 11px;
+          font-weight: 700;
+          line-height: 1;
         }
 
         .stock-card:hover {
