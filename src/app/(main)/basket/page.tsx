@@ -84,6 +84,12 @@ function BasketContent() {
     return `${baseUrl}/${url}`;
   };
 
+  const formatItemName = (name: string) => {
+    const chars = Array.from(name);
+    if (chars.length <= 10) return name;
+    return `${chars.slice(0, 10).join("")}…`;
+  };
+
   if (isLoading) {
     return <div className="p-8 text-center text-gray-500">読み込み中...</div>;
   }
@@ -136,8 +142,9 @@ function BasketContent() {
               <Link
                 href={`/stocks/${item.itemId}`}
                 className="text-lg font-bold text-gray-800 hover:text-red-500"
+                title={item.name}
               >
-                {item.name}
+                {formatItemName(item.name)}
               </Link>
               <p className="mt-1 font-bold text-red-500">
                 ¥{item.price.toLocaleString()}
