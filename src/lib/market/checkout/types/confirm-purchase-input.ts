@@ -1,4 +1,4 @@
-export type CreateOrderInput = {
+export type ConfirmPurchaseInput = {
   itemId: string;
   quantity: number;
   shippingName: string;

@@ -24,6 +24,7 @@ import { PurchaseLoadingView } from "@/components/purchase/PurchaseLoadingView";
 import { PurchaseErrorView } from "@/components/purchase/PurchaseErrorView";
 import { PurchaseSuccessView } from "@/components/purchase/PurchaseSuccessView";
 import { PurchaseOrderSummary } from "@/components/purchase/PurchaseOrderSummary";
+import StripePaymentModal from "@/components/StripePaymentModal";
 import AuthGuard from "@/components/features/auth/AuthGuard";
 
 function PurchaseContent() {
@@ -43,6 +44,9 @@ function PurchaseContent() {
     showAddAddressModal,
     showPaymentModal,
     showPlaceModal,
+    showStripeModal,
+    stripeClientSecret,
+    stripeAmount,
     setSelectedAddress,
     setSelectedPayment,
     setSelectedDeliveryPlace,
@@ -50,6 +54,8 @@ function PurchaseContent() {
     setShowAddAddressModal,
     setShowPaymentModal,
     setShowPlaceModal,
+    handleStripeModalClose,
+    handleStripePaymentSuccess,
     handleAddAddress,
     handlePurchase,
   } = usePurchasePage(itemId);
@@ -244,6 +250,17 @@ function PurchaseContent() {
         onClose={() => setShowPlaceModal(false)}
         selectedPlace={selectedDeliveryPlace}
         onSelect={setSelectedDeliveryPlace}
+      />
+
+      <StripePaymentModal
+        isOpen={showStripeModal && Boolean(stripeClientSecret)}
+        clientSecret={stripeClientSecret ?? ""}
+        amount={stripeAmount ?? item.price}
+        productName={item.title}
+        onClose={handleStripeModalClose}
+        onPaymentSuccess={(paymentIntentId) => {
+          void handleStripePaymentSuccess(paymentIntentId);
+        }}
       />
     </div>
   );

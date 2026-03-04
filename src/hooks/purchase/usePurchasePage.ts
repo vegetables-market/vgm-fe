@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { getErrorMessage } from "@/lib/api/error-handler";
-import { resolvePaymentMethod } from "@/lib/market/orders/resolve-payment-method";
+import { resolvePaymentMethod } from "@/lib/market/checkout/resolve-payment-method";
 import type { StockDetail } from "@/lib/market/stocks/types/stock-detail";
-import { confirmPurchase } from "@/service/market/orders/confirm-purchase";
+import {
+  completeCheckoutPayment,
+  startCheckout,
+} from "@/service/market/checkout/confirm-purchase";
 import { getStockDetail } from "@/service/market/stocks/get-stock-detail";
 import {
   DEFAULT_DELIVERY_PLACE,
@@ -34,6 +37,9 @@ type UsePurchasePageResult = {
   showAddAddressModal: boolean;
   showPaymentModal: boolean;
   showPlaceModal: boolean;
+  showStripeModal: boolean;
+  stripeClientSecret: string | null;
+  stripeAmount: number | null;
   setSelectedAddress: (value: ShippingAddress | null) => void;
   setSelectedPayment: (value: PaymentMethod) => void;
   setSelectedDeliveryPlace: (value: DeliveryPlaceOption) => void;
@@ -41,6 +47,8 @@ type UsePurchasePageResult = {
   setShowAddAddressModal: (value: boolean) => void;
   setShowPaymentModal: (value: boolean) => void;
   setShowPlaceModal: (value: boolean) => void;
+  handleStripeModalClose: () => void;
+  handleStripePaymentSuccess: (paymentIntentId: string) => Promise<void>;
   handleAddAddress: (newAddress: ShippingAddress) => Promise<void>;
   handlePurchase: () => Promise<void>;
 };
@@ -65,6 +73,10 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
   const [showAddAddressModal, setShowAddAddressModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPlaceModal, setShowPlaceModal] = useState(false);
+  const [showStripeModal, setShowStripeModal] = useState(false);
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [stripeAmount, setStripeAmount] = useState<number | null>(null);
+  const [pendingOrderId, setPendingOrderId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!itemId) {
@@ -130,7 +142,8 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
 
     setIsProcessing(true);
     try {
-      await confirmPurchase({
+      const paymentMethod = resolvePaymentMethod(selectedPayment);
+      const checkout = await startCheckout({
         itemId: stock.item.itemId,
         quantity: 1,
         shippingName: selectedAddress.name,
@@ -139,7 +152,23 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
         shippingCity: selectedAddress.city,
         shippingAddressLine1: selectedAddress.address1,
         shippingAddressLine2: selectedAddress.address2 || null,
-        paymentMethod: resolvePaymentMethod(selectedPayment),
+        paymentMethod,
+      });
+
+      if (selectedPayment.type === "credit_card") {
+        if (!checkout.clientSecret) {
+          throw new Error("カード決済の準備に失敗しました。時間をおいて再試行してください。");
+        }
+
+        setPendingOrderId(checkout.orderId);
+        setStripeClientSecret(checkout.clientSecret);
+        setStripeAmount(checkout.totalAmount);
+        setShowStripeModal(true);
+        return;
+      }
+
+      await completeCheckoutPayment(checkout.orderId, {
+        paymentMethod,
       });
       setIsPurchased(true);
     } catch (err: unknown) {
@@ -147,6 +176,34 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const handleStripePaymentSuccess = async (paymentIntentId: string) => {
+    if (pendingOrderId == null) {
+      alert("注文情報が失われました。もう一度購入手続きをやり直してください。");
+      return;
+    }
+
+    setIsProcessing(true);
+    try {
+      await completeCheckoutPayment(pendingOrderId, {
+        paymentMethod: resolvePaymentMethod(selectedPayment),
+        paymentIntentId,
+      });
+      setShowStripeModal(false);
+      setStripeClientSecret(null);
+      setStripeAmount(null);
+      setPendingOrderId(null);
+      setIsPurchased(true);
+    } catch (err: unknown) {
+      alert(getErrorMessage(err) || "決済確定に失敗しました");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleStripeModalClose = () => {
+    setShowStripeModal(false);
   };
 
   return {
@@ -163,6 +220,9 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
     showAddAddressModal,
     showPaymentModal,
     showPlaceModal,
+    showStripeModal,
+    stripeClientSecret,
+    stripeAmount,
     setSelectedAddress,
     setSelectedPayment,
     setSelectedDeliveryPlace,
@@ -170,6 +230,8 @@ export function usePurchasePage(itemId: string | null): UsePurchasePageResult {
     setShowAddAddressModal,
     setShowPaymentModal,
     setShowPlaceModal,
+    handleStripeModalClose,
+    handleStripePaymentSuccess,
     handleAddAddress,
     handlePurchase,
   };
