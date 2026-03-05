@@ -67,7 +67,10 @@ export function useChallengeResend({
       if (maskedEmail) params.set("masked_email", maskedEmail);
       if (verificationType === "email_mfa" && token) params.set("token", token);
 
-      const newUrl = withRedirectTo(`/challenge?${params.toString()}`, redirectTo);
+      const newUrl = withRedirectTo(
+        `/challenge?${params.toString()}`,
+        redirectTo,
+      );
       router.replace(newUrl);
     } catch (err: unknown) {
       if (isResendLimitExceededError(err)) {

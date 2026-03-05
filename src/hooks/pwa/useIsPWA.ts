@@ -7,8 +7,12 @@ export function useIsPWA(initialState: boolean = false) {
 
   useEffect(() => {
     // スタンドアロンモード（PWAとしてインストールされているか）のチェック
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-    const isFullscreen = window.matchMedia("(display-mode: fullscreen)").matches;
+    const isStandalone = window.matchMedia(
+      "(display-mode: standalone)",
+    ).matches;
+    const isFullscreen = window.matchMedia(
+      "(display-mode: fullscreen)",
+    ).matches;
     const isMinimalUi = window.matchMedia("(display-mode: minimal-ui)").matches;
 
     // iOS Safari用のチェック
@@ -16,7 +20,8 @@ export function useIsPWA(initialState: boolean = false) {
     const isIOSStandalone = window.navigator.standalone === true;
 
     // いずれかのモードならPWAとみなす
-    const result = isStandalone || isFullscreen || isMinimalUi || isIOSStandalone;
+    const result =
+      isStandalone || isFullscreen || isMinimalUi || isIOSStandalone;
     setIsPWA(result);
 
     // Cookieに保存 (有効期限: 1年)
@@ -27,4 +32,3 @@ export function useIsPWA(initialState: boolean = false) {
 
   return isPWA;
 }
-

@@ -4,7 +4,7 @@ import { Suspense } from "react";
 export default function PasswordRecoveryPage() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-         <PasswordRecoveryContainer />
+      <PasswordRecoveryContainer />
     </Suspense>
   );
 }

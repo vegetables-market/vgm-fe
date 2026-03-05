@@ -5,7 +5,9 @@ export interface UserAgentInfo {
   original: string;
 }
 
-export const parseUserAgent = (userAgent: string | null | undefined): UserAgentInfo => {
+export const parseUserAgent = (
+  userAgent: string | null | undefined,
+): UserAgentInfo => {
   if (!userAgent) {
     return {
       os: "Unknown",

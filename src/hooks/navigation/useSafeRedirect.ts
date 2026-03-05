@@ -19,4 +19,3 @@ export function useSafeRedirect() {
 
   return { pushRedirect, replaceRedirect };
 }
-

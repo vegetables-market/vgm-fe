@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { Elements } from '@stripe/react-stripe-js';
-import { getStripe } from '@/lib/stripe';
-import PaymentForm from './PaymentForm';
+import { useEffect } from "react";
+import { Elements } from "@stripe/react-stripe-js";
+import { getStripe } from "@/lib/stripe";
+import PaymentForm from "./PaymentForm";
 
 interface StripePaymentModalProps {
   isOpen: boolean;
@@ -25,20 +25,20 @@ export default function StripePaymentModal({
   // Escキーで閉じる
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
       // モーダル表示中はスクロール無効化
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isOpen, onClose]);
 
@@ -51,7 +51,7 @@ export default function StripePaymentModal({
   };
 
   const handleError = (error: string) => {
-    console.error('決済エラー:', error);
+    console.error("決済エラー:", error);
     // エラーはPaymentForm内で表示されるため、ここでは何もしない
   };
 
@@ -59,16 +59,19 @@ export default function StripePaymentModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+      className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black p-4"
       onClick={handleBackdropClick}
       role="dialog"
       aria-modal="true"
       aria-labelledby="payment-modal-title"
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-xl">
         {/* ヘッダー */}
         <div className="border-b border-gray-200 p-6">
-          <h2 id="payment-modal-title" className="text-2xl font-bold text-gray-800">
+          <h2
+            id="payment-modal-title"
+            className="text-2xl font-bold text-gray-800"
+          >
             決済情報の入力
           </h2>
           <button
@@ -77,7 +80,7 @@ export default function StripePaymentModal({
             aria-label="閉じる"
           >
             <svg
-              className="w-6 h-6"
+              className="h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -93,7 +96,7 @@ export default function StripePaymentModal({
         </div>
 
         {/* 商品情報 */}
-        <div className="bg-gray-50 p-6 border-b border-gray-200">
+        <div className="border-b border-gray-200 bg-gray-50 p-6">
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-sm text-gray-600">商品名</span>
@@ -115,9 +118,9 @@ export default function StripePaymentModal({
             options={{
               clientSecret,
               appearance: {
-                theme: 'stripe',
+                theme: "stripe",
                 variables: {
-                  colorPrimary: '#2563eb',
+                  colorPrimary: "#2563eb",
                 },
               },
             }}
@@ -133,7 +136,7 @@ export default function StripePaymentModal({
         </div>
 
         {/* フッター（注意事項） */}
-        <div className="bg-gray-50 p-6 border-t border-gray-200">
+        <div className="border-t border-gray-200 bg-gray-50 p-6">
           <p className="text-xs text-gray-500">
             このサイトはStripeによって保護されており、カード情報は安全に処理されます。
           </p>

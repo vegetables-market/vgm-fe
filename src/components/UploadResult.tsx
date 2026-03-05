@@ -22,7 +22,7 @@ export default function UploadResult({ fileName, onReset }: Props) {
       {/* ファイル名表示 */}
       <div className="rounded-lg border bg-gray-50 p-4">
         <h3 className="mb-2 font-semibold">アップロードされたファイル:</h3>
-        <code className="break-all text-sm">{fileName}</code>
+        <code className="text-sm break-all">{fileName}</code>
       </div>
 
       {/* R2から取得した画像 */}
@@ -32,7 +32,7 @@ export default function UploadResult({ fileName, onReset }: Props) {
         <img
           src={`${mediaUrl}/${fileName}?format=jpg`}
           alt="Uploaded Result"
-          className="max-w-full border rounded bg-white"
+          className="max-w-full rounded border bg-white"
         />
       </div>
 

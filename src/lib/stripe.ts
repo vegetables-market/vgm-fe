@@ -5,7 +5,7 @@
  * 再レンダリングによる重複ロードを防ぐ
  */
 
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe, Stripe } from "@stripe/stripe-js";
 
 // Stripeインスタンスのキャッシュ
 let stripePromise: Promise<Stripe | null> | null = null;
@@ -24,16 +24,16 @@ export const getStripe = (): Promise<Stripe | null> => {
 
     if (!key) {
       console.error(
-        'NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEYが設定されていません。\n' +
-        'vgm-fe/.env.localファイルにStripe Publishable Keyを設定してください。'
+        "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEYが設定されていません。\n" +
+          "vgm-fe/.env.localファイルにStripe Publishable Keyを設定してください。",
       );
       return Promise.resolve(null);
     }
 
-    if (!key.startsWith('pk_')) {
+    if (!key.startsWith("pk_")) {
       console.error(
-        'Stripe Publishable Keyの形式が正しくありません。\n' +
-        'Publishable Keyは "pk_test_" または "pk_live_" で始まる必要があります。'
+        "Stripe Publishable Keyの形式が正しくありません。\n" +
+          'Publishable Keyは "pk_test_" または "pk_live_" で始まる必要があります。',
       );
       return Promise.resolve(null);
     }

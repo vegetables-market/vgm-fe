@@ -158,10 +158,7 @@ export function useOtpDigitInput({
 
         case "Enter":
           e.preventDefault();
-          if (
-            digitsRef.current.join("").length === length &&
-            onComplete
-          ) {
+          if (digitsRef.current.join("").length === length && onComplete) {
             onComplete();
           }
           break;

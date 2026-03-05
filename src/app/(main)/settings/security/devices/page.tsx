@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { fetchApi } from "@/lib/api/fetch";
 import { parseUserAgent } from "@/lib/utils/user-agent";
-import { 
-  FaWindows, 
-  FaApple, 
-  FaAndroid, 
-  FaLinux, 
+import {
+  FaWindows,
+  FaApple,
+  FaAndroid,
+  FaLinux,
   FaDesktop,
-  FaChevronRight
+  FaChevronRight,
 } from "react-icons/fa6";
 import Link from "next/link";
 
@@ -100,24 +100,33 @@ export default function DevicesPage() {
 
   const getOsIcon = (os: string) => {
     switch (os) {
-      case "Windows": return <FaWindows className="text-xl" />;
-      case "macOS": return <FaApple className="text-xl" />;
-      case "iOS": return <FaApple className="text-xl" />;
-      case "Android": return <FaAndroid className="text-xl" />;
-      case "Linux": return <FaLinux className="text-xl" />;
-      default: return <FaDesktop className="text-xl" />;
+      case "Windows":
+        return <FaWindows className="text-xl" />;
+      case "macOS":
+        return <FaApple className="text-xl" />;
+      case "iOS":
+        return <FaApple className="text-xl" />;
+      case "Android":
+        return <FaAndroid className="text-xl" />;
+      case "Linux":
+        return <FaLinux className="text-xl" />;
+      default:
+        return <FaDesktop className="text-xl" />;
     }
   };
 
   const otherSessionsCount = sessions.filter((s) => !s.isCurrent).length;
 
   // OSごとにセッションをグルーピング
-  const groupedSessions = sessions.reduce((groups, session) => {
-    const { os } = parseUserAgent(session.deviceInfo);
-    if (!groups[os]) groups[os] = [];
-    groups[os].push(session);
-    return groups;
-  }, {} as Record<string, SessionInfo[]>);
+  const groupedSessions = sessions.reduce(
+    (groups, session) => {
+      const { os } = parseUserAgent(session.deviceInfo);
+      if (!groups[os]) groups[os] = [];
+      groups[os].push(session);
+      return groups;
+    },
+    {} as Record<string, SessionInfo[]>,
+  );
 
   // OSの表示順序を定義 (必要であれば)
   const sortedOsKeys = Object.keys(groupedSessions).sort();
@@ -136,11 +145,11 @@ export default function DevicesPage() {
       <div className="space-y-8">
         {sortedOsKeys.map((os) => (
           <div key={os} id={`os-${os}`} className="scroll-mt-24">
-            <h2 className="text-lg font-bold mb-3 flex items-center gap-2 text-gray-800 border-b pb-2">
+            <h2 className="mb-3 flex items-center gap-2 border-b pb-2 text-lg font-bold text-gray-800">
               <span className="text-gray-500">{getOsIcon(os)}</span>
               {os} デバイス
             </h2>
-            
+
             <div className="session-list">
               {groupedSessions[os].map((session) => {
                 const device = parseUserAgent(session.deviceInfo);
@@ -148,31 +157,38 @@ export default function DevicesPage() {
                   <Link
                     key={session.sessionId}
                     href={`/settings/security/devices/detail?sessionId=${session.sessionId}`}
-                    className={`session-item ${session.isCurrent ? "current" : ""} block hover:bg-gray-50 transition-colors cursor-pointer group`}
+                    className={`session-item ${session.isCurrent ? "current" : ""} group block cursor-pointer transition-colors hover:bg-gray-50`}
                   >
-                    <div className="flex items-center gap-4 w-full">
-                      <div className="session-icon">
-                        {getOsIcon(device.os)}
-                      </div>
+                    <div className="flex w-full items-center gap-4">
+                      <div className="session-icon">{getOsIcon(device.os)}</div>
                       <div className="session-info flex-1">
                         <div className="session-header">
                           <span className="session-device">
-                            {device.browser} {device.deviceType !== "desktop" ? `(${device.deviceType})` : ""}
+                            {device.browser}{" "}
+                            {device.deviceType !== "desktop"
+                              ? `(${device.deviceType})`
+                              : ""}
                           </span>
                           {session.isCurrent && (
-                            <span className="badge current">現在のデバイス</span>
+                            <span className="badge current">
+                              現在のデバイス
+                            </span>
                           )}
                         </div>
                         <div className="session-details">
-                          {session.ipAddress && <span>IP: {session.ipAddress}</span>}
+                          {session.ipAddress && (
+                            <span>IP: {session.ipAddress}</span>
+                          )}
                           <span>ログイン: {formatDate(session.createdAt)}</span>
                           {!session.isCurrent && session.lastActiveAt && (
-                             <span>最終アクセス: {formatDate(session.lastActiveAt)}</span>
+                            <span>
+                              最終アクセス: {formatDate(session.lastActiveAt)}
+                            </span>
                           )}
                         </div>
                       </div>
-                      <div className="text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <FaChevronRight className="w-4 h-4" />
+                      <div className="text-gray-400 opacity-0 transition-opacity group-hover:opacity-100">
+                        <FaChevronRight className="h-4 w-4" />
                       </div>
                     </div>
                   </Link>
@@ -184,9 +200,9 @@ export default function DevicesPage() {
       </div>
 
       {sessions.length === 0 && !isLoading && (
-          <div className="text-center py-8 text-gray-500">
-              ログイン中のデバイスはありません
-          </div>
+        <div className="py-8 text-center text-gray-500">
+          ログイン中のデバイスはありません
+        </div>
       )}
 
       {/* 一括ログアウト */}
@@ -281,7 +297,7 @@ export default function DevicesPage() {
         }
 
         .session-info {
-          min-width: 0; 
+          min-width: 0;
         }
 
         .session-header {

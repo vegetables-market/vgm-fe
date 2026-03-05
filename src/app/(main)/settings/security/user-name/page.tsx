@@ -29,7 +29,7 @@ export default function UserNameChangePage() {
   const fetchProfileInfo = async () => {
     try {
       const data = await fetchApi<ProfileInfo>("/v1/user/account/me", {
-        credentials: "include"
+        credentials: "include",
       });
       setProfileInfo(data);
       setNewUsername(data.username);
@@ -62,26 +62,27 @@ export default function UserNameChangePage() {
     setIsLoading(true);
 
     try {
-      const result = await fetchApi<{ success: boolean; message: string; username: string }>(
-        "/v1/user/account/username",
-        {
-          method: "PUT",
-          credentials: "include",
-          body: JSON.stringify({
-            newUsername,
-            password: profileInfo?.hasPassword ? password : null
-          })
-        }
-      );
+      const result = await fetchApi<{
+        success: boolean;
+        message: string;
+        username: string;
+      }>("/v1/user/account/username", {
+        method: "PUT",
+        credentials: "include",
+        body: JSON.stringify({
+          newUsername,
+          password: profileInfo?.hasPassword ? password : null,
+        }),
+      });
 
       setSuccess("ユーザー名を変更しました");
       setPassword("");
-      
+
       // AuthContextのユーザー情報を更新
       if (user) {
         updateUser({ ...user, username: result.username });
       }
-      
+
       // プロフィール情報を更新
       fetchProfileInfo();
     } catch (err: any) {
@@ -94,7 +95,9 @@ export default function UserNameChangePage() {
   return (
     <div className="username-page">
       <h1 className="page-title">ユーザー名変更</h1>
-      <p className="page-subtitle">ログインに使用するユーザー名を変更できます</p>
+      <p className="page-subtitle">
+        ログインに使用するユーザー名を変更できます
+      </p>
 
       <form onSubmit={handleSubmit} className="username-form">
         {error && <div className="error-box">{error}</div>}
@@ -117,7 +120,9 @@ export default function UserNameChangePage() {
             minLength={3}
             maxLength={20}
           />
-          <p className="input-hint">英数字とアンダースコア(_)のみ使用できます</p>
+          <p className="input-hint">
+            英数字とアンダースコア(_)のみ使用できます
+          </p>
         </div>
 
         {profileInfo?.hasPassword && (

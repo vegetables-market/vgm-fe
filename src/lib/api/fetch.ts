@@ -110,7 +110,7 @@ const url = `${apiUrl}/api${cleanEndpoint.startsWith("/") ? cleanEndpoint : `/${
           // Handle both camelCase and snake_case
           if (errorData.errorCode) errorCode = errorData.errorCode;
           else if (errorData.error_code) errorCode = errorData.error_code;
-          
+
           if (errorData.details) details = errorData.details;
         }
       } catch {
@@ -121,19 +121,19 @@ const url = `${apiUrl}/api${cleanEndpoint.startsWith("/") ? cleanEndpoint : `/${
       if (response.status === 401) {
         // 自動ログアウトを除外するエラーコード
         const ignoreAutoLogoutCodes = [
-          "AUTH_INVALID_CREDENTIALS", 
-          "AUTH_ACCOUNT_LOCKED", 
+          "AUTH_INVALID_CREDENTIALS",
+          "AUTH_ACCOUNT_LOCKED",
           "AUTH_FIREBASE_ERROR",
-          "AUTH_CODE_INVALID"
+          "AUTH_CODE_INVALID",
         ];
-        
+
         // エラーコードが特定できない、または除外リストに含まれない場合は自動ログアウト
         if (!errorCode || !ignoreAutoLogoutCodes.includes(errorCode)) {
           addLog("[API Error] 401 Unauthorized - Auto logout");
           handleUnauthorized();
           // セッション切れの場合はデフォルトメッセージにする（混乱を防ぐため）
           if (!errorCode) {
-             throw new ApiError(401, "Session expired", "UNAUTHORIZED");
+            throw new ApiError(401, "Session expired", "UNAUTHORIZED");
           }
         }
       }

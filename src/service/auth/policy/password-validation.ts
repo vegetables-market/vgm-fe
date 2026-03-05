@@ -20,4 +20,3 @@ export function validatePassword(
     isValid: hasLetter && hasNumberOrSpecialChar && isLengthValid,
   };
 }
-

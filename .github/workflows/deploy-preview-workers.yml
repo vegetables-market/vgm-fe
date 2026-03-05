@@ -96,14 +96,14 @@ jobs:
         run: |
           echo "=== Checking .open-next directory ==="
           ls -la .open-next/ || echo ".open-next directory not found"
-          
+
           echo "=== Checking for worker.js ==="
           if [ -f .open-next/worker.js ]; then
             echo "worker.js found"
           else
             echo "worker.js NOT found"
           fi
-          
+
           echo "=== Checking wrangler.jsonc ==="
           if [ -f wrangler.jsonc ]; then
             echo "wrangler.jsonc found:"
@@ -118,5 +118,3 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config wrangler.jsonc --name ${{ vars.WORKERS_PREVIEW_PROJECT_NAME }}
-
-

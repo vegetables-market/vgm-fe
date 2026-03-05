@@ -44,22 +44,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("theme", theme);
   }, [theme, mounted]);
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  const toggleTheme = async () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+
+      // ① 先にフロント側の状態を更新
+    setTheme(newTheme);
+
+      // ② DB に保存（0 = light, 1 = dark）
+    try {
+      await fetch("http://localhost:8080/api/user/theme", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          theme: newTheme === "dark" ? 1 : 0,
+        }),
+        credentials: "include", // 認証が必要なら
+      });
+    } catch (err) {
+      console.error("テーマ保存に失敗:", err);
+    }
   };
-
-  // Prevent hydration issues by rendering Provider always, but maybe with default values?
-  // Actually, we can just render the provider. The 'theme' state defaults to 'light', which matches server.
-  // The useEffect handles the update.
-  // The early return `if (!mounted) return <>{children}</>` was causing the issue because it stripped the Provider.
-
-  // We still want to avoid rendering mismatches if possible, but providing context is essential.
-  // So we just remove the early return.
-
-  if (!mounted) {
-    // 初期表示時は常にlightとしてProviderを提供 (フックがエラーにならないように)
-    // ただし、useEffectが走るまでクラス適用などはされない
-  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
@@ -67,6 +71,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     </ThemeContext.Provider>
   );
 }
+
+
 
 export const useTheme = () => {
   const context = useContext(ThemeContext);

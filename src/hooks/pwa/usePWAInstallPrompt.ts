@@ -134,15 +134,12 @@ export function usePWAInstallPrompt(options?: PWAInstallPromptOptions) {
       return;
     }
 
-    const t = window.setTimeout(() => setShowIOSHint(true), resolved.iosDelayMs);
+    const t = window.setTimeout(
+      () => setShowIOSHint(true),
+      resolved.iosDelayMs,
+    );
     return () => window.clearTimeout(t);
-  }, [
-    deferredPrompt,
-    dismissed,
-    isIOS,
-    isStandalone,
-    resolved.iosDelayMs,
-  ]);
+  }, [deferredPrompt, dismissed, isIOS, isStandalone, resolved.iosDelayMs]);
 
   useEffect(() => {
     if (!window.isSecureContext) {
@@ -210,4 +207,3 @@ export function usePWAInstallPrompt(options?: PWAInstallPromptOptions) {
 
   return { variant, install, dismiss };
 }
-

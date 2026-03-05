@@ -23,13 +23,19 @@ export default function VerificationInput({
   className,
   autoComplete,
 }: VerificationInputProps) {
-  const { digits, setInputRef, handleChange, handleKeyDown, handlePaste, handleFocus } =
-    useOtpDigitInput({
-      length: OTP_LENGTH,
-      value,
-      onChange,
-      onComplete: onEnter,
-    });
+  const {
+    digits,
+    setInputRef,
+    handleChange,
+    handleKeyDown,
+    handlePaste,
+    handleFocus,
+  } = useOtpDigitInput({
+    length: OTP_LENGTH,
+    value,
+    onChange,
+    onComplete: onEnter,
+  });
 
   return (
     <div

@@ -15,4 +15,3 @@ export const getApiUrl = (): string => {
 export const getMediaUrl = (): string => {
   return process.env.NEXT_PUBLIC_MEDIA_URL || "http://localhost:8787";
 };
-
